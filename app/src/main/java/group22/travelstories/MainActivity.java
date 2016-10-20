@@ -24,6 +24,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,6 +99,19 @@ public class MainActivity extends AppCompatActivity {
                         Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
                         System.out.println((float) lastKnownLocation.getLatitude());
                         System.out.println((float) lastKnownLocation.getLongitude());
+                        float lat = (float) lastKnownLocation.getLatitude();
+                        float lon = (float) lastKnownLocation.getLongitude();
+
+                        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.info);
+                        TextView valueTV = new TextView(MainActivity.this);
+                        valueTV.setText("[" + lat +", "+lon+"]");
+                        valueTV.setLayoutParams(new Toolbar.LayoutParams(
+                                Toolbar.LayoutParams.FILL_PARENT,
+                                Toolbar.LayoutParams.WRAP_CONTENT));
+
+                        ((LinearLayout) linearLayout).addView(valueTV);
+
+
                     } catch (SecurityException e){
                         System.out.println(e);
                     }
@@ -103,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     @Override
