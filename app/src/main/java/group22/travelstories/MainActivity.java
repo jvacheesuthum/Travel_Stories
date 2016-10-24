@@ -7,8 +7,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -62,24 +60,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
 
-        final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        final String locationProvider = LocationManager.GPS_PROVIDER;
-        // Define a listener that responds to location updates
-        final LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                // Called when a new location is found by the network location provider.
-                System.out.println("location changed!");
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            public void onProviderEnabled(String provider) {
-            }
-
-            public void onProviderDisabled(String provider) {
-            }
-        };
 
         buttonLoadImage.setOnClickListener(new View.OnClickListener() {
 
@@ -102,40 +82,41 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 Hi x = new Hi();
                 x.say();
+                addLocationToInfoLayout();
 
-                if (!provider.contains("gps")) { //if gps is disabled
-                    final Intent poke = new Intent();
-                    poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-                    poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
-                    poke.setData(Uri.parse("3"));
-                    sendBroadcast(poke);
-                    System.out.println("no gps");
-                }
-
-                if (provider.contains("gps")) {
-                    System.out.println("yes gps");
-                    try {
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-                        Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-                        System.out.println((float) lastKnownLocation.getLatitude());
-                        System.out.println((float) lastKnownLocation.getLongitude());
-                        float lat = (float) lastKnownLocation.getLatitude();
-                        float lon = (float) lastKnownLocation.getLongitude();
-
-                        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.info);
-                        TextView valueTV = new TextView(MainActivity.this);
-                        valueTV.setText("[" + lat + ", " + lon + "]");
-                        valueTV.setLayoutParams(new Toolbar.LayoutParams(
-                                Toolbar.LayoutParams.FILL_PARENT,
-                                Toolbar.LayoutParams.WRAP_CONTENT));
-
-                        ((LinearLayout) linearLayout).addView(valueTV);
-
-
-                    } catch (SecurityException e) {
-                        System.out.println(e);
-                    }
-                }
+//                if (!provider.contains("gps")) { //if gps is disabled
+//                    final Intent poke = new Intent();
+//                    poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+//                    poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+//                    poke.setData(Uri.parse("3"));
+//                    sendBroadcast(poke);
+//                    System.out.println("no gps");
+//                }
+//
+//                if (provider.contains("gps")) {
+//                    System.out.println("yes gps");
+//                    try {
+//                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+//                        Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+//                        System.out.println((float) lastKnownLocation.getLatitude());
+//                        System.out.println((float) lastKnownLocation.getLongitude());
+//                        float lat = (float) lastKnownLocation.getLatitude();
+//                        float lon = (float) lastKnownLocation.getLongitude();
+//
+//                        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.info);
+//                        TextView valueTV = new TextView(MainActivity.this);
+//                        valueTV.setText("[" + lat + ", " + lon + "]");
+//                        valueTV.setLayoutParams(new Toolbar.LayoutParams(
+//                                Toolbar.LayoutParams.FILL_PARENT,
+//                                Toolbar.LayoutParams.WRAP_CONTENT));
+//
+//                        ((LinearLayout) linearLayout).addView(valueTV);
+//
+//
+//                    } catch (SecurityException e) {
+//                        System.out.println(e);
+//                    }
+//                }
 
             }
         });
@@ -208,6 +189,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             System.out.println(String.valueOf(mLastLocation.getLongitude()));
             System.out.println("---play service---");
         }
+    }
+
+    public void addLocationToInfoLayout(){
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.info);
+        TextView valueTV = new TextView(MainActivity.this);
+        valueTV.setText("[" + mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude() + "]");
+        valueTV.setLayoutParams(new Toolbar.LayoutParams(
+                Toolbar.LayoutParams.FILL_PARENT,
+                Toolbar.LayoutParams.WRAP_CONTENT));
+
+        ((LinearLayout) linearLayout).addView(valueTV);
     }
 
     @Override
