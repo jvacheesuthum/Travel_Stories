@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -27,9 +29,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +46,18 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+        mGoogleApiClient.connect();
+        //
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
@@ -53,11 +71,14 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("location changed!");
             }
 
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
 
-            public void onProviderEnabled(String provider) {}
+            public void onProviderEnabled(String provider) {
+            }
 
-            public void onProviderDisabled(String provider) {}
+            public void onProviderDisabled(String provider) {
+            }
         };
 
         buttonLoadImage.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(i, RESULT_LOAD_IMAGE);
             }
         });
-
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -92,19 +112,19 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println("no gps");
                 }
 
-                if(provider.contains("gps")){
+                if (provider.contains("gps")) {
                     System.out.println("yes gps");
                     try {
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                         Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
                         System.out.println((float) lastKnownLocation.getLatitude());
                         System.out.println((float) lastKnownLocation.getLongitude());
                         float lat = (float) lastKnownLocation.getLatitude();
                         float lon = (float) lastKnownLocation.getLongitude();
 
-                        LinearLayout linearLayout = (LinearLayout)findViewById(R.id.info);
+                        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.info);
                         TextView valueTV = new TextView(MainActivity.this);
-                        valueTV.setText("[" + lat +", "+lon+"]");
+                        valueTV.setText("[" + lat + ", " + lon + "]");
                         valueTV.setLayoutParams(new Toolbar.LayoutParams(
                                 Toolbar.LayoutParams.FILL_PARENT,
                                 Toolbar.LayoutParams.WRAP_CONTENT));
@@ -112,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                         ((LinearLayout) linearLayout).addView(valueTV);
 
 
-                    } catch (SecurityException e){
+                    } catch (SecurityException e) {
                         System.out.println(e);
                     }
                 }
@@ -128,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
             Cursor cursor = getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
@@ -165,5 +185,38 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            System.out.println("PERMISSION CHECK fails at onConnected function");
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            System.out.println("---play service---");
+            System.out.println(String.valueOf(mLastLocation.getLatitude()));
+            System.out.println(String.valueOf(mLastLocation.getLongitude()));
+            System.out.println("---play service---");
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }
