@@ -26,16 +26,24 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
+    private LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +62,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     .addApi(LocationServices.API)
                     .build();
         }
-        mGoogleApiClient.connect();
-        //
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
@@ -170,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        System.out.println("on connected called");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -181,8 +189,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             System.out.println("PERMISSION CHECK fails at onConnected function");
             return;
         }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
             System.out.println("---play service---");
             System.out.println(String.valueOf(mLastLocation.getLatitude()));
@@ -191,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    public void addLocationToInfoLayout(){
+    public void addLocationToInfoLayout() {
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.info);
         TextView valueTV = new TextView(MainActivity.this);
         valueTV.setText("[" + mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude() + "]");
@@ -211,4 +218,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+    protected void onStart() {
+        System.out.println("on start called");
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        System.out.println("on stop called");
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+
+
 }
+
+
