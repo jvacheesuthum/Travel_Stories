@@ -3,6 +3,7 @@ package group22.travelstories;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
@@ -31,19 +32,24 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     private LocationRequest mLocationRequest;
+    private boolean mRequestingLocationUpdates = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     .addApi(LocationServices.API)
                     .build();
         }
+        createLocationRequest();
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -90,40 +97,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Hi x = new Hi();
                 x.say();
                 addLocationToInfoLayout();
-
-//                if (!provider.contains("gps")) { //if gps is disabled
-//                    final Intent poke = new Intent();
-//                    poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-//                    poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
-//                    poke.setData(Uri.parse("3"));
-//                    sendBroadcast(poke);
-//                    System.out.println("no gps");
-//                }
-//
-//                if (provider.contains("gps")) {
-//                    System.out.println("yes gps");
-//                    try {
-//                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-//                        Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-//                        System.out.println((float) lastKnownLocation.getLatitude());
-//                        System.out.println((float) lastKnownLocation.getLongitude());
-//                        float lat = (float) lastKnownLocation.getLatitude();
-//                        float lon = (float) lastKnownLocation.getLongitude();
-//
-//                        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.info);
-//                        TextView valueTV = new TextView(MainActivity.this);
-//                        valueTV.setText("[" + lat + ", " + lon + "]");
-//                        valueTV.setLayoutParams(new Toolbar.LayoutParams(
-//                                Toolbar.LayoutParams.FILL_PARENT,
-//                                Toolbar.LayoutParams.WRAP_CONTENT));
-//
-//                        ((LinearLayout) linearLayout).addView(valueTV);
-//
-//
-//                    } catch (SecurityException e) {
-//                        System.out.println(e);
-//                    }
-//                }
 
             }
         });
@@ -178,6 +151,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(Bundle connectionHint) {
         System.out.println("on connected called");
+
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -231,8 +209,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onStop();
     }
 
+    protected void createLocationRequest() {
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+    }
+
+    protected void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+    }
 
 
+    @Override
+    public void onLocationChanged(Location location) {
+        System.out.println("location changed!");
+        mLastLocation = location;
+    }
 }
 
 
