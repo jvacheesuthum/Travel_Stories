@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         createLocationRequest();
 
         ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
-        trackToggle.setText("start tracking");
         trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
