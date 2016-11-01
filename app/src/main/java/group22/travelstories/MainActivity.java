@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
                 Hi x = new Hi();
                 x.say();
-                //addLocationToInfoLayout();
+                addLocationToInfoLayout("click");
 
             }
         });
@@ -205,10 +205,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
     }
 
-    public void addLocationToInfoLayout() {
+    public void addLocationToInfoLayout(String message) {
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.info);
         TextView valueTV = new TextView(MainActivity.this);
-        valueTV.setText("[" + mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude() + "]");
+        valueTV.setText("[" + mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude() + "]" + message);
         valueTV.setLayoutParams(new Toolbar.LayoutParams(
                 Toolbar.LayoutParams.FILL_PARENT,
                 Toolbar.LayoutParams.WRAP_CONTENT));
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onLocationChanged(Location location) {
         System.out.println("location changed!");
 
-        addLocationToInfoLayout(); // just to test
+        addLocationToInfoLayout("no click"); // just to test
 
         mLastLocation = location;
 
