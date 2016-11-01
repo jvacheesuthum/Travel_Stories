@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
 
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251:1080");
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080");
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
