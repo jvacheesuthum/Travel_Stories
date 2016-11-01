@@ -20,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.Time;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,6 +44,13 @@ import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
+
 public class MainActivity extends AppCompatActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
@@ -50,6 +58,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     Location mLastLocation;
     private LocationRequest mLocationRequest;
     private boolean mRequestingLocationUpdates = true;
+    private List<TimeLineEntry> timeLine;
+    TimeLineEntry currentTimeLineEntry;
+
+    // create a Pacific Standard Time time zone
+    SimpleTimeZone pdt;
+    private long thresholdDuration = 60 * 1000; // 5 minutes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +83,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     .build();
         }
         createLocationRequest();
+        timeLine = new ArrayList<>();
+
+        // get the supported ids for GMT-08:00 (Pacific Standard Time)
+        String[] ids = TimeZone.getAvailableIDs(-8 * 60 * 60 * 1000);
+        // if no ids were returned, something is wrong. get out.
+        if (ids.length == 0)
+            System.exit(0);
+        // create a Pacific Standard Time time zone
+        pdt = new SimpleTimeZone(-8 * 60 * 60 * 1000, ids[0]);
+        // set up rules for Daylight Saving Time
+        pdt.setStartRule(Calendar.APRIL, 1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
+        pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
+
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -173,6 +200,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             System.out.println(String.valueOf(mLastLocation.getLatitude()));
             System.out.println(String.valueOf(mLastLocation.getLongitude()));
             System.out.println("---play service---");
+            GregorianCalendar currentTime = new GregorianCalendar(pdt);
+            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
         }
     }
 
@@ -236,6 +265,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onLocationChanged(Location location) {
         System.out.println("location changed!");
         mLastLocation = location;
+
+        GregorianCalendar currentTime = new GregorianCalendar(pdt);
+        if(currentTimeLineEntry.nearLocation(mLastLocation)){
+            System.out.println("it's near; time: " + currentTime.getTime());
+            currentTimeLineEntry.updatesEndTime(currentTime);
+
+        } else {
+            System.out.println("it's far : duration "+ currentTimeLineEntry.getDuration());
+            System.out.println("threshold duration " + thresholdDuration);
+            if(currentTimeLineEntry.getDuration() > thresholdDuration){
+                System.out.println("add");
+                timeLine.add(currentTimeLineEntry);
+            }
+            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
+        }
+        //check if location changed
+
     }
 }
 
