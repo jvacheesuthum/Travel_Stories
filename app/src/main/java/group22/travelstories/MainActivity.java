@@ -44,6 +44,7 @@ import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private boolean mRequestingLocationUpdates = true;
     private List<TimeLineEntry> timeLine;
     TimeLineEntry currentTimeLineEntry;
+
+    Client TravelServerWSClient;
 
     // create a Pacific Standard Time time zone
     SimpleTimeZone pdt;
@@ -97,6 +100,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
 
 
+        try {
+            TravelServerWSClient = new Client("http://cloud-vm-46-251:1080");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
@@ -124,7 +132,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 Hi x = new Hi();
                 x.say();
                 addLocationToInfoLayout("click");
-
+                try {
+                    TravelServerWSClient.connectBlocking();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                TravelServerWSClient.send("hihihi");
+                //close?
             }
         });
 
