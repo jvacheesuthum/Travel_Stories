@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
                 Hi x = new Hi();
                 x.say();
-                addLocationToInfoLayout();
+                //addLocationToInfoLayout();
 
             }
         });
@@ -264,6 +264,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onLocationChanged(Location location) {
         System.out.println("location changed!");
+
+        addLocationToInfoLayout(); // just to test
+
         mLastLocation = location;
 
         GregorianCalendar currentTime = new GregorianCalendar(pdt);
