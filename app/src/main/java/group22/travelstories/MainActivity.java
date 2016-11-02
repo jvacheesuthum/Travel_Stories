@@ -185,15 +185,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             System.out.println("PERMISSION CHECK fails at onConnected function");
             return;
         }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            System.out.println("---play service---");
-            System.out.println(String.valueOf(mLastLocation.getLatitude()));
-            System.out.println(String.valueOf(mLastLocation.getLongitude()));
-            System.out.println("---play service---");
-            GregorianCalendar currentTime = new GregorianCalendar(pdt);
-            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
-        }
+        //mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+//        if (mLastLocation != null) {
+//            System.out.println("---play service---");
+//            System.out.println(String.valueOf(mLastLocation.getLatitude()));
+//            System.out.println(String.valueOf(mLastLocation.getLongitude()));
+//            System.out.println("---play service---");
+////            GregorianCalendar currentTime = new GregorianCalendar(pdt);
+////            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
+//        }
     }
 
     public void addLocationToInfoLayout(String message) {
@@ -256,9 +256,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onLocationChanged(Location location) {
         System.out.println("location changed!");
 
-        //addLocationToInfoLayout("no click"); // just to test
 
         mLastLocation = location;
+        addLocationToInfoLayout("no click");
+
+        //first time when the app starts -> startLocationUpdates called -> new location received
+        // -> onLocationChanged triggered.
+        if(currentTimeLineEntry == null) {
+            GregorianCalendar currentTime = new GregorianCalendar(pdt);
+            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
+            return;
+        }
 
         GregorianCalendar currentTime = new GregorianCalendar(pdt);
         if(currentTimeLineEntry.nearLocation(mLastLocation)){
