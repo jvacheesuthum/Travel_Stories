@@ -39,6 +39,7 @@ import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.SimpleTimeZone;
@@ -57,6 +58,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     // create a Pacific Standard Time time zone
     SimpleTimeZone pdt;
     private long thresholdDuration = 60 * 1000; // 5 minutes
+
+    public class Photo {
+        String path;
+        Date date;
+        Double latitude;
+        Double longitude;
+
+        public Photo(String path, Date date, Double latitude, Double longitude) {
+            this.path = path;
+            this.date = date;
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        @Override
+        public String toString() {
+            return "Path: " + path + "\nDate: " + date.toString() + "\nLat: " + latitude + "\nLong: " + longitude;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +139,96 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 //        });
 
 
+    }
+
+    private Photo getPhoto(Cursor cursor, int dateColumn) {
+        int path = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA);
+        int latitude = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.LATITUDE);
+        int longitude = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.LONGITUDE);
+
+        Long date = cursor.getLong(dateColumn);
+        Date d = new Date(date);
+        String p = cursor.getString(path);
+        Double lat = cursor.getDouble(latitude);
+        Double longi = cursor.getDouble(longitude);
+        Photo photo = new Photo(p, d, lat, longi);
+        return photo;
+    }
+
+    private Double calculateDistance(Photo photo, TimeLineEntry t) {
+        Double photoLong = photo.longitude;
+        Double photoLat = photo.latitude;
+        Double entryLong = t.location.getLongitude();
+        Double entryLat = t.location.getLatitude();
+
+        int radius = 6371;
+        //Haversine formula:
+        // a = sin^2(latDiff/2) + cos(lat1)cos(lat2)sin^2(LongDiff/2)
+        // c = 2 * theta of (x, y) converted to polar (r, theta)
+        // distance = radius of sphere * c
+        Double sinDistanceLong = Math.sin(Math.toRadians(entryLong - photoLong)/2);
+        Double sinDistanceLat = Math.sin(Math.toRadians(entryLat - photoLat)/2);
+        Double a = Math.pow(sinDistanceLat, 2) + Math.cos(Math.toRadians(photoLat))
+                * Math.cos(Math.toRadians(entryLat)) * Math.pow(sinDistanceLong, 2);
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        Double distance = radius * c;
+
+        return distance;
+    }
+
+    private void populateList() {
+        if (timeLine.isEmpty()) return;
+        String[] projection = {MediaStore.Images.ImageColumns.DATA,
+                MediaStore.Images.ImageColumns.LATITUDE,
+                MediaStore.Images.ImageColumns.LONGITUDE,
+                MediaStore.Images.ImageColumns.DATE_TAKEN};
+        String selection = MediaStore.Images.ImageColumns.DATE_TAKEN + " > ? AND " +
+                MediaStore.Images.ImageColumns.DATE_TAKEN + " < ?";
+        Long start = timeLine.get(0).start.getTimeInMillis();
+        Long end = timeLine.get(timeLine.size() - 1).end.getTimeInMillis();
+        String[] selectionArgs = {start.toString(), end.toString()};
+        final Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null);
+        cursor.moveToFirst();
+        int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
+
+        int index = 0;
+        TimeLineEntry prevEntry = null;
+        TimeLineEntry currEntry = timeLine.get(index);
+
+
+        do {
+            ArrayList<Photo> photos = new ArrayList<>();
+            currEntry = timeLine.get(index);
+            if (prevEntry != null) {
+                start = end;
+                end = currEntry.start.getTimeInMillis();
+                while (cursor.getLong(dateColumn) < end) {
+                    Photo photo = getPhoto(cursor, dateColumn);
+                    if (calculateDistance(photo, prevEntry) >
+                            calculateDistance(photo, currEntry)) {
+                        photos.add(photo);
+                    } else {
+                        prevEntry.photos.add(photo);
+                    }
+                    cursor.moveToNext();
+                }
+            }
+            start = currEntry.start.getTimeInMillis();
+            end = currEntry.end.getTimeInMillis();
+
+            while (cursor.getLong(dateColumn) <= end) {
+                photos.add(getPhoto(cursor, dateColumn));
+                if (!cursor.moveToNext()) {
+                    break;
+                }
+            }
+            prevEntry = currEntry;
+            index++;
+        } while (cursor.moveToNext());
     }
 
     @Override
