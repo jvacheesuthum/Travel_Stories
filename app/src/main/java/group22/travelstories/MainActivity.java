@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
         System.out.println("request message is:*" + request+"*");
         wsc.send(request);
-        while(wsc.message == null) {System.out.print(".");};  // TODO: Find a better way to do this! call back perhapsgit
+        while(wsc.message == null) {};  // TODO: Find a better way to do this! call back perhapsgit
         String response = wsc.message;
         String[] addresses = response.split("@");
         int count = 0;

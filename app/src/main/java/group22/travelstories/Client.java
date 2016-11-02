@@ -30,7 +30,7 @@ public class Client extends WebSocketClient{
         System.out.println("message received: " + message);
         String[] x = message.split(":");
         switch(x[0]){
-            case "timeline_address" : this.message = message; break;
+            case "timeline_address" : this.message = x[1]; break;
             default: System.out.println("got wrong type message back from server");
         }
     }
