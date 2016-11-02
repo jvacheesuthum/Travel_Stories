@@ -13,6 +13,8 @@ import java.net.URISyntaxException;
 
 public class Client extends WebSocketClient{
 
+    String message = null;
+
     public Client(String url) throws URISyntaxException {
 
         super(new URI(url));
@@ -26,6 +28,11 @@ public class Client extends WebSocketClient{
     @Override
     public void onMessage(String message) {
         System.out.println("message received: " + message);
+        String[] x = message.split(":");
+        switch(x[0]){
+            case "timeline_address" : this.message = message; break;
+            default: System.out.println("got wrong type message back from server");
+        }
     }
 
     @Override

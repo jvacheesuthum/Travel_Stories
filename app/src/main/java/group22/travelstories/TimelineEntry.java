@@ -10,11 +10,10 @@ import java.util.GregorianCalendar;
  */
 
 public class TimeLineEntry {
-    String locationName;
-    Location location;
-    GregorianCalendar start;
-    GregorianCalendar end;
-
+    private String locationName;
+    private Location location;
+    private GregorianCalendar start;
+    private GregorianCalendar end;
     //pictures
 
     public TimeLineEntry(Location l, GregorianCalendar start, GregorianCalendar end){
@@ -36,5 +35,16 @@ public class TimeLineEntry {
 
     public long getDuration() {
         return end.getTimeInMillis() - start.getTimeInMillis();
+    }
+
+    public Location getLocation(){
+        return location;
+    }
+    public void setAddress(String name){
+        locationName = name;
+    }
+
+    public String getAddress() {
+        return locationName;
     }
 }

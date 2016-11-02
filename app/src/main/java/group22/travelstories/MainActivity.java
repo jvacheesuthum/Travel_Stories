@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     // create a Pacific Standard Time time zone
     SimpleTimeZone pdt;
-    private long thresholdDuration = 60 * 1000; // 5 minutes
+    private long thresholdDuration = 10 * 1000; // sec * 1000
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,11 +100,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
 
 
-        try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
@@ -131,14 +127,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
                 Hi x = new Hi();
                 x.say();
+
                 addLocationToInfoLayout("click");
-                try {
-                    TravelServerWSClient.connectBlocking();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
+
                 TravelServerWSClient.send("hihihi");
-                //close?
+                sendTimeLineLocation(TravelServerWSClient);
+
+
             }
         });
 
@@ -242,12 +238,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     protected void onStart() {
         System.out.println("on start called");
+        try {
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        try {
+            TravelServerWSClient.connectBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         mGoogleApiClient.connect();
         super.onStart();
     }
 
     protected void onStop() {
         System.out.println("on stop called");
+        try {
+            TravelServerWSClient.closeBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         mGoogleApiClient.disconnect();
         super.onStop();
     }
@@ -292,13 +303,36 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             System.out.println("it's far : duration "+ currentTimeLineEntry.getDuration());
             System.out.println("threshold duration " + thresholdDuration);
             if(currentTimeLineEntry.getDuration() > thresholdDuration){
-                System.out.println("add");
                 timeLine.add(currentTimeLineEntry);
+                System.out.println("add, size" + timeLine.size());
             }
             currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
         }
         //check if location changed
 
+    }
+
+    public void sendTimeLineLocation(Client wsc){
+        if(timeLine.isEmpty()) {
+            System.out.println("timeline is empty");
+            return;
+        }
+        String request = "timeline_address:";
+        for(TimeLineEntry each : timeLine){
+            Location eachLocation = each.getLocation();
+            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
+        }
+        System.out.println("request message is:*" + request+"*");
+        wsc.send(request);
+        while(wsc.message == null) {System.out.print(".");};  // TODO: Find a better way to do this! call back perhapsgit
+        String response = wsc.message;
+        String[] addresses = response.split("@");
+        int count = 0;
+        for(TimeLineEntry t : timeLine){
+            t.setAddress(addresses[count]);
+            count++;
+            System.out.println(t.getAddress());
+        }
     }
 }
 
