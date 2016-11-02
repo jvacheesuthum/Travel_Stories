@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onLocationChanged(Location location) {
         System.out.println("location changed!");
 
-        addLocationToInfoLayout("no click"); // just to test
+        //addLocationToInfoLayout("no click"); // just to test
 
         mLastLocation = location;
 
