@@ -24,25 +24,18 @@ import android.text.format.Time;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ToggleButton;
+
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -97,36 +90,34 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
 
 
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
-
-
-        buttonLoadImage.setOnClickListener(new View.OnClickListener() {
-
+        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
+        trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View arg0) {
-
-                Intent i = new Intent(
-                        Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-                startActivityForResult(i, RESULT_LOAD_IMAGE);
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    //toggle enabled - starts tracking
+                    Hi x = new Hi();
+                    x.say();
+                    addLocationToInfoLayout("Most recent location");
+                } else {
+                    System.out.println("stops tracking");//toggle disabled - stops tracking
+                }
             }
         });
 
+//        Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
+//        buttonLoadImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View arg0) {
+//
+//                Intent i = new Intent(
+//                        Intent.ACTION_PICK,
+//                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//
+//                startActivityForResult(i, RESULT_LOAD_IMAGE);
+//            }
+//        });
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-
-                Hi x = new Hi();
-                x.say();
-                addLocationToInfoLayout("click");
-
-            }
-        });
 
     }
 
@@ -286,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         //check if location changed
 
     }
+
 }
 
 
