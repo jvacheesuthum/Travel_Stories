@@ -101,7 +101,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     x.say();
                     addLocationToInfoLayout("Most recent location");
                 } else {
-                    System.out.println("stops tracking");//toggle disabled - stops tracking
+                    System.out.println("stops tracking");
+                    //toggle disabled - stops tracking
                 }
             }
         });

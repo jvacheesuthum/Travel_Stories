@@ -11,7 +11,7 @@ import java.util.List;
  */
 
 public class TimeLineEntry {
-    List<MainActivity.Photo> photos;
+    List<Photo> photos;
     String locationName;
     Location location;
     GregorianCalendar start;
