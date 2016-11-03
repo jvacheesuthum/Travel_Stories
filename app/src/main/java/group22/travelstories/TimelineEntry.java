@@ -3,6 +3,7 @@ package group22.travelstories;
 import android.location.Location;
 
 import java.util.GregorianCalendar;
+import java.util.List;
 
 
 /**
@@ -10,11 +11,13 @@ import java.util.GregorianCalendar;
  */
 
 public class TimeLineEntry {
-    private String locationName;
-    private Location location;
-    private GregorianCalendar start;
-    private GregorianCalendar end;
-    //pictures
+
+    List<Photo> photos;
+    String locationName;
+    Location location;
+    GregorianCalendar start;
+    GregorianCalendar end;
+
 
     public TimeLineEntry(Location l, GregorianCalendar start, GregorianCalendar end){
         location = l;

@@ -24,29 +24,23 @@ import android.text.format.Time;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ToggleButton;
+
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.SimpleTimeZone;
@@ -100,66 +94,135 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
 
 
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
-
-
-        buttonLoadImage.setOnClickListener(new View.OnClickListener() {
-
+        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
+        trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View arg0) {
-
-                Intent i = new Intent(
-                        Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-                startActivityForResult(i, RESULT_LOAD_IMAGE);
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    //toggle enabled - starts tracking
+                    Hi x = new Hi();
+                    x.say();
+                    addLocationToInfoLayout("Most recent location");
+                } else {
+                    System.out.println("stops tracking");//toggle disabled - stops tracking
+                    TravelServerWSClient.send("hihihi");
+                    sendTimeLineLocation(TravelServerWSClient);
+                }
             }
         });
 
+    }
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+    private Photo getPhoto(Cursor cursor, int dateColumn) {
+        int path = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA);
+        int latitude = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.LATITUDE);
+        int longitude = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.LONGITUDE);
 
-                Hi x = new Hi();
-                x.say();
+        Long date = cursor.getLong(dateColumn);
+        Date d = new Date(date);
+        String p = cursor.getString(path);
+        Double lat = cursor.getDouble(latitude);
+        Double longi = cursor.getDouble(longitude);
+        Photo photo = new Photo(p, d, lat, longi);
+        return photo;
+    }
 
-                addLocationToInfoLayout("click");
+    private Double calculateDistance(Photo photo, TimeLineEntry t) {
+        Double photoLong = photo.longitude;
+        Double photoLat = photo.latitude;
+        Double entryLong = t.location.getLongitude();
+        Double entryLat = t.location.getLatitude();
+
+        int radius = 6371;
+        //Haversine formula:
+        // a = sin^2(latDiff/2) + cos(lat1)cos(lat2)sin^2(LongDiff/2)
+        // c = 2 * theta of (x, y) converted to polar (r, theta)
+        // distance = radius of sphere * c
+        Double sinDistanceLong = Math.sin(Math.toRadians(entryLong - photoLong)/2);
+        Double sinDistanceLat = Math.sin(Math.toRadians(entryLat - photoLat)/2);
+        Double a = Math.pow(sinDistanceLat, 2) + Math.cos(Math.toRadians(photoLat))
+                * Math.cos(Math.toRadians(entryLat)) * Math.pow(sinDistanceLong, 2);
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        Double distance = radius * c;
+
+        return distance;
+    }
+
+    private void populateList() {
+        if (timeLine.isEmpty()) return;
+        String[] projection = {MediaStore.Images.ImageColumns.DATA,
+                MediaStore.Images.ImageColumns.LATITUDE,
+                MediaStore.Images.ImageColumns.LONGITUDE,
+                MediaStore.Images.ImageColumns.DATE_TAKEN};
+        String selection = MediaStore.Images.ImageColumns.DATE_TAKEN + " > ? AND " +
+                MediaStore.Images.ImageColumns.DATE_TAKEN + " < ?";
+        Long start = timeLine.get(0).start.getTimeInMillis();
+        Long end = timeLine.get(timeLine.size() - 1).end.getTimeInMillis();
+        String[] selectionArgs = {start.toString(), end.toString()};
+        final Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null);
+        cursor.moveToFirst();
+        int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
+
+        int index = 0;
+        TimeLineEntry prevEntry = null;
+        TimeLineEntry currEntry = timeLine.get(index);
 
 
-                TravelServerWSClient.send("hihihi");
-                sendTimeLineLocation(TravelServerWSClient);
-
-
+        do {
+            ArrayList<Photo> photos = new ArrayList<>();
+            currEntry = timeLine.get(index);
+            if (prevEntry != null) {
+                start = end;
+                end = currEntry.start.getTimeInMillis();
+                while (cursor.getLong(dateColumn) < end) {
+                    Photo photo = getPhoto(cursor, dateColumn);
+                    if (calculateDistance(photo, prevEntry) >
+                            calculateDistance(photo, currEntry)) {
+                        photos.add(photo);
+                    } else {
+                        prevEntry.photos.add(photo);
+                    }
+                    cursor.moveToNext();
+                }
             }
-        });
+            start = currEntry.start.getTimeInMillis();
+            end = currEntry.end.getTimeInMillis();
 
+            while (cursor.getLong(dateColumn) <= end) {
+                photos.add(getPhoto(cursor, dateColumn));
+                if (!cursor.moveToNext()) {
+                    break;
+                }
+            }
+            prevEntry = currEntry;
+            index++;
+        } while (cursor.moveToNext());
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-
-            ImageView imageView = (ImageView) findViewById(R.id.imgView);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-
-        }
+//        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+//            Uri selectedImage = data.getData();
+//            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+//
+//            Cursor cursor = getContentResolver().query(selectedImage,
+//                    filePathColumn, null, null, null);
+//            cursor.moveToFirst();
+//
+//            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//            String picturePath = cursor.getString(columnIndex);
+//            cursor.close();
+//
+//            ImageView imageView = (ImageView) findViewById(R.id.imgView);
+//            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+//
+//        }
 
     }
 
@@ -187,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        System.out.println("on connected called");
+        System.out.println("googleApi on connected called");
 
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
@@ -204,15 +267,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             System.out.println("PERMISSION CHECK fails at onConnected function");
             return;
         }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            System.out.println("---play service---");
-            System.out.println(String.valueOf(mLastLocation.getLatitude()));
-            System.out.println(String.valueOf(mLastLocation.getLongitude()));
-            System.out.println("---play service---");
-            GregorianCalendar currentTime = new GregorianCalendar(pdt);
-            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
-        }
+        //mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+//        if (mLastLocation != null) {
+//            System.out.println("---play service---");
+//            System.out.println(String.valueOf(mLastLocation.getLatitude()));
+//            System.out.println(String.valueOf(mLastLocation.getLongitude()));
+//            System.out.println("---play service---");
+////            GregorianCalendar currentTime = new GregorianCalendar(pdt);
+////            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
+//        }
     }
 
     public void addLocationToInfoLayout(String message) {
@@ -259,7 +322,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        mGoogleApiClient.disconnect();
+
+        mGoogleApiClient.disconnect(); //do we remove this line to keep location updates after exitting app?
         super.onStop();
     }
 
@@ -290,9 +354,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onLocationChanged(Location location) {
         System.out.println("location changed!");
 
-        addLocationToInfoLayout("no click"); // just to test
 
         mLastLocation = location;
+        addLocationToInfoLayout("no click");
+
+        //first time when the app starts -> startLocationUpdates called -> new location received
+        // -> onLocationChanged triggered.
+        if(currentTimeLineEntry == null) {
+            GregorianCalendar currentTime = new GregorianCalendar(pdt);
+            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
+            return;
+        }
 
         GregorianCalendar currentTime = new GregorianCalendar(pdt);
         if(currentTimeLineEntry.nearLocation(mLastLocation)){
@@ -311,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         //check if location changed
 
     }
+
 
     public void sendTimeLineLocation(Client wsc){
         if(timeLine.isEmpty()) {
@@ -334,6 +407,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             System.out.println(t.getAddress());
         }
     }
+
 }
 
 
