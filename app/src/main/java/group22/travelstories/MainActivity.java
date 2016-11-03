@@ -59,25 +59,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     SimpleTimeZone pdt;
     private long thresholdDuration = 60 * 1000; // 5 minutes
 
-    public class Photo {
-        String path;
-        Date date;
-        Double latitude;
-        Double longitude;
-
-        public Photo(String path, Date date, Double latitude, Double longitude) {
-            this.path = path;
-            this.date = date;
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
-
-        @Override
-        public String toString() {
-            return "Path: " + path + "\nDate: " + date.toString() + "\nLat: " + latitude + "\nLong: " + longitude;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -235,22 +216,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-
-            ImageView imageView = (ImageView) findViewById(R.id.imgView);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-
-        }
+//        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+//            Uri selectedImage = data.getData();
+//            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+//
+//            Cursor cursor = getContentResolver().query(selectedImage,
+//                    filePathColumn, null, null, null);
+//            cursor.moveToFirst();
+//
+//            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//            String picturePath = cursor.getString(columnIndex);
+//            cursor.close();
+//
+//            ImageView imageView = (ImageView) findViewById(R.id.imgView);
+//            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+//
+//        }
 
     }
 
