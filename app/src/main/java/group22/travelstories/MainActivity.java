@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         super.onStart();
 
         mGoogleApiClient.connect();
-        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
+        final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
         trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
@@ -328,6 +328,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     addLocationToInfoLayout("Most recent location");
                 } else {
                     System.out.println("stops tracking");
+                    trackToggle.setText("See summary");
+                    seeSummary();
                     //stop tracking activity
                     //toggle changes to see summary
                 }
@@ -399,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     }
 
-    public void seeSummary(View view){
+    public void seeSummary(){
         Intent intent = new Intent(this, DisplayStoryActivity.class);
         ArrayList list = new ArrayList();
         for (int i = 0 ; i < timeLine.size() ; i++ ){
