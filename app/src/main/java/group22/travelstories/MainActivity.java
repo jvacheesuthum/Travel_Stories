@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     // create a Pacific Standard Time time zone
     SimpleTimeZone pdt;
-    private long thresholdDuration = 60 * 1000; // 5 minutes
+    private long thresholdDuration = 10 * 1000; // 5 minutes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -350,6 +350,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     protected void startLocationUpdates() {
+        System.out.println("starting location updates");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -401,11 +402,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void seeSummary(View view){
         Intent intent = new Intent(this, DisplayStoryActivity.class);
         ArrayList list = new ArrayList();
-        for (int i = 0 ; i < 15 ; i++ ){
-            list.add(i, "Location");
+        for (int i = 0 ; i < timeLine.size() ; i++ ){
+            list.add(i, timeLine.get(i).getLocationName());
         }
         intent.putParcelableArrayListExtra(EXTRA_MESSAGE, list);
-//        intent.putParcelableArrayListExtra(EXTRA_MESSAGE, timeLine);
         startActivity(intent);
     }
 
