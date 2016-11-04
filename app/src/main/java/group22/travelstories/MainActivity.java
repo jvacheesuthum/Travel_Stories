@@ -24,6 +24,7 @@ import android.text.format.Time;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -311,8 +312,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     protected void onStart() {
         System.out.println("on start called");
-        mGoogleApiClient.connect();
         super.onStart();
+
+        mGoogleApiClient.connect();
+        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
+        trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    //toggle enabled - starts tracking
+                    Hi x = new Hi();
+                    x.say();
+                    addLocationToInfoLayout("Most recent location");
+                } else {
+                    System.out.println("stops tracking");
+                    //stop tracking activity
+                    //toggle changes to see summary
+                }
+            }
+        });
+
     }
 
     protected void onStop() {
@@ -348,7 +367,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     public void onLocationChanged(Location location) {
         System.out.println("location changed!");
 
-
         mLastLocation = location;
         addLocationToInfoLayout("no click");
 
@@ -376,6 +394,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
         //check if location changed
 
+    }
+
+    public void seeSummary(View view){
+        Intent intent = new Intent(this, DisplayStoryActivity.class);
+        //pass timeline into the intent
+        startActivity(intent);
     }
 
 }
