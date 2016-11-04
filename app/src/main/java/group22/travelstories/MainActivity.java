@@ -34,6 +34,7 @@ import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.server.converter.StringToIntConverter;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -53,8 +54,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     Location mLastLocation;
     private LocationRequest mLocationRequest;
     private boolean mRequestingLocationUpdates = true;
-    private List<TimeLineEntry> timeLine;
+    private ArrayList<TimeLineEntry> timeLine;
     TimeLineEntry currentTimeLineEntry;
+    public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
 
     // create a Pacific Standard Time time zone
     SimpleTimeZone pdt;
@@ -398,7 +400,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     public void seeSummary(View view){
         Intent intent = new Intent(this, DisplayStoryActivity.class);
-        //pass timeline into the intent
+        ArrayList list = new ArrayList();
+        for (int i = 0 ; i < 15 ; i++ ){
+            list.add(i, "Location");
+        }
+        intent.putParcelableArrayListExtra(EXTRA_MESSAGE, list);
+//        intent.putParcelableArrayListExtra(EXTRA_MESSAGE, timeLine);
         startActivity(intent);
     }
 
