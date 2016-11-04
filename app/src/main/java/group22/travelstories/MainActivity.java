@@ -99,22 +99,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
 
 
-        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
-        trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked){
-                    //toggle enabled - starts tracking
-                    Hi x = new Hi();
-                    x.say();
-                    addLocationToInfoLayout("Most recent location");
-                } else {
-                    System.out.println("stops tracking");//toggle disabled - stops tracking
-                    TravelServerWSClient.send("hihihi");
-                    sendTimeLineLocation(TravelServerWSClient);
-                }
-            }
-        });
+//        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
+//        trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+//                if(isChecked){
+//                    //toggle enabled - starts tracking
+//                    Hi x = new Hi();
+//                    x.say();
+//                    addLocationToInfoLayout("Most recent location");
+//                } else {
+//                    System.out.println("stops tracking");//toggle disabled - stops tracking
+//                    TravelServerWSClient.send("hihihi");
+//                    sendTimeLineLocation(TravelServerWSClient);
+//                }
+//            }
+//        });
 
     }
 
@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
 
         mGoogleApiClient.connect();
-        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
+        final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
         trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
@@ -330,9 +330,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     x.say();
                     addLocationToInfoLayout("Most recent location");
                 } else {
-                    System.out.println("stops tracking");
-                    //stop tracking activity
-                    //toggle changes to see summary
+                    System.out.println("stops tracking");//toggle disabled - stops tracking
+                    TravelServerWSClient.send("hihihi");
+                    sendTimeLineLocation(TravelServerWSClient);
+                    seeSummary();
                 }
             }
         });
@@ -435,7 +436,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
     }
 
-    public void seeSummary(View view){
+
+    public void seeSummary(){
         Intent intent = new Intent(this, DisplayStoryActivity.class);
         ArrayList list = new ArrayList();
         for (int i = 0 ; i < timeLine.size() ; i++ ){
