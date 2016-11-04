@@ -333,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     System.out.println("stops tracking");//toggle disabled - stops tracking
                     TravelServerWSClient.send("hihihi");
                     sendTimeLineLocation(TravelServerWSClient);
+                    trackToggle.setText("See summary");
                     seeSummary();
                 }
             }
