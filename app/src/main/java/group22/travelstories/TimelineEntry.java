@@ -23,6 +23,7 @@ public class TimeLineEntry {
         location = l;
         this.start = start;
         this.end  = end;
+        this.locationName = "default location";
     }
 
     public boolean nearLocation(Location location) {
@@ -40,6 +41,7 @@ public class TimeLineEntry {
         return end.getTimeInMillis() - start.getTimeInMillis();
     }
 
+
     public Location getLocation(){
         return location;
     }
@@ -47,7 +49,7 @@ public class TimeLineEntry {
         locationName = name;
     }
 
-    public String getAddress() {
+    public String getLocationName() {
         return locationName;
     }
 }
