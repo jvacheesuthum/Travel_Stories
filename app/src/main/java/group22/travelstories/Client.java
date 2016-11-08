@@ -37,6 +37,7 @@ public class Client extends WebSocketClient{
             case "timeline_address" : this.message = x[1]; break;
             default: System.out.println("got wrong type message back from server");
         }*/
+
         if(message.split(":")[0] == "timeline_address"){
             try {
                 seeSummary.call();
@@ -44,6 +45,13 @@ public class Client extends WebSocketClient{
                 e.printStackTrace();
             }
         }
+//        if(!message.equals("Connected to Server")){
+//            try {
+//                seeSummary.call();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     @Override

@@ -98,24 +98,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         pdt.setStartRule(Calendar.APRIL, 1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
         pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
 
-
-//        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
-//        trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-//                if(isChecked){
-//                    //toggle enabled - starts tracking
-//                    Hi x = new Hi();
-//                    x.say();
-//                    addLocationToInfoLayout("Most recent location");
-//                } else {
-//                    System.out.println("stops tracking");//toggle disabled - stops tracking
-//                    TravelServerWSClient.send("hihihi");
-//                    sendTimeLineLocation(TravelServerWSClient);
-//                }
-//            }
-//        });
-
     }
 
     private Photo getPhoto(Cursor cursor, int dateColumn) {
@@ -419,42 +401,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             return;
         }
         String request = "timeline_address:";
-//
-//        for (TimeLineEntry each : timeLine) {
-//            Location eachLocation = each.getLocation();
-//            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
-//        }
-        request += "-0.1269566,51.5194133";
+
+        for (TimeLineEntry each : timeLine) {
+            Location eachLocation = each.getLocation();
+            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
+        }
+//        request += "-0.1269566,51.5194133";
         System.out.println("request message is:*" + request + "*");
         wsc.send(request);
-
-        /*
-        while (wsc.message == null) {
-        }
-        ;  // TODO: Find a better way to do this! call back perhapsgit
-        String response = wsc.message;
-        String[] addresses = response.split("@");
-        int count = 0;
-        for (TimeLineEntry t : timeLine) {
-            t.setAddress(addresses[count]);
-            count++;
-            System.out.println(t.getLocationName());
-        }
-        */
-        return;
     }
 
-
-//    public void seeSummary(){
-//        Intent intent = new Intent(this, DisplayStoryActivity.class);
-//        ArrayList list = new ArrayList();
-//        for (int i = 0 ; i < timeLine.size() ; i++ ){
-//            list.add(i, timeLine.get(i).getLocationName());
-//        }
-//        intent.putParcelableArrayListExtra(EXTRA_MESSAGE, list);
-//        startActivity(intent);
-//
-//    }
 
 }
 
