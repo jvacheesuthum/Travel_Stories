@@ -309,7 +309,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         super.onStart();
 
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080");
+            //TravelServerWSClient = new Client("localhost:1080");
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", new SeeSummary(timeLine,this));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -334,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     TravelServerWSClient.send("hihihi");
                     sendTimeLineLocation(TravelServerWSClient);
                     trackToggle.setText("See summary");
-                    seeSummary();
+                    //seeSummary();
                 }
             }
         });
@@ -418,12 +419,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             return;
         }
         String request = "timeline_address:";
-        for (TimeLineEntry each : timeLine) {
-            Location eachLocation = each.getLocation();
-            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
-        }
+//
+//        for (TimeLineEntry each : timeLine) {
+//            Location eachLocation = each.getLocation();
+//            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
+//        }
+        request += "-0.1269566,51.5194133";
         System.out.println("request message is:*" + request + "*");
         wsc.send(request);
+
+        /*
         while (wsc.message == null) {
         }
         ;  // TODO: Find a better way to do this! call back perhapsgit
@@ -435,19 +440,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             count++;
             System.out.println(t.getLocationName());
         }
+        */
+        return;
     }
 
 
-    public void seeSummary(){
-        Intent intent = new Intent(this, DisplayStoryActivity.class);
-        ArrayList list = new ArrayList();
-        for (int i = 0 ; i < timeLine.size() ; i++ ){
-            list.add(i, timeLine.get(i).getLocationName());
-        }
-        intent.putParcelableArrayListExtra(EXTRA_MESSAGE, list);
-        startActivity(intent);
-
-    }
+//    public void seeSummary(){
+//        Intent intent = new Intent(this, DisplayStoryActivity.class);
+//        ArrayList list = new ArrayList();
+//        for (int i = 0 ; i < timeLine.size() ; i++ ){
+//            list.add(i, timeLine.get(i).getLocationName());
+//        }
+//        intent.putParcelableArrayListExtra(EXTRA_MESSAGE, list);
+//        startActivity(intent);
+//
+//    }
 
 }
 
