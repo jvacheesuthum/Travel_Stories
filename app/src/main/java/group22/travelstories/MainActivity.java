@@ -411,6 +411,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         startActivity(intent);
     }
 
+    public void mapShow(View view){
+
+
+    }
+
 }
 
 
