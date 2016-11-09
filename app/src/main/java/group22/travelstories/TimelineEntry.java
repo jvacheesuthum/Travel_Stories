@@ -10,6 +10,7 @@ import java.util.List;
  * Created by vasin on 01/11/2016.
  */
 
+//TODO make this implements parcelable
 public class TimeLineEntry {
 
     List<Photo> photos;
@@ -51,5 +52,9 @@ public class TimeLineEntry {
 
     public String getLocationName() {
         return locationName;
+    }
+
+    public String getTime(){
+        return start.getTime().toString() + " - " + end.getTime().toString();
     }
 }

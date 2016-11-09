@@ -36,11 +36,12 @@ public class SeeSummary implements Callable {
 
     public void seeSummary(){
         Intent intent = new Intent(main, DisplayStoryActivity.class);
-        ArrayList list = new ArrayList();
+        ArrayList<String[]> list = new ArrayList();
         for (int i = 0 ; i < timeLine.size() ; i++ ){
-            list.add(i, timeLine.get(i).getLocationName());
+            list.add(i, new String[]{timeLine.get(i).getLocationName(),
+                                    timeLine.get(i).getTime()});
         }
-        intent.putParcelableArrayListExtra(EXTRA_MESSAGE, list);
+        intent.putParcelableArrayListExtra(EXTRA_MESSAGE, (ArrayList) list);
         main.startActivity(intent);
     }
 }
