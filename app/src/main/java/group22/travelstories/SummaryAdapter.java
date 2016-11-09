@@ -53,13 +53,6 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
     @Override
     public void onBindViewHolder(TimeLineViewHolder holder, int i) {
 
-        if(holder.timeLineName == null){
-            System.out.println("NAME NULL");
-        }
-
-        //TODO: null here!
-//        holder.timeLineName.setText("nanme");
-        //holder.timeLineTime.setText("time");
         holder.timeLineName.setText(fromIntent.get(i)[0]);
         holder.timeLineTime.setText(fromIntent.get(i)[1]);
 
