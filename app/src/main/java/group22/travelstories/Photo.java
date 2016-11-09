@@ -1,12 +1,13 @@
 package group22.travelstories;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Felix on 03/11/2016.
  */
 
-public class Photo {
+public class Photo implements Serializable{
     String path;
     Date date;
     Double latitude;

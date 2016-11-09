@@ -2,6 +2,8 @@ package group22.travelstories;
 
 import android.location.Location;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -10,11 +12,11 @@ import java.util.List;
  * Created by vasin on 01/11/2016.
  */
 
-public class TimeLineEntry {
+public class TimeLineEntry implements Serializable{
 
-    List<Photo> photos;
+    ArrayList<Photo> photos;
     String locationName;
-    Location location;
+    transient Location location; //<------ temp fix
     GregorianCalendar start;
     GregorianCalendar end;
 

@@ -408,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
             timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
 
+            tempPopulateList();
             wsc.send("timeline_address:-0.126957,51.5194133");
             return;
         }
@@ -422,6 +423,48 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         wsc.send(request);
     }
 
+
+    private void tempPopulateList() {
+        if (timeLine.isEmpty()) return;
+        String[] projection = {MediaStore.Images.ImageColumns.DATA,
+                MediaStore.Images.ImageColumns.LATITUDE,
+                MediaStore.Images.ImageColumns.LONGITUDE,
+                MediaStore.Images.ImageColumns.DATE_TAKEN};
+        final Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
+
+        int index = 0;
+        TimeLineEntry firstEntry = timeLine.get(0);
+        TimeLineEntry secondEntry = timeLine.get(1);
+        TimeLineEntry thirdEntry = timeLine.get(2);
+        firstEntry.photos = new ArrayList<>();
+        secondEntry.photos = new ArrayList<>();
+        thirdEntry.photos = new ArrayList<>();
+
+        do {
+            Photo photo = getPhoto(cursor, dateColumn);
+            switch (index) {
+                case 0:
+                    firstEntry.photos.add(photo);
+                    break;
+                case 1:
+                    secondEntry.photos.add(photo);
+                    break;
+                case 2:
+                    thirdEntry.photos.add(photo);
+                    break;
+                default:
+                    System.out.println("Incorrect Index");
+                    break;
+            }
+            index = (index + 1) % 3;
+        } while (cursor.moveToNext());
+    }
 
 }
 

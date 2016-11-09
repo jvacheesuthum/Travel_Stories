@@ -18,11 +18,14 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_story);
 
         Intent intent = getIntent();
         ArrayList timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
+        System.out.println("Class: " + timeline.get(0));
+
 
         //doing it programmatically - dirty
         //should try ArrayAdapter later
@@ -39,7 +42,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
             //TextView to put the value from the ArrayList
             TextView info = new TextView(this);
-            info.setText(timeline.get(i).toString());
+//            info.setText(timeline.get(i).toString());
+            info.setText("Start time: " + ((TimeLineEntry)timeline.get(i)).photos);
             item.addView(info, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
 
             //Add this layout to the main layout of the XML
