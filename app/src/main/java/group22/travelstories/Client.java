@@ -38,20 +38,22 @@ public class Client extends WebSocketClient{
             default: System.out.println("got wrong type message back from server");
         }*/
 
-        if(message.split(":")[0] == "timeline_address"){
-            try {
-                seeSummary.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-//        if(!message.equals("Connected to Server")){
+        // real thing
+//        if(message.split(":")[0] == "timeline_address"){
 //            try {
 //                seeSummary.call();
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
 //        }
+        // test thing
+        if(!message.equals("Connected to Server")){
+            try {
+                seeSummary.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

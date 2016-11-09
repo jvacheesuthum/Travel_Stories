@@ -314,7 +314,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     addLocationToInfoLayout("Most recent location");
                 } else {
                     System.out.println("stops tracking");//toggle disabled - stops tracking
-                    TravelServerWSClient.send("hihihi");
                     sendTimeLineLocation(TravelServerWSClient);
                     trackToggle.setText("See summary");
                     //seeSummary();
@@ -397,7 +396,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     public void sendTimeLineLocation(Client wsc) {
         if (timeLine.isEmpty()) {
+            //real thing
+            /*
             System.out.println("timeline is empty");
+            return;
+            */
+            // test thing
+            System.out.println("timeline is empty");
+            System.out.println("populating timeline list ...");
+            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+
+            wsc.send("timeline_address:-0.126957,51.5194133");
             return;
         }
         String request = "timeline_address:";
