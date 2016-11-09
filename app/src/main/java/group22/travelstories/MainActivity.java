@@ -110,6 +110,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
         });
 
+
+        ToggleButton mapToggle = (ToggleButton) findViewById(R.id.mapToggle);
+        mapToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    //toggle enabled - starts tracking
+                    Hi x = new Hi();
+                    x.say();
+                    addLocationToInfoLayout("Most recent location");
+                } else {
+                    System.out.println("stops tracking");
+                    //toggle disabled - stops tracking
+                }
+            }
+        });
+
 //        Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
 //        buttonLoadImage.setOnClickListener(new View.OnClickListener() {
 //            @Override
