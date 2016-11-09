@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by vasin on 09/11/2016.
  */
-public class SummaryAdapter extends RecyclerView.Adapter {
+public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLineViewHolder> {
     private ArrayList<String[]> fromIntent;
 
     // Provide a reference to the views for each data item
@@ -51,12 +51,17 @@ public class SummaryAdapter extends RecyclerView.Adapter {
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int i) {
-        TimeLineViewHolder tvh = (TimeLineViewHolder) holder;
+    public void onBindViewHolder(TimeLineViewHolder holder, int i) {
 
-        //TODO: tvh is null here!
-        tvh.timeLineName.setText(fromIntent.get(i)[0]);
-        tvh.timeLineTime.setText(fromIntent.get(i)[1]);
+        if(holder.timeLineName == null){
+            System.out.println("NAME NULL");
+        }
+
+        //TODO: null here!
+//        holder.timeLineName.setText("nanme");
+        //holder.timeLineTime.setText("time");
+        holder.timeLineName.setText(fromIntent.get(i)[0]);
+        holder.timeLineTime.setText(fromIntent.get(i)[1]);
 
         //holder.timeLinePhoto.setImageResource(persons.get(i).photoId);
     }
