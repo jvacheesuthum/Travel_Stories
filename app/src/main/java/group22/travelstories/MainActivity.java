@@ -407,6 +407,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
             timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
             timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
 
             tempPopulateList();
             wsc.send("timeline_address:-0.126957,51.5194133");
@@ -439,30 +445,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
 
         int index = 0;
-        TimeLineEntry firstEntry = timeLine.get(0);
-        TimeLineEntry secondEntry = timeLine.get(1);
-        TimeLineEntry thirdEntry = timeLine.get(2);
-        firstEntry.photos = new ArrayList<>();
-        secondEntry.photos = new ArrayList<>();
-        thirdEntry.photos = new ArrayList<>();
+
+        for (TimeLineEntry e : timeLine) {
+            e.photos = new ArrayList<>();
+        }
 
         do {
+            System.out.println("Index: " + index);
+            TimeLineEntry e = timeLine.get(index);
             Photo photo = getPhoto(cursor, dateColumn);
-            switch (index) {
-                case 0:
-                    firstEntry.photos.add(photo);
-                    break;
-                case 1:
-                    secondEntry.photos.add(photo);
-                    break;
-                case 2:
-                    thirdEntry.photos.add(photo);
-                    break;
-                default:
-                    System.out.println("Incorrect Index");
-                    break;
-            }
-            index = (index + 1) % 3;
+            e.photos.add(photo);
+            index = (index + 1) % timeLine.size();
         } while (cursor.moveToNext());
     }
 

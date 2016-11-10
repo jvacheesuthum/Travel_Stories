@@ -54,4 +54,8 @@ public class TimeLineEntry implements Serializable{
     public String getLocationName() {
         return locationName;
     }
+
+    public String getTime(){
+        return start.getTime().toString() + " - " + end.getTime().toString();
+    }
 }
