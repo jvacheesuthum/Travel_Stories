@@ -266,6 +266,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //Intent settings = new Intent(this, SettingsActivity.class);
+            //startActivity(settings);
             return true;
         }
 
