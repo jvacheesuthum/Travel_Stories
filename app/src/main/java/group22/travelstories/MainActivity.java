@@ -116,13 +116,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if(isChecked){
-                    //toggle enabled - starts tracking
-                    Hi x = new Hi();
-                    x.say();
-                    addLocationToInfoLayout("Most recent location");
+                    setContentView(R.layout.activity_maps);
                 } else {
-                    System.out.println("stops tracking");
-                    //toggle disabled - stops tracking
+                    setContentView(R.layout.activity_main);
+
                 }
             }
         });
