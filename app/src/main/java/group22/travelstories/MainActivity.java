@@ -112,19 +112,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
         });
 
-        ToggleButton mapToggle = (ToggleButton) findViewById(R.id.mapToggle);
-        mapToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        Button mapToggle = (Button) findViewById(R.id.mapToggle);
+        mapToggle.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked){
-                    showMap();
-                    //setContentView(R.layout.activity_maps);
-                } else {
-                    setContentView(R.layout.activity_main);
-
-                }
+            public void onClick(View v){
+                showMap();
             }
-        });
+            });
+        };
 
 //        Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
 //        buttonLoadImage.setOnClickListener(new View.OnClickListener() {
@@ -140,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 //        });
 
 
-    }
+
 
     private Photo getPhoto(Cursor cursor, int dateColumn) {
         int path = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA);
