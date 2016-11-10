@@ -85,6 +85,7 @@
             android:textOff="@string/map_off"
             android:textOn="@string/map_on" />
 
+
         <!--
                 <Button
                     android:layout_width="wrap_content"

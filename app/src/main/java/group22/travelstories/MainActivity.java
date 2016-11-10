@@ -1,6 +1,7 @@
 package group22.travelstories;
 
 import android.Manifest;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -17,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -110,13 +112,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }
         });
 
-
         ToggleButton mapToggle = (ToggleButton) findViewById(R.id.mapToggle);
         mapToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if(isChecked){
-                    setContentView(R.layout.activity_maps);
+                    showMap();
+                    //setContentView(R.layout.activity_maps);
                 } else {
                     setContentView(R.layout.activity_main);
 
@@ -423,6 +425,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
         intent.putParcelableArrayListExtra(EXTRA_MESSAGE, list);
         startActivity(intent);
+    }
+
+    public void showMap(){
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+
     }
 
     public void mapShow(View view){
