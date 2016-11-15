@@ -73,10 +73,10 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
         holder.timeLineName.setText(((TimeLineEntry)fromIntent.get(i)).getLocationName());
         holder.timeLineTime.setText(((TimeLineEntry)fromIntent.get(i)).getTime());
 
-        Bitmap b = BitmapFactory.decodeFile(((TimeLineEntry)fromIntent.get(i)).photos.get(0).path);
-        Bitmap scaledB = Bitmap.createScaledBitmap(b,b.getWidth()/10, b.getHeight()/10, true);
-        b.recycle();
-        holder.timeLinePhoto.setImageBitmap(scaledB);
+//        Bitmap b = BitmapFactory.decodeFile(((TimeLineEntry)fromIntent.get(i)).photos.get(0).path);
+//        Bitmap scaledB = Bitmap.createScaledBitmap(b,b.getWidth()/10, b.getHeight()/10, true);
+//        b.recycle();
+//        holder.timeLinePhoto.setImageBitmap(scaledB);
 
         //holder.timeLinePhoto.setImageResource(persons.get(i).photoId);
     }

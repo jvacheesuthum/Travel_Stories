@@ -39,15 +39,16 @@ public class Client extends WebSocketClient{
         }*/
 
         // real thing
-//        if(message.split(":")[0] == "timeline_address"){
-//            try {
-//                seeSummary.call();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
+        if(message.split(":")[0] == "timeline_address"){
+            try {
+                String[] locations = message.split(":")[1].split("@");
+                ((SeeSummary) seeSummary).callWithArg(locations);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         // test thing
-        if(!message.equals("Connected to Server")){
+        else if(!message.equals("Connected to Server")){
             try {
                 seeSummary.call();
             } catch (Exception e) {

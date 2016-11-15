@@ -34,6 +34,14 @@ public class SeeSummary implements Callable {
         return null;
     }
 
+    public void callWithArg(String[] messages){
+        for(int i = 0; i<messages.length; i++){
+            System.out.println("asdfasfafds");
+            timeLine.get(i).setAddress(messages[i]);
+        }
+        seeSummary();
+    }
+
     public void seeSummary(){
         Intent intent = new Intent(main, DisplayStoryActivity.class);
         ArrayList list = new ArrayList();
