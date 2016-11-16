@@ -1,5 +1,6 @@
 package group22.travelstories;
 
+import java.util.ArrayList;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
@@ -28,6 +29,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 
 import java.io.IOException;
@@ -44,6 +47,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationRequest mLocationRequest;
     private Location mLastLocation;
     private Marker mCurrLocationMarker;
+    private ArrayList<LatLng> points;
+    Polyline line;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +67,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 showMap();
             }
         });
+        points = new ArrayList<LatLng>();
     }
 
 
@@ -109,6 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 options.icon(BitmapDescriptorFactory.defaultMarker());
                 mMap.addMarker(options.draggable(true));
+                //TODO need to set marker drag event later in order for it to change loaction along with the drag
             }
         });
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
@@ -168,6 +176,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
+
+        //for tracing path
+        points.add(latLng);
+        redrawLine();
     }
 
     protected synchronized void buildGoogleApiClient(){
@@ -251,18 +263,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-        private String getAddrFromLatLng(LatLng latLng) {
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-            String address = "address undefined";
-            try {
-                //this retrieve address
-                address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1).get(0).getAddressLine(0);
-            } catch (IOException e) {
-            }
-
-            return address;
+    private String getAddrFromLatLng(LatLng latLng) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        String address = "address undefined";
+        try {
+            //this retrieve address
+            address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1).get(0).getAddressLine(0);
+        } catch (IOException e) {
         }
+            return address;
+    }
 
+    private void redrawLine(){
 
+        mMap.clear();  //clears all Markers and Polylines
+
+        PolylineOptions options = new PolylineOptions().width(5).geodesic(true);
+        for (int i = 0; i < points.size(); i++) {
+            LatLng point = points.get(i);
+            options.add(point);
+        }
+        mMap.addMarker(new MarkerOptions()); //add Marker in current position
+        line = mMap.addPolyline(options); //add Polyline
+    }
 
 }
