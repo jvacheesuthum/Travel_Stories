@@ -179,7 +179,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //for tracing path
         points.add(latLng);
-        redrawLine();
+        redrawLine(latLng);
     }
 
     protected synchronized void buildGoogleApiClient(){
@@ -274,7 +274,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return address;
     }
 
-    private void redrawLine(){
+    private void redrawLine(LatLng currentLocation){
 
         mMap.clear();  //clears all Markers and Polylines
 
@@ -283,7 +283,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LatLng point = points.get(i);
             options.add(point);
         }
-        mMap.addMarker(new MarkerOptions()); //add Marker in current position
+        mMap.addMarker(new MarkerOptions().position(currentLocation)); //add Marker in current position
         line = mMap.addPolyline(options); //add Polyline
     }
 
