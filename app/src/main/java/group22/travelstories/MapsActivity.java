@@ -108,7 +108,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 options.title(getAddrFromLatLng(latLng));
 
                 options.icon(BitmapDescriptorFactory.defaultMarker());
-                mMap.addMarker(options);
+                mMap.addMarker(options.draggable(true));
             }
         });
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
