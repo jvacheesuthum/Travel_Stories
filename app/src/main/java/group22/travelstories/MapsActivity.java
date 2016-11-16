@@ -2,6 +2,7 @@ package group22.travelstories;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +28,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+
+import java.io.IOException;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -93,6 +98,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            //this adds a marker on tap
+            public void onMapClick(LatLng latLng){
+
+                MarkerOptions options = new MarkerOptions().position(latLng);
+                options.title(getAddrFromLatLng(latLng));
+
+                options.icon(BitmapDescriptorFactory.defaultMarker());
+                mMap.addMarker(options);
+            }
+        });
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+
     }
 
     @Override
@@ -223,5 +249,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(intent);
 
     }
+
+
+        private String getAddrFromLatLng(LatLng latLng) {
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            String address = "address undefined";
+            try {
+                //this retrieve address
+                address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1).get(0).getAddressLine(0);
+            } catch (IOException e) {
+            }
+
+            return address;
+        }
+
+
 
 }
