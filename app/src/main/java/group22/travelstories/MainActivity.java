@@ -32,40 +32,19 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.server.converter.StringToIntConverter;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
 
-//public class MainActivity extends AppCompatActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
 public class MainActivity extends AppCompatActivity {
 
     private static int RESULT_LOAD_IMAGE = 1;
-///    GoogleApiClient mGoogleApiClient;
-///    Location mLastLocation;
-///    private LocationRequest mLocationRequest;
-///    private boolean mRequestingLocationUpdates = true;
     private ArrayList<TimeLineEntry> timeLine;
-///    TimeLineEntry currentTimeLineEntry;
     public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
 
     Client TravelServerWSClient;
 
-    // create a Pacific Standard Time time zone
-///    SimpleTimeZone pdt;
-///
-///    private long thresholdDuration = 10 * 1000; // 5 minutes
 
 
     @Override
@@ -77,27 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
-        // Create an instance of GoogleAPIClient.
-///        if (mGoogleApiClient == null) {
-///            mGoogleApiClient = new GoogleApiClient.Builder(this)
-///                    .addConnectionCallbacks(this)
-///                    .addOnConnectionFailedListener(this)
-///                    .addApi(LocationServices.API)
-///                    .build();
-///        }
-///        createLocationRequest();
         timeLine = new ArrayList<>();
-///
-///        // get the supported ids for GMT-08:00 (Pacific Standard Time)
-///        String[] ids = TimeZone.getAvailableIDs(-8 * 60 * 60 * 1000);
-///        // if no ids were returned, something is wrong. get out.
-///        if (ids.length == 0)
-///            System.exit(0);
-///        // create a Pacific Standard Time time zone
-///        pdt = new SimpleTimeZone(-8 * 60 * 60 * 1000, ids[0]);
-///        // set up rules for Daylight Saving Time
-///        pdt.setStartRule(Calendar.APRIL, 1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
-///        pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
+
 
     }
 
@@ -236,57 +196,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-///    @Override
-///    public void onConnected(Bundle connectionHint) {
-///        System.out.println("googleApi on connected called");
-///
-///        if (mRequestingLocationUpdates) {
-///            startLocationUpdates();
-///        }
-///
-///        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-///            // TODO: Consider calling
-///            //    ActivityCompat#requestPermissions
-///            // here to request the missing permissions, and then overriding
-///            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-///            //                                          int[] grantResults)
-///            // to handle the case where the user grants the permission. See the documentation
-///            // for ActivityCompat#requestPermissions for more details.
-///            System.out.println("PERMISSION CHECK fails at onConnected function");
-///            return;
-///        }
 
-        //mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-/////        if (mLastLocation != null) {
-/////            System.out.println("---play service---");
-/////            System.out.println(String.valueOf(mLastLocation.getLatitude()));
-/////            System.out.println(String.valueOf(mLastLocation.getLongitude()));
-/////            System.out.println("---play service---");
-///////            GregorianCalendar currentTime = new GregorianCalendar(pdt);
-///////            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
-/////        }
-///    }
-
-///    public void addLocationToInfoLayout(String message) {
-///        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.info);
-///        TextView valueTV = new TextView(MainActivity.this);
-///        valueTV.setText("[" + mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude() + "]" + message);
-///        valueTV.setLayoutParams(new Toolbar.LayoutParams(
-///                Toolbar.LayoutParams.FILL_PARENT,
-///                Toolbar.LayoutParams.WRAP_CONTENT));
-///
-///        ((LinearLayout) linearLayout).addView(valueTV);
-///    }
-
-///    @Override
-///    public void onConnectionSuspended(int i) {
-///
-///    }
-///
-///    @Override
-///    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-///
-///    }
 
     protected void onStart() {
         System.out.println("on start called");
@@ -304,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
 
-///        mGoogleApiClient.connect();
+
         final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
         trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -312,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
                 if(isChecked){ // Let's go case //
                     //toggle enabled - starts tracking
                     startTravelLocationService();
-///                    addLocationToInfoLayout("Most recent location");
                 } else {  // That's it case//
                     timeLine = getTimeLineFromTravelLocationService();
                     stopTravelLocationService();
@@ -349,8 +258,6 @@ public class MainActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
         //startService(new Intent(this, HiService.class));
-
-///        mGoogleApiClient.disconnect();
     }
 
     @Override
@@ -366,62 +273,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-///    protected void createLocationRequest() {
-///        mLocationRequest = LocationRequest.create()
-///                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-///                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-///                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
-///    }
 
-///    protected void startLocationUpdates() {
-///        System.out.println("starting location updates");
-///        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-///            // TODO: Consider calling
-///            //    ActivityCompat#requestPermissions
-///            // here to request the missing permissions, and then overriding
-///            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-///            //                                          int[] grantResults)
-///            // to handle the case where the user grants the permission. See the documentation
-///            // for ActivityCompat#requestPermissions for more details.
-///            return;
-///        }
-///        LocationServices.FusedLocationApi.requestLocationUpdates(
-///                mGoogleApiClient, mLocationRequest, this);
-///    }
-
-
-///    @Override
-///    public void onLocationChanged(Location location) {
-///        System.out.println("location changed!");
-///
-///        mLastLocation = location;
-///        addLocationToInfoLayout("no click");
-///
-///       //first time when the app starts -> startLocationUpdates called -> new location received
-///        // -> onLocationChanged triggered.
-///        if(currentTimeLineEntry == null) {
-///            GregorianCalendar currentTime = new GregorianCalendar(pdt);
-///            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
-///            return;
-///        }
-///
-///        GregorianCalendar currentTime = new GregorianCalendar(pdt);
-///        if(currentTimeLineEntry.nearLocation(mLastLocation)){
-///            System.out.println("it's near; time: " + currentTime.getTime());
-///            currentTimeLineEntry.updatesEndTime(currentTime);
-///
-///        } else {
-///            System.out.println("it's far : duration "+ currentTimeLineEntry.getDuration());
-///            System.out.println("threshold duration " + thresholdDuration);
-///            if(currentTimeLineEntry.getDuration() > thresholdDuration){
-///                timeLine.add(currentTimeLineEntry);
-///                System.out.println("add, size" + timeLine.size());
-///            }
-///            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
-///        }
-///        //check if location changed
-///
-///    }
 
 
 
