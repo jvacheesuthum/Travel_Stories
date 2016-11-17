@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private ArrayList<TimeLineEntry> timeLine;
     TimeLineEntry currentTimeLineEntry;
     public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
+    Long initStart;
 
     Client TravelServerWSClient;
 
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
         createLocationRequest();
         timeLine = new ArrayList<>();
+
+        initStart = System.currentTimeMillis();
 
         // get the supported ids for GMT-08:00 (Pacific Standard Time)
         String[] ids = TimeZone.getAvailableIDs(-8 * 60 * 60 * 1000);
@@ -143,8 +146,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 MediaStore.Images.ImageColumns.DATE_TAKEN};
         String selection = MediaStore.Images.ImageColumns.DATE_TAKEN + " > ? AND " +
                 MediaStore.Images.ImageColumns.DATE_TAKEN + " < ?";
-        Long start = timeLine.get(0).start.getTimeInMillis();
-        Long end = timeLine.get(timeLine.size() - 1).end.getTimeInMillis();
+//        Long start = timeLine.get(0).start.getTimeInMillis();
+//        Long end = timeLine.get(timeLine.size() - 1).end.getTimeInMillis();
+        Long start = initStart;
+        Long end = System.currentTimeMillis();
+
         String[] selectionArgs = {start.toString(), end.toString()};
         final Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
@@ -154,12 +160,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         cursor.moveToFirst();
         int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
 
+        for (TimeLineEntry e : timeLine) {
+            e.photos = new ArrayList<>();
+        }
+
         int index = 0;
         TimeLineEntry prevEntry = null;
-        TimeLineEntry currEntry = timeLine.get(index);
+        TimeLineEntry currEntry;
 
+        for (TimeLineEntry e : timeLine) {
+            System.out.println("TimeLine Time: " + e.getTime());
+        }
+
+        if (!cursor.moveToNext()) return;
+        cursor.moveToFirst();
+
+        int count = cursor.getCount();
 
         do {
+
             ArrayList<Photo> photos = new ArrayList<>();
             currEntry = timeLine.get(index);
             if (prevEntry != null) {
@@ -173,7 +192,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     } else {
                         prevEntry.photos.add(photo);
                     }
-                    cursor.moveToNext();
+                    if (!cursor.moveToNext()) {
+                        break;
+                    }
                 }
             }
             start = currEntry.start.getTimeInMillis();
@@ -181,13 +202,31 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             while (cursor.getLong(dateColumn) <= end) {
                 photos.add(getPhoto(cursor, dateColumn));
+
                 if (!cursor.moveToNext()) {
                     break;
                 }
+//                cursor.moveToPrevious();
             }
+            currEntry.photos = photos;
             prevEntry = currEntry;
             index++;
-        } while (cursor.moveToNext());
+            if (cursor.isLast()) {
+                break;
+            }
+        } while (index != timeLine.size());
+
+        if (!cursor.isLast() && !cursor.isAfterLast()) {
+            do {
+                currEntry.photos.add(getPhoto(cursor, dateColumn));
+                if (!cursor.moveToNext()) {
+                    break;
+                }
+                cursor.moveToPrevious();
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
     }
 
     @Override
@@ -426,7 +465,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         }
 //        request += "-0.1269566,51.5194133";
         System.out.println("request message is:*" + request + "*");
+
+        System.out.println("POPULATE LISTTTTTTTTTTTTTTTTTTTTT");
+        populateList();
+
         wsc.send(request);
+
     }
 
 

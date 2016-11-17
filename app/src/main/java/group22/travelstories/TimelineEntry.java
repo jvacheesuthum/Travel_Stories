@@ -31,8 +31,8 @@ public class TimeLineEntry implements Serializable{
     public boolean nearLocation(Location location) {
         int radius = 2; // radius in 100 meters
 
-        return ( Math.abs(location.getLongitude() - this.location.getLongitude()) < 0.001 * radius) &&
-                ( Math.abs(location.getLatitude() - this.location.getLatitude()) < 0.001 * radius);
+        return ( Math.abs(location.getLongitude() - this.location.getLongitude()) < 0.00001 * radius) &&
+                ( Math.abs(location.getLatitude() - this.location.getLatitude()) < 0.00001 * radius);
     }
 
     public void updatesEndTime(GregorianCalendar gregorianCalendar) {
