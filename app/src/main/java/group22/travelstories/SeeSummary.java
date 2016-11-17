@@ -23,9 +23,8 @@ public class SeeSummary implements Callable {
     Context main;
     public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
 
-    public SeeSummary(List<TimeLineEntry> timeline, Context v){
+    public SeeSummary(Context v){
         this.main = v;
-        this.timeLine = timeline;
     }
 
     @Override
@@ -53,5 +52,9 @@ public class SeeSummary implements Callable {
         }
         intent.putParcelableArrayListExtra(EXTRA_MESSAGE, (ArrayList) list);
         main.startActivity(intent);
+    }
+
+    public void setTimeLine(List<TimeLineEntry> timeLine) {
+        this.timeLine = timeLine;
     }
 }
