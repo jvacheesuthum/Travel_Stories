@@ -1,16 +1,19 @@
 package group22.travelstories;
 
 import android.Manifest;
-import android.app.FragmentManager;
+
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -31,38 +34,29 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.server.converter.StringToIntConverter;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
 
-public class MainActivity extends AppCompatActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+public class MainActivity extends AppCompatActivity {
 
     private static int RESULT_LOAD_IMAGE = 1;
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
-    private LocationRequest mLocationRequest;
-    private boolean mRequestingLocationUpdates = true;
-    private ArrayList<TimeLineEntry> timeLine;
-    TimeLineEntry currentTimeLineEntry;
+    private List<TimeLineEntry> timeLine;
     public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
+    Long initStart;
 
-    // create a Pacific Standard Time time zone
-    SimpleTimeZone pdt;
-    private long thresholdDuration = 10 * 1000; // 5 minutes
+    Client TravelServerWSClient;
+
+    TravelLocationService mService;
+    boolean mBound = false;
+    private boolean isTracking;
+    SeeSummary mSeeSummary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,27 +67,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
-        // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-        createLocationRequest();
         timeLine = new ArrayList<>();
 
-        // get the supported ids for GMT-08:00 (Pacific Standard Time)
-        String[] ids = TimeZone.getAvailableIDs(-8 * 60 * 60 * 1000);
-        // if no ids were returned, something is wrong. get out.
-        if (ids.length == 0)
-            System.exit(0);
-        // create a Pacific Standard Time time zone
-        pdt = new SimpleTimeZone(-8 * 60 * 60 * 1000, ids[0]);
-        // set up rules for Daylight Saving Time
-        pdt.setStartRule(Calendar.APRIL, 1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
-        pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
+        initStart = System.currentTimeMillis();
+
 
 
         ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
@@ -104,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     //toggle enabled - starts tracking
                     Hi x = new Hi();
                     x.say();
-                    addLocationToInfoLayout("Most recent location");
+                    //addLocationToInfoLayout("Most recent location");
                 } else {
                     System.out.println("stops tracking");
                     //toggle disabled - stops tracking
@@ -180,8 +157,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 MediaStore.Images.ImageColumns.DATE_TAKEN};
         String selection = MediaStore.Images.ImageColumns.DATE_TAKEN + " > ? AND " +
                 MediaStore.Images.ImageColumns.DATE_TAKEN + " < ?";
-        Long start = timeLine.get(0).start.getTimeInMillis();
-        Long end = timeLine.get(timeLine.size() - 1).end.getTimeInMillis();
+//        Long start = timeLine.get(0).start.getTimeInMillis();
+//        Long end = timeLine.get(timeLine.size() - 1).end.getTimeInMillis();
+        Long start = initStart;
+        Long end = System.currentTimeMillis();
+
         String[] selectionArgs = {start.toString(), end.toString()};
         final Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
@@ -191,12 +171,30 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         cursor.moveToFirst();
         int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
 
+        while(cursor.moveToNext()) {
+            System.out.println("Curosr: " + cursor.getLong(dateColumn));
+        }
+        cursor.moveToFirst();
+
+        for (TimeLineEntry e : timeLine) {
+            e.photos = new ArrayList<>();
+        }
+
         int index = 0;
         TimeLineEntry prevEntry = null;
-        TimeLineEntry currEntry = timeLine.get(index);
+        TimeLineEntry currEntry;
 
+        for (TimeLineEntry e : timeLine) {
+            System.out.println("TimeLine Time: " + e.getTime());
+        }
+
+        if (!cursor.moveToNext()) return;
+        cursor.moveToFirst();
+
+        int count = cursor.getCount();
 
         do {
+
             ArrayList<Photo> photos = new ArrayList<>();
             currEntry = timeLine.get(index);
             if (prevEntry != null) {
@@ -210,7 +208,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                     } else {
                         prevEntry.photos.add(photo);
                     }
-                    cursor.moveToNext();
+                    if (!cursor.moveToNext()) {
+                        break;
+                    }
                 }
             }
             start = currEntry.start.getTimeInMillis();
@@ -218,13 +218,33 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
             while (cursor.getLong(dateColumn) <= end) {
                 photos.add(getPhoto(cursor, dateColumn));
+
                 if (!cursor.moveToNext()) {
                     break;
                 }
+//                cursor.moveToPrevious();
             }
+            currEntry.photos = photos;
             prevEntry = currEntry;
             index++;
-        } while (cursor.moveToNext());
+            if (cursor.isLast()) {
+                break;
+            }
+        } while (index != timeLine.size());
+
+        if (!cursor.isLast() && !cursor.isAfterLast()) {
+            System.out.println("In last if");
+            do {
+                System.out.println("IN LAST LOOP: " + cursor.getLong(dateColumn));
+                currEntry.photos.add(getPhoto(cursor, dateColumn));
+                if (!cursor.moveToNext()) {
+                    break;
+                }
+                cursor.moveToPrevious();
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
     }
 
     @Override
@@ -274,154 +294,188 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        System.out.println("on connected called");
 
-        if (mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            System.out.println("PERMISSION CHECK fails at onConnected function");
-            return;
-        }
-        //mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-//        if (mLastLocation != null) {
-//            System.out.println("---play service---");
-//            System.out.println(String.valueOf(mLastLocation.getLatitude()));
-//            System.out.println(String.valueOf(mLastLocation.getLongitude()));
-//            System.out.println("---play service---");
-////            GregorianCalendar currentTime = new GregorianCalendar(pdt);
-////            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
-//        }
-    }
-
-    public void addLocationToInfoLayout(String message) {
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.info);
-        TextView valueTV = new TextView(MainActivity.this);
-        valueTV.setText("[" + mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude() + "]" + message);
-        valueTV.setLayoutParams(new Toolbar.LayoutParams(
-                Toolbar.LayoutParams.FILL_PARENT,
-                Toolbar.LayoutParams.WRAP_CONTENT));
-
-        ((LinearLayout) linearLayout).addView(valueTV);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+    private void myBindService(){
+        Intent intent = new Intent(this, TravelLocationService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     protected void onStart() {
         System.out.println("on start called");
         super.onStart();
+        mSeeSummary = new SeeSummary(this);
+        if(isTracking){
+            Intent intent = new Intent(this, TravelLocationService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
 
-        mGoogleApiClient.connect();
+        try {
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", mSeeSummary);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        try {
+            TravelServerWSClient.connectBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
         final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
         trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked){
+                if(isChecked){ // Let's go case //
                     //toggle enabled - starts tracking
-                    Hi x = new Hi();
-                    x.say();
-                    addLocationToInfoLayout("Most recent location");
-                } else {
-                    System.out.println("stops tracking");
+                    startTravelLocationService();
+                    myBindService();
+                    isTracking = true;
+                } else {  // That's it case//
+                    timeLine = getTimeLineFromTravelLocationService();
+                    mSeeSummary.setTimeLine(timeLine);
+                    stopTravelLocationService();
+                    isTracking = false;
+                    if(timeLine == null) {
+                        System.out.println("getTimeLineFromTravelLocationService not yet implemented");
+                    } else {
+                        System.out.println("got a timeline from service");
+                        for(TimeLineEntry each : timeLine){
+                            System.out.println(each.getTime());
+                        }
+                    }
+                    sendTimeLineLocation(TravelServerWSClient);
                     trackToggle.setText("See summary");
-                    seeSummary();
-                    //stop tracking activity
-                    //toggle changes to see summary
                 }
             }
         });
 
     }
 
+    private void startTravelLocationService(){
+        startService(new Intent(this, TravelLocationService.class));
+    }
+
+    private void stopTravelLocationService(){
+        stopService(new Intent(this, TravelLocationService.class));
+    }
+
     protected void onStop() {
-        System.out.println("on stop called");
-        mGoogleApiClient.disconnect();
         super.onStop();
-    }
-
-    protected void createLocationRequest() {
-        mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
-                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
-    }
-
-    protected void startLocationUpdates() {
-        System.out.println("starting location updates");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        System.out.println("on stop called");
+        if(isTracking){
+            // Unbind from the service
+            if (mBound) {
+                unbindService(mConnection);
+                mBound = false;
+            }
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+        try {
+            TravelServerWSClient.closeBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-
 
     @Override
-    public void onLocationChanged(Location location) {
-        System.out.println("location changed!");
+    protected void onRestart(){
+        System.out.println("on restart called");
+        super.onRestart();
+    }
 
-        mLastLocation = location;
-        addLocationToInfoLayout("no click");
+    @Override
+    protected void onDestroy(){
+        System.out.println("on destroy called");
+        super.onDestroy();
+    }
 
-        //first time when the app starts -> startLocationUpdates called -> new location received
-        // -> onLocationChanged triggered.
-        if(currentTimeLineEntry == null) {
-            GregorianCalendar currentTime = new GregorianCalendar(pdt);
-            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
+
+
+
+
+
+    public void sendTimeLineLocation(Client wsc) {
+        if (timeLine.isEmpty()) {
+            //real thing
+            /*
+            System.out.println("timeline is empty");
+            return;
+            */
+            // test thing
+            System.out.println("timeline is empty");
+            System.out.println("populating timeline list ...");
+///            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+///            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+///            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+///            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+///            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+///            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+///            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+///            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+///            timeLine.add(new TimeLineEntry(mLastLocation, new GregorianCalendar(pdt), new GregorianCalendar(pdt)));
+
+            tempPopulateList();
+            wsc.send("timeline_address:-0.126957,51.5194133");
             return;
         }
+        String request = "timeline_address:";
 
-        GregorianCalendar currentTime = new GregorianCalendar(pdt);
-        if(currentTimeLineEntry.nearLocation(mLastLocation)){
-            System.out.println("it's near; time: " + currentTime.getTime());
-            currentTimeLineEntry.updatesEndTime(currentTime);
-
-        } else {
-            System.out.println("it's far : duration "+ currentTimeLineEntry.getDuration());
-            System.out.println("threshold duration " + thresholdDuration);
-            if(currentTimeLineEntry.getDuration() > thresholdDuration){
-                System.out.println("add");
-                timeLine.add(currentTimeLineEntry);
-            }
-            currentTimeLineEntry = new TimeLineEntry(mLastLocation, currentTime, currentTime);
+        for (TimeLineEntry each : timeLine) {
+            Location eachLocation = each.getLocation();
+            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
         }
-        //check if location changed
+//        request += "-0.1269566,51.5194133";
+        System.out.println("request message is:*" + request + "*");
+
+        System.out.println("POPULATE LISTTTTTTTTTTTTTTTTTTTTT");
+        populateList();
+
+        wsc.send(request);
 
     }
 
-    public void seeSummary(){
-        Intent intent = new Intent(this, DisplayStoryActivity.class);
-        ArrayList list = new ArrayList();
-        for (int i = 0 ; i < timeLine.size() ; i++ ){
-            list.add(i, timeLine.get(i).getLocationName());
+
+    private void tempPopulateList() {
+        if (timeLine.isEmpty()) return;
+        String[] projection = {MediaStore.Images.ImageColumns.DATA,
+                MediaStore.Images.ImageColumns.LATITUDE,
+                MediaStore.Images.ImageColumns.LONGITUDE,
+                MediaStore.Images.ImageColumns.DATE_TAKEN};
+        final Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+        cursor.moveToFirst();
+        int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
+
+        int index = 0;
+
+        for (TimeLineEntry e : timeLine) {
+            e.photos = new ArrayList<>();
         }
-        intent.putParcelableArrayListExtra(EXTRA_MESSAGE, list);
-        startActivity(intent);
+
+        do {
+            System.out.println("Index: " + index);
+            TimeLineEntry e = timeLine.get(index);
+            Photo photo = getPhoto(cursor, dateColumn);
+            e.photos.add(photo);
+            index = (index + 1) % timeLine.size();
+        } while (cursor.moveToNext());
+    }
+
+
+    /** Called when a button is clicked (the button in the layout file attaches to
+     * this method with the android:onClick attribute) */
+    public List<TimeLineEntry> getTimeLineFromTravelLocationService() {
+        List<TimeLineEntry> out = null;
+        if (mBound) {
+            // Call a method from the LocalService.
+            // However, if this call were something that might hang, then this request should
+            // occur in a separate thread to avoid slowing down the activity performance.
+            out = mService.getTimeLineList();
+            Toast.makeText(this, "get timeline frm serv", Toast.LENGTH_SHORT).show();
+        }
+        return out;
     }
 
     public void showMap(){
@@ -435,6 +489,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     }
 
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            TravelLocationService.LocalBinder binder = (TravelLocationService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 }
 
 
