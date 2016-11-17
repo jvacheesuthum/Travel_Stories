@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private static int RESULT_LOAD_IMAGE = 1;
     private List<TimeLineEntry> timeLine;
     public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
+    Long initStart;
 
     Client TravelServerWSClient;
 
@@ -65,7 +66,11 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
         timeLine = new ArrayList<>();
+
+        initStart = System.currentTimeMillis();
+
         isTracking = false;
+
 
     }
 
@@ -112,8 +117,11 @@ public class MainActivity extends AppCompatActivity {
                 MediaStore.Images.ImageColumns.DATE_TAKEN};
         String selection = MediaStore.Images.ImageColumns.DATE_TAKEN + " > ? AND " +
                 MediaStore.Images.ImageColumns.DATE_TAKEN + " < ?";
-        Long start = timeLine.get(0).start.getTimeInMillis();
-        Long end = timeLine.get(timeLine.size() - 1).end.getTimeInMillis();
+//        Long start = timeLine.get(0).start.getTimeInMillis();
+//        Long end = timeLine.get(timeLine.size() - 1).end.getTimeInMillis();
+        Long start = initStart;
+        Long end = System.currentTimeMillis();
+
         String[] selectionArgs = {start.toString(), end.toString()};
         final Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
@@ -123,12 +131,25 @@ public class MainActivity extends AppCompatActivity {
         cursor.moveToFirst();
         int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
 
+        for (TimeLineEntry e : timeLine) {
+            e.photos = new ArrayList<>();
+        }
+
         int index = 0;
         TimeLineEntry prevEntry = null;
-        TimeLineEntry currEntry = timeLine.get(index);
+        TimeLineEntry currEntry;
 
+        for (TimeLineEntry e : timeLine) {
+            System.out.println("TimeLine Time: " + e.getTime());
+        }
+
+        if (!cursor.moveToNext()) return;
+        cursor.moveToFirst();
+
+        int count = cursor.getCount();
 
         do {
+
             ArrayList<Photo> photos = new ArrayList<>();
             currEntry = timeLine.get(index);
             if (prevEntry != null) {
@@ -142,7 +163,9 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         prevEntry.photos.add(photo);
                     }
-                    cursor.moveToNext();
+                    if (!cursor.moveToNext()) {
+                        break;
+                    }
                 }
             }
             start = currEntry.start.getTimeInMillis();
@@ -150,13 +173,31 @@ public class MainActivity extends AppCompatActivity {
 
             while (cursor.getLong(dateColumn) <= end) {
                 photos.add(getPhoto(cursor, dateColumn));
+
                 if (!cursor.moveToNext()) {
                     break;
                 }
+//                cursor.moveToPrevious();
             }
+            currEntry.photos = photos;
             prevEntry = currEntry;
             index++;
-        } while (cursor.moveToNext());
+            if (cursor.isLast()) {
+                break;
+            }
+        } while (index != timeLine.size());
+
+        if (!cursor.isLast() && !cursor.isAfterLast()) {
+            do {
+                currEntry.photos.add(getPhoto(cursor, dateColumn));
+                if (!cursor.moveToNext()) {
+                    break;
+                }
+                cursor.moveToPrevious();
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
     }
 
     @Override
@@ -335,7 +376,12 @@ public class MainActivity extends AppCompatActivity {
         }
 //        request += "-0.1269566,51.5194133";
         System.out.println("request message is:*" + request + "*");
+
+        System.out.println("POPULATE LISTTTTTTTTTTTTTTTTTTTTT");
+        populateList();
+
         wsc.send(request);
+
     }
 
 

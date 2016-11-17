@@ -47,6 +47,8 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
                 @Override
                 public void onClick(View v) {
                     System.out.println("Detected click on card view: " + v.toString());
+//                    setContentView(R.id.)
+
                 }
             });
         }
@@ -73,10 +75,20 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
         holder.timeLineName.setText(((TimeLineEntry)fromIntent.get(i)).getLocationName());
         holder.timeLineTime.setText(((TimeLineEntry)fromIntent.get(i)).getTime());
 
-//        Bitmap b = BitmapFactory.decodeFile(((TimeLineEntry)fromIntent.get(i)).photos.get(0).path);
-//        Bitmap scaledB = Bitmap.createScaledBitmap(b,b.getWidth()/10, b.getHeight()/10, true);
-//        b.recycle();
-//        holder.timeLinePhoto.setImageBitmap(scaledB);
+        System.out.println("FROM INTENT GET: " + (((TimeLineEntry) fromIntent.get(i))));
+        System.out.println("FROM INTENT PHOTO: " + (((TimeLineEntry) fromIntent.get(i)).photos));
+        if (((TimeLineEntry) fromIntent.get(i)).photos.size() == 0) System.out.println("SIZE EQUALS ZERO");
+        if (((TimeLineEntry) fromIntent.get(i)).photos.isEmpty()) System.out.println("PHOTOS IS EMPTY");
+        if (((TimeLineEntry) fromIntent.get(i)).photos.toArray().length == 0) System.out.println("ARRAY LENGTH ZERO");
+
+        if (!((TimeLineEntry) fromIntent.get(i)).photos.isEmpty()) {
+            System.out.println("In check");
+            Bitmap b = BitmapFactory.decodeFile(((TimeLineEntry)fromIntent.get(i)).photos.get(0).path);
+            Bitmap scaledB = Bitmap.createScaledBitmap(b,b.getWidth()/10, b.getHeight()/10, true);
+            b.recycle();
+            holder.timeLinePhoto.setImageBitmap(scaledB);
+        }
+
 
         //holder.timeLinePhoto.setImageResource(persons.get(i).photoId);
     }
