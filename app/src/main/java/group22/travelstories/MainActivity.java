@@ -1,6 +1,7 @@
 package group22.travelstories;
 
 import android.Manifest;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -69,10 +71,48 @@ public class MainActivity extends AppCompatActivity {
 
         initStart = System.currentTimeMillis();
 
-        isTracking = false;
 
 
-    }
+        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
+        trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    //toggle enabled - starts tracking
+                    Hi x = new Hi();
+                    x.say();
+                    //addLocationToInfoLayout("Most recent location");
+                } else {
+                    System.out.println("stops tracking");
+                    //toggle disabled - stops tracking
+                }
+            }
+        });
+
+        Button mapToggle = (Button) findViewById(R.id.mapToggle);
+        mapToggle.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                showMap();
+            }
+            });
+        };
+
+//        Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
+//        buttonLoadImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View arg0) {
+//
+//                Intent i = new Intent(
+//                        Intent.ACTION_PICK,
+//                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//
+//                startActivityForResult(i, RESULT_LOAD_IMAGE);
+//            }
+//        });
+
+
+
 
     private Photo getPhoto(Cursor cursor, int dateColumn) {
         int path = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA);
@@ -246,6 +286,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //Intent settings = new Intent(this, SettingsActivity.class);
+            //startActivity(settings);
             return true;
         }
 
@@ -434,6 +476,17 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "get timeline frm serv", Toast.LENGTH_SHORT).show();
         }
         return out;
+    }
+
+    public void showMap(){
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+
+    }
+
+    public void mapShow(View view){
+
+
     }
 
     /** Defines callbacks for service binding, passed to bindService() */

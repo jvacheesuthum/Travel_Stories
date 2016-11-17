@@ -4,4 +4,7 @@
     <string name="summary">Your Travel Story</string>
     <string name="start_tracking">Let\'s go!</string>
     <string name="stop_tracking">That\'s it!</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="map_on">Map Display</string>
+    <string name="map_off">Map Display</string>
 </resources>

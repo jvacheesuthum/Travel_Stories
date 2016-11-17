@@ -21,10 +21,17 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar2"
+            android:layout_weight="0.19" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -38,6 +45,30 @@
                 android:layout_weight="0.07"/>
         </ScrollView>
 
+<!--
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="group22.travelstories.MapsActivity" />
+-->
+        <!--<ImageView-->
+            <!--android:id="@+id/imgView"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="0.40"/>-->
+
+
+        <!--<Button-->
+            <!--android:id="@+id/summary"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/summary"-->
+            <!--android:onClick="seeSummary"/>-->
+
 
         <ToggleButton
             android:id="@+id/trackToggle"
@@ -47,6 +78,23 @@
             android:layout_margin="@dimen/toggle_margin"
             android:textOff="@string/start_tracking"
             android:textOn="@string/stop_tracking"/>
+
+        <ToggleButton
+            android:text="Map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/mapToggle"
+            android:textOff="@string/map_off"
+            android:textOn="@string/map_on" />
+
+
+        <!--
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Map_Time"
+                    android:onClick="mapShow" />
+                    -->
 
     </LinearLayout>
 
