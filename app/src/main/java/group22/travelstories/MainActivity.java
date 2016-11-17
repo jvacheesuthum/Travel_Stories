@@ -296,11 +296,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        try {
-            TravelServerWSClient.connectBlocking();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            TravelServerWSClient.connectBlocking();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         mGoogleApiClient.connect();
         final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
@@ -323,17 +323,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     }
 
+    private void startHiService(){
+        startService(new Intent(this, HiService.class));
+    }
+
     protected void onStop() {
+        super.onStop();
         System.out.println("on stop called");
-        try {
-            TravelServerWSClient.closeBlocking();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            TravelServerWSClient.closeBlocking();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         mGoogleApiClient.disconnect(); //do we remove this line to keep location updates after exitting app?
-        super.onStop();
+        startHiService();
     }
+
+    @Override
+    protected void onRestart(){
+        System.out.println("on restart called");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onDestroy(){
+        System.out.println("on destroy called");
+        super.onDestroy();
+    }
+
 
     protected void createLocationRequest() {
         mLocationRequest = LocationRequest.create()
