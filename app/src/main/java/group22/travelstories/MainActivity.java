@@ -218,16 +218,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            //TravelServerWSClient = new Client("localhost:1080");
             TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", new SeeSummary(timeLine,this));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-//        try {
-//            TravelServerWSClient.connectBlocking();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            TravelServerWSClient.connectBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
         final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
@@ -277,11 +276,11 @@ public class MainActivity extends AppCompatActivity {
                 mBound = false;
             }
         }
-//        try {
-//            TravelServerWSClient.closeBlocking();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            TravelServerWSClient.closeBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
