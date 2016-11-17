@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".DisplayStoryActivity"></activity>
         <service android:name=".HiService" ></service>
+        <service android:name=".TravelLocationService" ></service>
     </application>
 
 </manifest>
