@@ -41,7 +41,7 @@ public class Client extends WebSocketClient{
         // real thing
         if(message.split(":")[0].equals("timeline_address")){
             try {
-                String[] locations = message.split(":")[1].split(",");
+                String[] locations = message.split(":")[1].split("@");
                 ((SeeSummary) seeSummary).callWithArg(locations);
             } catch (Exception e) {
                 e.printStackTrace();
