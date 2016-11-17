@@ -52,9 +52,11 @@
                 android:value="@integer/google_play_services_version" />
 
         </activity>
-//=======
-        <service android:name=".HiService" ></service>
-        <service android:name=".TravelLocationService" ></service>
+
+        <service android:name=".HiService" />
+        <service android:name=".TravelLocationService" />
+
+        <activity android:name=".EditStoryActivity"></activity>
     </application>
 
 </manifest>
