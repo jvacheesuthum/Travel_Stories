@@ -153,9 +153,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onLocationChanged(Location location)
     {
         mLastLocation = location;
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
-        }
 
         //Place current location marker and move camera (only for first location detected)
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -163,7 +160,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
             markerOptions.title("Starting Position");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             mCurrLocationMarker = mMap.addMarker(markerOptions);
 
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -275,7 +272,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void redrawLine(LatLng currentLocation){
 
-        mMap.clear();  //clears all Markers and Polylines
+        //clear previously drawn line if not null\
+        if (line != null){
+            line.remove();
+        }
 
         PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
         for (int i = 0; i < points.size(); i++) {
