@@ -7,6 +7,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
+import com.google.gson.*;
 
 /**
  * Created by vasin on 01/11/2016.
@@ -17,10 +18,12 @@ public class Client extends WebSocketClient{
     //String message = null;
     //String message = "British Museum@Blah@Ha";
     Callable seeSummary;
+    SeeSuggestions seeSuggestions;
 
-    public Client(String url, Callable seeSummary) throws URISyntaxException {
+    public Client(String url, Callable seeSummary, Callable seeSuggestions) throws URISyntaxException {
         super(new URI(url));
         this.seeSummary = seeSummary;
+        this.seeSuggestions = (SeeSuggestions) seeSuggestions;
     }
 
     @Override
@@ -46,15 +49,27 @@ public class Client extends WebSocketClient{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if(message.split(":")[0].equals("nearby_place")){
+            Gson gson = new Gson();
+            Place[] places = gson.fromJson(message.split(":")[1],Place[].class);
+            for(Place each : places){
+                System.out.println(each.toString());
+            }
+//            TODO:
+//            try {
+//                seeSuggestions.callWithArg(places);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
         // test thing
-        else if(!message.equals("Connected to Server")){
-            try {
-                seeSummary.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+//        else if(!message.equals("Connected to Server")){
+//            try {
+//                seeSummary.call();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     @Override

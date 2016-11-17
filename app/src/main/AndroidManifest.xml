@@ -21,9 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayStoryActivity"></activity>
-        <service android:name=".HiService" ></service>
-        <service android:name=".TravelLocationService" ></service>
+        <activity android:name=".DisplayStoryActivity" />
+
+        <service android:name=".HiService" />
+        <service android:name=".TravelLocationService" />
+
+        <activity android:name=".suggestionActivity"></activity>
     </application>
 
 </manifest>

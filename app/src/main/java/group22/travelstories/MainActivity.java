@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     boolean mBound = false;
     private boolean isTracking;
     SeeSummary mSeeSummary;
+    SeeSuggestions mSeeSuggestions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
         initStart = System.currentTimeMillis();
 
         isTracking = false;
+
+
 
 
     }
@@ -258,17 +261,22 @@ public class MainActivity extends AppCompatActivity {
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
+    private void makeToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
     protected void onStart() {
         System.out.println("on start called");
         super.onStart();
         mSeeSummary = new SeeSummary(this);
+        mSeeSuggestions = new SeeSuggestions(this);
         if(isTracking){
             Intent intent = new Intent(this, TravelLocationService.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
 
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", mSeeSummary);
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", mSeeSummary, mSeeSuggestions);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -277,6 +285,16 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        View suggestButton = findViewById(R.id.suggestion);
+        suggestButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                makeToast("suggest!");
+                requestNearBySuggestions(TravelServerWSClient);
+            }
+        });
 
 
         final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
@@ -347,7 +365,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    public void requestNearBySuggestions(Client wsc){
+        wsc.send("nearby_place:"+"-0.126,51.519,1");
+    }
 
 
 

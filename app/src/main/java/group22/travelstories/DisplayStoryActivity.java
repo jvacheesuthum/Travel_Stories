@@ -4,15 +4,21 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
 //import android.widget.ListView;
 //import android.widget.ArrayAdapter<T>;
 
@@ -21,6 +27,10 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private View mFab;
+    private ArrayList timeline;
+
+    Client TravelServerWSClient;
     //private RecyclerView rv;
 
     @Override
@@ -29,6 +39,13 @@ public class DisplayStoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_story);
         mRecyclerView = (RecyclerView) findViewById(R.id.rv);
+        mFab = findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                shareStorySummary();
+            }
+        });
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -40,7 +57,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        ArrayList timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
+        timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
 
         // specify an adapter (see also next example)
         mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
@@ -66,7 +83,52 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
     }
 
+    private void makeToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
 
+    private void shareStorySummary(){
+        makeToast("sharing");
+        Gson gson = new Gson();
+        List<ServerTimeLineEntry> toSend = new ArrayList<>();
+        for(Object each : timeline){
+            toSend.add(((TimeLineEntry) each).toServerTimeLineEntry());
+        }
+        String timeline_json = gson.toJson(toSend);
+        //for test purpose userId = 1
+        int userId = 1;
+        String request = "timeline_share:"+userId+"@"+timeline_json;
+        System.out.println("sharing request:"+request);
+        TravelServerWSClient.send(request);
+    }
+
+    @Override
+    public void onStart(){
+        System.out.println("summary on start called");
+        super.onStart();
+        try {
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", null,null);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        try {
+            TravelServerWSClient.connectBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        System.out.println("summary on stop called");
+        try {
+            TravelServerWSClient.closeBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
