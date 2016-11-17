@@ -1,15 +1,18 @@
 package group22.travelstories;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -29,23 +32,27 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static int RESULT_LOAD_IMAGE = 1;
-    private ArrayList<TimeLineEntry> timeLine;
+    private List<TimeLineEntry> timeLine;
     public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
 
     Client TravelServerWSClient;
 
-
+    TravelLocationService mService;
+    boolean mBound = false;
+    private boolean isTracking;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
         timeLine = new ArrayList<>();
-
+        isTracking = false;
 
     }
 
@@ -197,10 +204,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void myBindService(){
+        Intent intent = new Intent(this, TravelLocationService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
 
     protected void onStart() {
         System.out.println("on start called");
         super.onStart();
+        if(isTracking){
+            Intent intent = new Intent(this, TravelLocationService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
 
         try {
             //TravelServerWSClient = new Client("localhost:1080");
@@ -222,11 +237,19 @@ public class MainActivity extends AppCompatActivity {
                 if(isChecked){ // Let's go case //
                     //toggle enabled - starts tracking
                     startTravelLocationService();
+                    myBindService();
+                    isTracking = true;
                 } else {  // That's it case//
                     timeLine = getTimeLineFromTravelLocationService();
                     stopTravelLocationService();
+                    isTracking = false;
                     if(timeLine == null) {
                         System.out.println("getTimeLineFromTravelLocationService not yet implemented");
+                    } else {
+                        System.out.println("got a timeline from service");
+                        for(TimeLineEntry each : timeLine){
+                            System.out.println(each.getTime());
+                        }
                     }
                     sendTimeLineLocation(TravelServerWSClient);
                     trackToggle.setText("See summary");
@@ -234,11 +257,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    private ArrayList<TimeLineEntry> getTimeLineFromTravelLocationService() {
-        ///TODO: implement this!
-        return null;
     }
 
     private void startTravelLocationService(){
@@ -252,12 +270,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         System.out.println("on stop called");
+        if(isTracking){
+            // Unbind from the service
+            if (mBound) {
+                unbindService(mConnection);
+                mBound = false;
+            }
+        }
 //        try {
 //            TravelServerWSClient.closeBlocking();
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
-        //startService(new Intent(this, HiService.class));
     }
 
     @Override
@@ -342,6 +366,38 @@ public class MainActivity extends AppCompatActivity {
         } while (cursor.moveToNext());
     }
 
+
+    /** Called when a button is clicked (the button in the layout file attaches to
+     * this method with the android:onClick attribute) */
+    public List<TimeLineEntry> getTimeLineFromTravelLocationService() {
+        List<TimeLineEntry> out = null;
+        if (mBound) {
+            // Call a method from the LocalService.
+            // However, if this call were something that might hang, then this request should
+            // occur in a separate thread to avoid slowing down the activity performance.
+            out = mService.getTimeLineList();
+            Toast.makeText(this, "get timeline frm serv", Toast.LENGTH_SHORT).show();
+        }
+        return out;
+    }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            TravelLocationService.LocalBinder binder = (TravelLocationService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 }
 
 

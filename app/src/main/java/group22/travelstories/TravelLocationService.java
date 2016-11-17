@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import com.google.android.gms.location.LocationServices;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.Timer;
@@ -32,6 +34,8 @@ import java.util.TimerTask;
 
 public class TravelLocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,LocationListener {
 
+    private final IBinder mBinder = new LocalBinder();
+
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     private LocationRequest mLocationRequest;
@@ -42,10 +46,22 @@ public class TravelLocationService extends Service implements GoogleApiClient.Co
     private long thresholdDuration = 10 * 1000; // 5 minutes
 
     private Timer mTimer = null;
+
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    public class LocalBinder extends Binder {
+        TravelLocationService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return TravelLocationService.this;
+        }
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
 
 //    @Override
@@ -78,6 +94,10 @@ public class TravelLocationService extends Service implements GoogleApiClient.Co
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+    }
+
+    public ArrayList<TimeLineEntry> getTimeLineList(){
+        return this.timeLine;
     }
 
     @Override
@@ -116,10 +136,6 @@ public class TravelLocationService extends Service implements GoogleApiClient.Co
         super.onDestroy();
         mGoogleApiClient.disconnect();
     }
-
-
-
-
 
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -196,4 +212,6 @@ public class TravelLocationService extends Service implements GoogleApiClient.Co
         }
         //check if location changed
     }
+
+
 }
