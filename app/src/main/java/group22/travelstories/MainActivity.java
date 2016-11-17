@@ -131,6 +131,11 @@ public class MainActivity extends AppCompatActivity {
         cursor.moveToFirst();
         int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
 
+        while(cursor.moveToNext()) {
+            System.out.println("Curosr: " + cursor.getLong(dateColumn));
+        }
+        cursor.moveToFirst();
+
         for (TimeLineEntry e : timeLine) {
             e.photos = new ArrayList<>();
         }
@@ -188,7 +193,9 @@ public class MainActivity extends AppCompatActivity {
         } while (index != timeLine.size());
 
         if (!cursor.isLast() && !cursor.isAfterLast()) {
+            System.out.println("In last if");
             do {
+                System.out.println("IN LAST LOOP: " + cursor.getLong(dateColumn));
                 currEntry.photos.add(getPhoto(cursor, dateColumn));
                 if (!cursor.moveToNext()) {
                     break;
