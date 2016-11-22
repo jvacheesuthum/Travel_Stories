@@ -1,12 +1,16 @@
 package group22.travelstories;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Felix on 03/11/2016.
  */
 
-public class Photo {
+public class Photo implements Serializable{
     String path;
     Date date;
     Double latitude;
@@ -23,4 +27,5 @@ public class Photo {
     public String toString() {
         return "Path: " + path + "\nDate: " + date.toString() + "\nLat: " + latitude + "\nLong: " + longitude;
     }
+
 }
