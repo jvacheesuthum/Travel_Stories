@@ -62,25 +62,6 @@ public class DisplayStoryActivity extends AppCompatActivity {
         // specify an adapter (see also next example)
         mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
         mRecyclerView.setAdapter(mAdapter);
-
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_display_story);
-//
-//        rv = (RecyclerView) findViewById(R.id.rv);
-//
-//        LinearLayoutManager llm = new LinearLayoutManager(this);
-//        rv.setLayoutManager(llm);
-//        rv.setHasFixedSize(true);
-//        // specify an adapter (see also next example)
-//        Intent intent = getIntent();
-//        ArrayList timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
-//        SummaryAdapter mAdapter = new SummaryAdapter(timeline);
-//        rv.setAdapter(mAdapter);
-//    }
-
     }
 
     private void makeToast(String msg){
@@ -166,4 +147,5 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //
 //
 //    }
+
 }

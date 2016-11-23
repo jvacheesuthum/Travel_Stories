@@ -1,6 +1,7 @@
 package group22.travelstories;
 
 import android.Manifest;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -69,10 +71,6 @@ public class MainActivity extends AppCompatActivity {
         timeLine = new ArrayList<>();
 
         initStart = System.currentTimeMillis();
-
-        isTracking = false;
-
-
 
 
     }
@@ -249,6 +247,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //Intent settings = new Intent(this, SettingsActivity.class);
+            //startActivity(settings);
             return true;
         }
 
@@ -454,6 +454,17 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "get timeline frm serv", Toast.LENGTH_SHORT).show();
         }
         return out;
+    }
+
+    public void showMap(){
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+
+    }
+
+    public void mapShow(View view){
+
+
     }
 
     /** Defines callbacks for service binding, passed to bindService() */

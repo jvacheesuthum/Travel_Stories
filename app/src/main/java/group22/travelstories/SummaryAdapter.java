@@ -1,10 +1,12 @@
 package group22.travelstories;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,7 +25,7 @@ import java.util.List;
  * Created by vasin on 09/11/2016.
  */
 public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLineViewHolder> {
-    private ArrayList fromIntent;
+    private static ArrayList fromIntent;
     private int rowLayout;
 
     // Provide a reference to the views for each data item
@@ -35,20 +37,29 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
         TextView timeLineTime;
         ImageView timeLinePhoto;
 
+
         TimeLineViewHolder(View itemView) {
             super(itemView);
             cv = (CardView)itemView.findViewById(R.id.cv);
             timeLineName = (TextView)itemView.findViewById(R.id.timeLine_name);
+            String location = timeLineName.getText().toString();
             timeLineTime = (TextView)itemView.findViewById(R.id.timeLine_time);
+            String time = timeLineTime.getText().toString();
             timeLinePhoto = (ImageView)itemView.findViewById(R.id.timeLine_photo);
+
 
             View view = itemView;
             view.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
                     System.out.println("Detected click on card view: " + v.toString());
-//                    setContentView(R.id.)
-
+                    Intent intent = new Intent(v.getContext(), EditStoryActivity.class);
+                    System.out.println("Check: " + getAdapterPosition());
+                    Bundle dataMap = new Bundle();
+//                    ArrayList<Photo> s = ((TimeLineEntry)fromIntent.get(getAdapterPosition())).photos;
+                    dataMap.putSerializable("photos", (TimeLineEntry)fromIntent.get(getAdapterPosition()));
+                    intent.putExtras(dataMap);
+                    v.getContext().startActivity(intent);
                 }
             });
         }

@@ -5,7 +5,7 @@
     android:layout_margin="5dp"
     card_view:cardCornerRadius="5dp"
     android:layout_height="100dp"
-    >
+    android:id="@+id/cv">
 
         <RelativeLayout
             android:layout_width="wrap_content"
