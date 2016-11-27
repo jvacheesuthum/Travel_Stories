@@ -54,7 +54,7 @@ public class Client extends WebSocketClient{
             Place[] places = gson.fromJson(message.split(":")[1],Place[].class);
             for(Place each : places){
                 System.out.println(each.toString());
-            }
+        }
 //            TODO:
 //            try {
 //                seeSuggestions.callWithArg(places);

@@ -9,9 +9,11 @@ import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -26,6 +28,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
+import android.util.Base64;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +41,9 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
+import com.google.gson.Gson;
+
+import java.io.ByteArrayOutputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -484,6 +490,38 @@ public class MainActivity extends AppCompatActivity {
             mBound = false;
         }
     };
+
+    
+    /*private class UploadImage extends AsyncTask<Void, Void, Void>{
+
+        Bitmap image;
+        String name;
+        String path;
+
+        public UploadImage(String path, String name){
+            this.path = path;
+            this.name = name;
+            this.image = BitmapFactory.decodeFile(path);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            String compressedImage = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
+
+            ArrayList<ImageToUpload> toSend = new ArrayList<>();
+            toSend.add(new ImageToUpload(name, compressedImage));
+            makeToast("uploading map trace to server");
+            Gson gson = new Gson();
+            String images_json = gson.toJson(toSend);
+            int userId = 1;
+            String request = "images_taken:"+userId+"@"+images_json;
+            TravelServerWSClient.send(request);
+            return null;
+
+        }
+    }*/
 }
 
 
