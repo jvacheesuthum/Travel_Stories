@@ -3,6 +3,7 @@ package group22.travelstories;
 import android.location.Location;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -19,6 +20,7 @@ public class TimeLineEntry implements Serializable{
     transient Location location; //<------ temp fix
     GregorianCalendar start;
     GregorianCalendar end;
+    BigInteger locationKey = new BigInteger("1");
 
 
     public TimeLineEntry(Location l, GregorianCalendar start, GregorianCalendar end){
@@ -56,6 +58,53 @@ public class TimeLineEntry implements Serializable{
     }
 
     public String getTime(){
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         return start.getTime().toString() + " - " + end.getTime().toString();
+    }
+
+    public ServerTimeLineEntry toServerTimeLineEntry(){
+        return new ServerTimeLineEntry(null, locationName, locationKey, start, end);
     }
 }

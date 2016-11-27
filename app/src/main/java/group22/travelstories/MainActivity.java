@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     boolean mBound = false;
     private boolean isTracking;
     SeeSummary mSeeSummary;
+    SeeSuggestions mSeeSuggestions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,47 +73,7 @@ public class MainActivity extends AppCompatActivity {
         initStart = System.currentTimeMillis();
 
 
-
-        ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
-        trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked){
-                    //toggle enabled - starts tracking
-                    Hi x = new Hi();
-                    x.say();
-                    //addLocationToInfoLayout("Most recent location");
-                } else {
-                    System.out.println("stops tracking");
-                    //toggle disabled - stops tracking
-                }
-            }
-        });
-
-        Button mapToggle = (Button) findViewById(R.id.mapToggle);
-        mapToggle.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                showMap();
-            }
-            });
-        };
-
-//        Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
-//        buttonLoadImage.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View arg0) {
-//
-//                Intent i = new Intent(
-//                        Intent.ACTION_PICK,
-//                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//
-//                startActivityForResult(i, RESULT_LOAD_IMAGE);
-//            }
-//        });
-
-
-
+    }
 
     private Photo getPhoto(Cursor cursor, int dateColumn) {
         int path = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA);
@@ -300,17 +261,22 @@ public class MainActivity extends AppCompatActivity {
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
+    private void makeToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
     protected void onStart() {
         System.out.println("on start called");
         super.onStart();
         mSeeSummary = new SeeSummary(this);
+        mSeeSuggestions = new SeeSuggestions(this);
         if(isTracking){
             Intent intent = new Intent(this, TravelLocationService.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
 
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", mSeeSummary);
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", mSeeSummary, mSeeSuggestions);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -319,6 +285,16 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        View suggestButton = findViewById(R.id.suggestion);
+        suggestButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                makeToast("suggest!");
+                requestNearBySuggestions(TravelServerWSClient);
+            }
+        });
 
 
         final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
@@ -389,7 +365,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    public void requestNearBySuggestions(Client wsc){
+        wsc.send("nearby_place:"+"-0.126,51.519,1");
+    }
 
 
 
