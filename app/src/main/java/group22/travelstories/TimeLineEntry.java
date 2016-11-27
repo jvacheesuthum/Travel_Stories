@@ -58,10 +58,53 @@ public class TimeLineEntry implements Serializable{
     }
 
     public String getTime(){
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         return start.getTime().toString() + " - " + end.getTime().toString();
     }
 
     public ServerTimeLineEntry toServerTimeLineEntry(){
-        return new ServerTimeLineEntry(null, locationName, locationKey, start.toString(), end.toString());
+        return new ServerTimeLineEntry(null, locationName, locationKey, start, end);
     }
 }
