@@ -91,7 +91,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
         //Initialize Google Play Service and track user location on map
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -109,7 +108,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
-            //this adds a marker on tap
             public void onMapClick(LatLng latLng){
 
                 MarkerOptions options = new MarkerOptions().position(latLng);
@@ -144,14 +142,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-
-    }
+    public void onConnectionSuspended(int i) {    }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {    }
 
     @Override
     public void onLocationChanged(Location location)
@@ -176,8 +170,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         /*if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }*/
-
-        //for tracing path
         points.add(latLng);
         redrawLine(latLng);
     }
@@ -259,7 +251,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void showMap(){
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-
     }
 
 
@@ -267,7 +258,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         String address = "address undefined";
         try {
-            //this retrieve address
             address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1).get(0).getAddressLine(0);
         } catch (IOException e) {
         }
@@ -276,7 +266,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void redrawLine(LatLng currentLocation){
 
-        //clear previously drawn line if not null\
+        //clear previously drawn line if not null
         if (line != null){
             line.remove();
         }
@@ -301,7 +291,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onStop();
     }
 
-    //call this later once MapsActivity and MainActivity both terminate
     public void sendLocationTrace() {
         if (points.isEmpty()) {
             makeToast("No trace to upload");
