@@ -10,9 +10,12 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -23,6 +26,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -40,16 +44,36 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
     private List<TimeLineEntry> timeLine;
@@ -64,6 +88,19 @@ public class MainActivity extends AppCompatActivity {
     SeeSummary mSeeSummary;
     SeeSuggestions mSeeSuggestions;
 
+    //moved local vars from mapsactivity ----------------
+    private GoogleMap mMap;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+
+
+    private Location mLastLocation;
+    private Marker mCurrLocationMarker;
+    private ArrayList<LatLng> points; //for tracing, invisible markers every location change
+    private boolean firstRun;
+    Polyline line;
+    //---------------------------------------------------
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,18 +111,27 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
         timeLine = new ArrayList<>();
-
         initStart = System.currentTimeMillis();
 
+        //from mapsactivity----------------------------------
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        points = new ArrayList<LatLng>();
+        firstRun = true;
+        //------------------------------------------------
 
-        Button mapToggle = (Button) findViewById(R.id.mapToggle);
+        /*Button mapToggle = (Button) findViewById(R.id.mapToggle);
         mapToggle.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 showMap();
             }
-        });
+        });*/
     };
+
+
 
 
     @Override
@@ -230,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        //TODO send location trace
     }
 
     @Override
@@ -243,86 +290,6 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("on destroy called");
         super.onDestroy();
     }
-
-
-    public void requestNearBySuggestions(Client wsc){
-        wsc.send("nearby_place:"+"-0.126,51.519,1");
-    }
-
-
-
-    public void sendTimeLineLocation(Client wsc) {
-        if (timeLine.isEmpty()) {
-            //real thing
-            /*
-            System.out.println("timeline is empty");
-            return;
-            */
-            // test thing
-            System.out.println("timeline is empty");
-            System.out.println("populating timeline list ...");
-
-            wsc.send("timeline_address:-0.126957,51.5194133");
-            return;
-        }
-        String request = "timeline_address:";
-
-        for (TimeLineEntry each : timeLine) {
-            Location eachLocation = each.getLocation();
-            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
-        }
-//        request += "-0.1269566,51.5194133";
-        System.out.println("request message is:*" + request + "*");
-
-        System.out.println("POPULATE LISTTTTTTTTTTTTTTTTTTTTT");
-        Helper.populateList(timeLine, initStart, this);
-
-        wsc.send(request);
-        System.out.println("uploadddddd");
-        //uploadPhotoBitmaps();
-    }
-
-
-    /** Called when a button is clicked (the button in the layout file attaches to
-     * this method with the android:onClick attribute) */
-    public List<TimeLineEntry> getTimeLineFromTravelLocationService() {
-        List<TimeLineEntry> out = null;
-        if (mBound) {
-            // Call a method from the LocalService.
-            // However, if this call were something that might hang, then this request should
-            // occur in a separate thread to avoid slowing down the activity performance.
-            out = mService.getTimeLineList();
-            Toast.makeText(this, "get timeline frm serv", Toast.LENGTH_SHORT).show();
-        }
-        return out;
-    }
-
-    public void showMap(){
-        Intent intent = new Intent(this, MapsActivity.class);
-        //Bundle extra = new Bundle();   //could use to pass arg into mapsactivity but cannot pass client
-        startActivity(intent);
-
-    }
-
-    public void mapShow(View view){    }
-
-    /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            TravelLocationService.LocalBinder binder = (TravelLocationService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
 
     private void uploadPhotoBitmaps() {
 
@@ -378,6 +345,280 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }*/
+
+    //------------------------------------------- methods from mapsactivity
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        //Initialize Google Play Service and track user location on map
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                buildGoogleApiClient();
+                mMap.setMyLocationEnabled(true);
+            }
+        }
+        else {
+            buildGoogleApiClient();
+            mMap.setMyLocationEnabled(true);
+        }
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng){
+
+                MarkerOptions options = new MarkerOptions().position(latLng);
+                options.title(getAddrFromLatLng(latLng));
+
+                options.icon(BitmapDescriptorFactory.defaultMarker());
+                mMap.addMarker(options.draggable(true));
+                //TODO need to set marker drag event later in order for it to change loaction along with the drag
+            }
+        });
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(1000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {    }
+
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        mLastLocation = location;
+
+        //Place current location marker and move camera (only for first location detected)
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        if (firstRun) {
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("Starting Position");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+            firstRun = false;
+        }
+
+        //stop location updates DON'T DELETE THIS COMMENT
+        /*if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }*/
+        points.add(latLng);
+        redrawLine(latLng);
+    }
+
+    protected synchronized void buildGoogleApiClient(){
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    public boolean checkLocationPermission(){
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Asking user if explanation is needed
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+                //Prompt the user once explanation has been shown
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // Permission was granted.
+                    if (ContextCompat.checkSelfPermission(this,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+
+                        if (mGoogleApiClient == null) {
+                            buildGoogleApiClient();
+                        }
+                        mMap.setMyLocationEnabled(true);
+                    }
+
+                } else {
+
+                    // Permission denied, Disable the functionality that depends on this permission.
+                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other permissions this app might request.
+            //You can add here other case statements according to your requirement.
+        }
+    }
+
+
+
+    public void requestNearBySuggestions(Client wsc){
+        wsc.send("nearby_place:"+"-0.126,51.519,1");
+    }
+
+
+
+    public void sendTimeLineLocation(Client wsc) {
+        if (timeLine.isEmpty()) {
+            //real thing
+            /*
+            System.out.println("timeline is empty");
+            return;
+            */
+            // test thing
+            System.out.println("timeline is empty");
+            System.out.println("populating timeline list ...");
+
+            wsc.send("timeline_address:-0.126957,51.5194133");
+            return;
+        }
+        String request = "timeline_address:";
+
+        for (TimeLineEntry each : timeLine) {
+            Location eachLocation = each.getLocation();
+            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
+        }
+//        request += "-0.1269566,51.5194133";
+        System.out.println("request message is:*" + request + "*");
+
+        System.out.println("POPULATE LISTTTTTTTTTTTTTTTTTTTTT");
+        Helper.populateList(timeLine, initStart, this);
+
+        wsc.send(request);
+        System.out.println("uploadddddd");
+        //uploadPhotoBitmaps();
+    }
+
+
+    /** Called when a button is clicked (the button in the layout file attaches to
+     * this method with the android:onClick attribute) */
+    public List<TimeLineEntry> getTimeLineFromTravelLocationService() {
+        List<TimeLineEntry> out = null;
+        if (mBound) {
+            // Call a method from the LocalService.
+            // However, if this call were something that might hang, then this request should
+            // occur in a separate thread to avoid slowing down the activity performance.
+            out = mService.getTimeLineList();
+            Toast.makeText(this, "get timeline frm serv", Toast.LENGTH_SHORT).show();
+        }
+        return out;
+    }
+
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            TravelLocationService.LocalBinder binder = (TravelLocationService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
+    private String getAddrFromLatLng(LatLng latLng) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        String address = "address undefined";
+        try {
+            address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1).get(0).getAddressLine(0);
+        } catch (IOException e) {
+        }
+        return address;
+    }
+
+    private void redrawLine(LatLng currentLocation){
+
+        //clear previously drawn line if not null
+        if (line != null){
+            line.remove();
+        }
+
+        PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+        for (int i = 0; i < points.size(); i++) {
+            LatLng point = points.get(i);
+            options.add(point);
+        }
+        mMap.addMarker(new MarkerOptions().position(currentLocation).visible(false)); //add Marker in current position
+        line = mMap.addPolyline(options); //add Polyline
+    }
+
+
+    public void sendLocationTrace() {
+        if (points.isEmpty()) {
+            makeToast("No trace to upload");
+            return;
+        }
+        makeToast("Uploading map trace to server");
+        Gson gson = new Gson();
+        String mapTrace_json = gson.toJson(points);
+        int userId = 1;
+        String request = "Final_map_trace:"+userId+"@"+mapTrace_json;
+        //TravelServerWSClient.send(request);
+    }
+
 }
 
 
