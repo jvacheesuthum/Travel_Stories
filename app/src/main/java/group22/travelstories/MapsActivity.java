@@ -50,6 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
+
     private Location mLastLocation;
     private Marker mCurrLocationMarker;
     private ArrayList<LatLng> points; //for tracing, invisible markers every location change
@@ -296,21 +297,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onStop() {
         System.out.println("LEAVING MAP DISPLAY");
+        sendLocationTrace();
         super.onStop();
     }
 
     //call this later once MapsActivity and MainActivity both terminate
-    public void sendLocationTrace(Client client) {
+    public void sendLocationTrace() {
         if (points.isEmpty()) {
-            makeToast("no trace to upload");
+            makeToast("No trace to upload");
             return;
         }
-        makeToast("uploading map trace to server");
+        makeToast("Uploading map trace to server");
         Gson gson = new Gson();
         String mapTrace_json = gson.toJson(points);
         int userId = 1;
         String request = "Final_map_trace:"+userId+"@"+mapTrace_json;
-        client.send(request);
+        //TravelServerWSClient.send(request);
     }
 
 }
