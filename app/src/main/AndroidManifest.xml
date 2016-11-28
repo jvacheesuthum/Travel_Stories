@@ -25,7 +25,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayStoryActivity" />
+        <activity android:name=".DisplayStoryActivity"
+            android:launchMode="singleTop"/>
 
         <activity android:name=".suggestionActivity"></activity>
 
@@ -57,7 +58,10 @@
         <service android:name=".HiService" />
         <service android:name=".TravelLocationService" />
 
-        <activity android:name=".EditStoryActivity"></activity>
+        <activity android:name=".EditStoryActivity"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity android:name=".EntryFormActivity"></activity>
     </application>
 
 </manifest>

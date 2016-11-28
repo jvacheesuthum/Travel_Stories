@@ -1,5 +1,6 @@
 package group22.travelstories;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -42,7 +43,7 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
             super(itemView);
             cv = (CardView)itemView.findViewById(R.id.cv);
             timeLineName = (TextView)itemView.findViewById(R.id.timeLine_name);
-            String location = timeLineName.getText().toString();
+            final String location = timeLineName.getText().toString();
             timeLineTime = (TextView)itemView.findViewById(R.id.timeLine_time);
             String time = timeLineTime.getText().toString();
             timeLinePhoto = (ImageView)itemView.findViewById(R.id.timeLine_photo);
@@ -59,9 +60,14 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
 //                    ArrayList<Photo> s = ((TimeLineEntry)fromIntent.get(getAdapterPosition())).photos;
                     dataMap.putSerializable("photos", (TimeLineEntry)fromIntent.get(getAdapterPosition()));
                     intent.putExtras(dataMap);
-                    v.getContext().startActivity(intent);
+
+                    intent.putExtra("Index", getAdapterPosition());
+//                    v.getContext().startActivity(intent);
+                    ((Activity) v.getContext()).startActivityForResult(intent, 1);
                 }
             });
+
+
         }
     }
 
@@ -83,7 +89,12 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
     @Override
     public void onBindViewHolder(TimeLineViewHolder holder, int i) {
 
-        holder.timeLineName.setText(((TimeLineEntry)fromIntent.get(i)).getLocationName());
+        if (((TimeLineEntry)fromIntent.get(i)).getLocationName().toString().equals("null")) {
+            holder.timeLineName.setText("No Location");
+            System.out.println("HERERE IN THE LOOOOOOOP ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        } else {
+            holder.timeLineName.setText(((TimeLineEntry)fromIntent.get(i)).getLocationName());
+        }
         holder.timeLineTime.setText(((TimeLineEntry)fromIntent.get(i)).getTime());
 
         System.out.println("FROM INTENT GET: " + (((TimeLineEntry) fromIntent.get(i))));
@@ -107,6 +118,8 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
+
+        if (fromIntent == null) return 0;
         return fromIntent.size();
     }
 
@@ -114,4 +127,5 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
+
 }
