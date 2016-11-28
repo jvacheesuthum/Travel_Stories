@@ -293,6 +293,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    protected void onStop() {
+        System.out.println("LEAVING MAP DISPLAY");
+        super.onStop();
+    }
 
     //call this later once MapsActivity and MainActivity both terminate
     public void sendLocationTrace(Client client) {

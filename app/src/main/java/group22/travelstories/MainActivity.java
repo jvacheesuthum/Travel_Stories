@@ -79,7 +79,16 @@ public class MainActivity extends AppCompatActivity {
         initStart = System.currentTimeMillis();
 
 
-    }
+        Button mapToggle = (Button) findViewById(R.id.mapToggle);
+        mapToggle.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                showMap();
+            }
+        });
+    };
+
+
 
     private Photo getPhoto(Cursor cursor, int dateColumn) {
         int path = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA);
@@ -414,7 +423,8 @@ public class MainActivity extends AppCompatActivity {
         populateList();
 
         wsc.send(request);
-
+        System.out.println("uploadddddd");
+        uploadPhotoBitmaps();
     }
 
 
@@ -491,7 +501,30 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    
+    private void uploadPhotoBitmaps() {
+
+        List<ImageToUpload> toSend = new ArrayList<>();
+
+        for (TimeLineEntry entry : timeLine) {
+            for (Photo photo : entry.photos) {
+                Bitmap decoded = BitmapFactory.decodeFile(photo.getPath());
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                decoded.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                String compressedPhoto = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
+
+                toSend.add(new ImageToUpload("", compressedPhoto)); //empty photo name for now?
+
+            }
+        }
+
+        makeToast("uploading map trace to server");
+        Gson gson = new Gson();
+        String images_json = gson.toJson(toSend);
+        int userId = 1;
+        String request = "images_taken:"+userId+"@"+images_json;
+        TravelServerWSClient.send(request);
+    }
+    //separate class if needed - only structure
     /*private class UploadImage extends AsyncTask<Void, Void, Void>{
 
         Bitmap image;
