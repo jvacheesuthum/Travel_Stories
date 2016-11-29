@@ -89,14 +89,6 @@
             android:textOn="@string/stop_tracking"/>
 
 
-        <!--
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/Map_Time"
-                    android:onClick="mapShow" />
-                    -->
-
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
