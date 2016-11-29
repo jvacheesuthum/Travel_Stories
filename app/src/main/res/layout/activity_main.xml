@@ -22,9 +22,10 @@
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
+        android:layout_weight="1"
         android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="match_parent">
 
         <ProgressBar
             style="?android:attr/progressBarStyleSmall"
@@ -33,7 +34,16 @@
             android:id="@+id/progressBar2"
             android:layout_weight="0.19" />
 
-        <ScrollView
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_gravity="top"
+            android:layout_width="match_parent"
+            android:layout_height="402dp"
+            tools:context="group22.travelstories.MainActivity"
+            android:layout_weight="0.04" />
+
+        <!--<ScrollView
             android:layout_width="match_parent"
             android:layout_height="140dp"
             android:layout_weight="0.19">
@@ -43,7 +53,7 @@
                 android:layout_height="198dp"
                 android:id="@+id/info"
                 android:layout_weight="0.07"/>
-        </ScrollView>
+        </ScrollView>-->
 
         <!--
                 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
@@ -65,28 +75,18 @@
         <Button
             android:id="@+id/suggestion"
             android:layout_gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_width="291dp"
             android:layout_height="wrap_content"
             android:text="@string/suggestion"
             />
 
-
         <ToggleButton
             android:id="@+id/trackToggle"
-            android:layout_width="160dp"
-            android:layout_height="80dp"
+            android:layout_width="269dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="@dimen/toggle_margin"
             android:textOff="@string/start_tracking"
             android:textOn="@string/stop_tracking"/>
-
-        <ToggleButton
-            android:text="Map"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/mapToggle"
-            android:textOff="@string/map_off"
-            android:textOn="@string/map_on" />
 
 
         <!--

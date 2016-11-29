@@ -246,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                     sendTimeLineLocation(TravelServerWSClient);
+                    sendLocationTrace(TravelServerWSClient);
                     trackToggle.setText("See summary");
                 }
             }
@@ -346,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }*/
 
-    //------------------------------------------- methods from mapsactivity
+    //------------------------------------------- methods reimplemented from mapsactivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -421,8 +422,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             mCurrLocationMarker = mMap.addMarker(markerOptions);
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+            //mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
             firstRun = false;
         }
 
@@ -541,8 +542,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Helper.populateList(timeLine, initStart, this);
 
         wsc.send(request);
-        System.out.println("uploadddddd");
-        //uploadPhotoBitmaps();
     }
 
 
@@ -606,7 +605,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    public void sendLocationTrace() {
+    public void sendLocationTrace(Client wsc) {
         if (points.isEmpty()) {
             makeToast("No trace to upload");
             return;
@@ -616,7 +615,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String mapTrace_json = gson.toJson(points);
         int userId = 1;
         String request = "Final_map_trace:"+userId+"@"+mapTrace_json;
-        //TravelServerWSClient.send(request);
+        System.out.println("uploading map coordinates");
+        wsc.send(request);
+        System.out.println("map coords uploaded : "+request);
+
     }
 
 }
