@@ -38,4 +38,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.0.0'
     compile 'com.android.support:recyclerview-v7:23.0.0'
     compile 'com.google.code.gson:gson:2.6.2'
+
+    //FACEBOOK SDK
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
 }
