@@ -88,7 +88,7 @@ public class EditStoryActivity extends AppCompatActivity {
 //        startActivityForResult(intent, Activity.RESULT_OK);
         System.out.println("==================================<<<<<3.111>>>>>>>>>>>>>>===================");
 
-        setResult(1, intent);
+        setResult(DisplayStoryActivity.EDIT_STORY_ACTIVITY_REQUEST_CODE, intent);
         finish();
         super.onBackPressed();
 //        super.onBackPressed();

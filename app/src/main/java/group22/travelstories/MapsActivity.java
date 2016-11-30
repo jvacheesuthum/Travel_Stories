@@ -33,9 +33,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
 
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -47,9 +49,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
+
+
     private Location mLastLocation;
     private Marker mCurrLocationMarker;
-    private ArrayList<LatLng> points;
+    private ArrayList<LatLng> points; //for tracing, invisible markers every location change
     private boolean firstRun;
     Polyline line;
 
@@ -284,6 +288,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.addMarker(new MarkerOptions().position(currentLocation).visible(false)); //add Marker in current position
         line = mMap.addPolyline(options); //add Polyline
+    }
+
+    private void makeToast(String msg){
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onStop() {
+        System.out.println("LEAVING MAP DISPLAY");
+        sendLocationTrace();
+        super.onStop();
+    }
+
+    //call this later once MapsActivity and MainActivity both terminate
+    public void sendLocationTrace() {
+        if (points.isEmpty()) {
+            makeToast("No trace to upload");
+            return;
+        }
+        makeToast("Uploading map trace to server");
+        Gson gson = new Gson();
+        String mapTrace_json = gson.toJson(points);
+        int userId = 1;
+        String request = "Final_map_trace:"+userId+"@"+mapTrace_json;
+        //TravelServerWSClient.send(request);
     }
 
 }

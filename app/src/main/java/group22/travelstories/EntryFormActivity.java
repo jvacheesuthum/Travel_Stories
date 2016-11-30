@@ -3,8 +3,15 @@ package group22.travelstories;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.ClipData;
+import android.content.Intent;
+import android.database.Cursor;
 import android.media.TimedMetaData;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.BundleCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +24,15 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+import me.iwf.photopicker.PhotoPicker;
+
+import static me.iwf.photopicker.PhotoPicker.REQUEST_CODE;
 
 /**
  * Created by Felix on 27/11/2016.
@@ -30,7 +44,21 @@ public class EntryFormActivity extends AppCompatActivity {
     static TextView fromTime;
     static TextView endDate;
     static TextView endTime;
+    private String location;
+    private ArrayList<String> photos;
+    private static int fromYear;
+    private static int fromMonth;
+    private static int fromDay;
+    private static int fromHour;
+    private static int fromMinute;
+
+    private static int endYear;
+    private static int endMonth;
+    private static int endDay;
+    private static int endHour;
+    private static int endMinute;
     static boolean end;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +74,7 @@ public class EntryFormActivity extends AppCompatActivity {
                 name.setEnabled(true);
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     name.setEnabled(false);
+                    location = name.getText().toString();
 //                    name.setTextColor(0);
                 }
                 return false;
@@ -95,9 +124,63 @@ public class EntryFormActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(EntryFormActivity.this, DisplayStoryActivity.class);
+
+                intent.putExtra("Location", location);
+//                GregorianCalendar from = new GregorianCalendar(fromYear, fromMonth, fromDay, fromHour, fromMinute);
+//                GregorianCalendar end = new GregorianCalendar(endYear, endMonth, endDay, endHour, endMinute);
+                intent.putStringArrayListExtra("Photos", photos);
+                intent.putExtra("FromYear", fromYear);
+                intent.putExtra("FromMonth", fromMonth);
+                intent.putExtra("FromDay", fromDay);
+                intent.putExtra("FromHour", fromHour);
+                intent.putExtra("FromMinute", fromMinute);
+                intent.putExtra("EndYear", endYear);
+                intent.putExtra("EndMonth", endMonth);
+                intent.putExtra("EndDay", endDay);
+                intent.putExtra("EndHour", endHour);
+                intent.putExtra("EndMinute", endMinute);
+                setResult(DisplayStoryActivity.ENTRY_FORM_ACTIVITY_REQUEST_CODE, intent);
+
+                finish();
+            }
+        });
+
+        Button upload = (Button) findViewById(R.id.upload);
+        upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Intent intent = new Intent();
+//                intent.setType("image/*");
+//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+//                intent.setAction(Intent.ACTION_GET_CONTENT);
+//                startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
+                PhotoPicker.builder()
+//                        .setPhotoCount(9)
+//                        .setShowCamera(true)
+                        .setPreviewEnabled(true)
+                        .start(EntryFormActivity.this, PhotoPicker.REQUEST_CODE);
 
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            if (requestCode == REQUEST_CODE && resultCode == RESULT_OK  && data != null) {
+//                Uri selectedImage = data.getData();
+//                ClipData clipData = data.getClipData();
+
+                photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
+
+
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong with uploading", Toast.LENGTH_LONG).show();
+            System.out.println(e);
+        }
     }
 
     public void showTimePickerDialog() {
@@ -128,8 +211,12 @@ public class EntryFormActivity extends AppCompatActivity {
             String time = hourOfDay + ":" + minute;
             System.out.println("The Time is: " + time);
             if (end) {
+                endHour = hourOfDay;
+                endMinute = minute;
                 endTime.setText(time);
             } else {
+                fromHour = hourOfDay;
+                fromMinute = minute;
                 fromTime.setText(time);
             }
 
@@ -155,8 +242,14 @@ public class EntryFormActivity extends AppCompatActivity {
             String date = day + "/" + month + "/" + year;
             System.out.println("The Date is: " + date);
             if (end) {
+                endYear = year;
+                endMonth = month;
+                endDay = day;
                 endDate.setText(date);
             } else {
+                fromYear = year;
+                fromMonth = month;
+                fromDay = day;
                 fromDate.setText(date);
             }
         }

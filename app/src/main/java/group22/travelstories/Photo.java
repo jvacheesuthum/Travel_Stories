@@ -28,4 +28,8 @@ public class Photo implements Serializable{
         return "Path: " + path + "\nDate: " + date.toString() + "\nLat: " + latitude + "\nLong: " + longitude;
     }
 
+    public String getPath() {
+        return path;
+    }
+
 }
