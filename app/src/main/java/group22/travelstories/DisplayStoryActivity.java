@@ -105,7 +105,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
         super.onStart();
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", null,null);
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", null,new SeeSuggestions(this));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

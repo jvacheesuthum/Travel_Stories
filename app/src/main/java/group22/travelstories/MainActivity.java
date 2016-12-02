@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     boolean mBound = false;
     private boolean isTracking;
     SeeSummary mSeeSummary;
-    SeeSuggestions mSeeSuggestions;
 
     //moved local vars from mapsactivity ----------------
     private GoogleMap mMap;
@@ -177,14 +176,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println("on start called");
         super.onStart();
         mSeeSummary = new SeeSummary(this);
-        mSeeSuggestions = new SeeSuggestions(this);
         if(isTracking){
             Intent intent = new Intent(this, TravelLocationService.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
 
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", mSeeSummary, mSeeSuggestions);
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", mSeeSummary, new SeeSuggestions(this));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

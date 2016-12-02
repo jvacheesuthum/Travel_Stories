@@ -20,7 +20,7 @@
         android:name=".GalleryApplication">
         <activity
             android:name=".MainActivity"
-            android:label="main_page_tracking"
+            android:label="Begin Your Story"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,12 +32,12 @@
         <activity
             android:name=".DisplayStoryActivity"
             android:launchMode="singleTop"
-            android:label="show_most_recent_story">
+            android:label="Your Most Recent Story">
         </activity>
 
         <activity
             android:name=".SuggestionActivity"
-            android:label="show_suggestions">
+            android:label="Suggestions">
         </activity>
 
         <!--
