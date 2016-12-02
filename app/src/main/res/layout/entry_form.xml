@@ -78,19 +78,28 @@
             android:layout_height="wrap_content"
             android:weightSum="1">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/upload"
-            android:text="Upload"
-            android:layout_weight="0.5"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/upload"
+                android:text="Upload"
+                android:layout_weight="0.33"/>
 
-        <Button
-            android:text="Add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/addEntry"
-            android:layout_weight="0.5"/>
+            <ToggleButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/deleteEntry"
+                android:textOff="Delete"
+                android:textOn="Deleting"
+                android:layout_weight="0.33"/>
+
+            <Button
+                android:text="Add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/addEntry"
+                android:layout_weight="0.33"/>
+
 
         </LinearLayout>
 

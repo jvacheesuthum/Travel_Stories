@@ -87,12 +87,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
-
-        if (timeline != null) {
-            if (timeline.isEmpty())
-                System.out.println("+++++++++++++++++++++++++++++++++++++++++++");
-            System.out.println("TimeLine SIZE: " + timeline.size());
-        }
+        
         // specify an adapter (see also next example)
         mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
 
@@ -251,8 +246,11 @@ public class DisplayStoryActivity extends AppCompatActivity {
                     System.out.println("=======================================");
                     timeline = new ArrayList();
                     timeline.add(newEntry);
+                    System.out.println("Timeline size: " + timeline.size());
                 } else {
+                    System.out.println("++++++++++++++++++++++++++++++++++++++++++");
                     timeline.add(newEntry);
+                    System.out.println("Timeline size: " + timeline.size());
                 }
 
                 if (timeline == null) System.out.println("WHY IS IT STILL NULLLLLL");
@@ -262,6 +260,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //                finish();
 //                startActivity(getIntent());
                 mAdapter.updateAdapter(newEntry);
+                System.out.println("------------------------------------------");
+                System.out.println("Timeline size: " + timeline.size());
                 break;
         }
     }
