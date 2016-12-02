@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
+import java.math.BigInteger;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ public class SeeSummary implements Callable {
     List<TimeLineEntry> timeLine;
     Context main;
     public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
+    public BigInteger userid;
 
     public SeeSummary(Context v){
         this.main = v;
@@ -52,10 +54,15 @@ public class SeeSummary implements Callable {
             list.add(i, timeLine.get(i));
         }
         intent.putParcelableArrayListExtra(EXTRA_MESSAGE, (ArrayList) list);
+        intent.putExtra("UserId", userid.toString());
         main.startActivity(intent);
     }
 
     public void setTimeLine(List<TimeLineEntry> timeLine) {
         this.timeLine = timeLine;
+    }
+
+    public void setUserId(BigInteger userId) {
+        this.userid = userId;
     }
 }

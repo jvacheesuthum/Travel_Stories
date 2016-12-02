@@ -2,6 +2,8 @@ package group22.travelstories;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -10,7 +12,13 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,6 +41,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.gson.Gson;
+import com.google.gson.internal.ObjectConstructor;
 //import android.widget.ListView;
 //import android.widget.ArrayAdapter<T>;
 
@@ -43,6 +52,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private View mFab;
     private ArrayList timeline;
+    private BigInteger userid;
     static final int EDIT_STORY_ACTIVITY_REQUEST_CODE = 1;
     static final int ENTRY_FORM_ACTIVITY_REQUEST_CODE = 2;
 
@@ -87,6 +97,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
+        userid = new BigInteger(intent.getStringExtra("UserId"));
 
         // specify an adapter (see also next example)
         mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
@@ -111,6 +122,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
         String request = "timeline_share:"+userId+"@"+timeline_json;
         System.out.println("sharing request:"+request);
         TravelServerWSClient.send(request);
+        makeToast("sending photos");
+        sendAllPhotos();
     }
 
     @Override
@@ -301,5 +314,58 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //
 //
 //    }
+
+    public void sendAllPhotos(){
+        List<String> all_paths = getAllPhotoPaths(timeline);
+        int basetime = ((TimeLineEntry) timeline.get(0)).getStartTime();
+        for(int i = 0; i < all_paths.size(); i++){
+            String path = all_paths.get(i);
+            try {
+                sendPhoto(path, userid, basetime + i);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public List<String> getAllPhotoPaths(List timeline){
+        List<String> out = new ArrayList<String>();
+        for(Object each : timeline){
+            TimeLineEntry each_entry = (TimeLineEntry) each;
+            for(String path : each_entry.getAllPhotoPath()){
+                out.add(path);
+            }
+        }
+        return out;
+    }
+
+
+    public void sendPhoto(String photo_path, BigInteger userid, int time) throws UnsupportedEncodingException {
+
+        Bitmap img  = null;
+
+        String fileName = userid.toString() + ":" + time;
+        int name_length = fileName.length();
+        byte[] lengthToBuffer = ByteBuffer.allocate(4).putInt(name_length).array();
+        byte[] filenameToBuffer = fileName.getBytes("UTF-8");
+
+
+        try {
+            img = BitmapFactory.decodeFile(photo_path);
+            ByteArrayOutputStream byteout = new ByteArrayOutputStream();
+            byteout.write(lengthToBuffer);
+            byteout.write(filenameToBuffer);
+            img.compress(Bitmap.CompressFormat.PNG, 100, byteout);
+            byteout.flush();
+            byte[] imgbyte = byteout.toByteArray();
+
+            TravelServerWSClient.send(imgbyte);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        } {
+
+        }
+    }
 
 }

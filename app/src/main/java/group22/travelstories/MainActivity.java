@@ -30,10 +30,16 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
-import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
@@ -57,6 +63,7 @@ import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +74,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
+
+    CallbackManager callbackManager;
+
+    ShareDialog shareDialog;
 
     private static int RESULT_LOAD_IMAGE = 1;
     private List<TimeLineEntry> timeLine;
@@ -93,9 +104,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean firstRun;
     Polyline line;
 
+    private BigInteger userid = new BigInteger("1");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Facebook Sdk setup
+        loadFacebookLogin();
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -113,8 +130,69 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         points = new ArrayList<LatLng>();
         firstRun = true;
 
+    }
+
+    private void loadFacebookLogin() {
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
+        callbackManager = CallbackManager.Factory.create();
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        // App code
+                        userid = new BigInteger(loginResult.getAccessToken().getUserId());
+                        System.out.println("Hi");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                        System.out.println("what");
+
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                        System.out.println("crap");
+
+                    }
+                });
+        //SHARNG
+        /*
+        shareDialog = new ShareDialog(this);
 
     };
+
+        if (ShareDialog.canShow(ShareLinkContent.class)) {
+            ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                    .setContentUrl(Uri.parse("https://placekitten.com/"))
+                    .build();
+
+            shareDialog.show(linkContent);
+        }
+
+
+//        Bitmap image = ...
+//        if (ShareDialog.canShow(SharePhoto.class)) {
+//        SharePhoto photo = new SharePhoto.Builder()
+//                .setBitmap(image)
+//                .build();
+//        SharePhotoContent content = new SharePhotoContent.Builder()
+//                .addPhoto(photo)
+//                .build();
+//        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /*
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -136,8 +214,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 //
 //        }
-
+*/
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -220,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             getTimeLineFromTravelLocationService();
                     mSeeSummary.setTimeLine(timeLine);
+                    mSeeSummary.setUserId(userid);
                     stopTravelLocationService();
                     isTracking = false;
                     if(timeLine == null) {
@@ -231,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                     sendTimeLineLocation(TravelServerWSClient);
-                    //sendLocationTrace(TravelServerWSClient);
+                    sendLocationTrace(TravelServerWSClient);
                     trackToggle.setText("See summary");
                 }
             }
@@ -257,11 +337,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mBound = false;
             }
         }
-        try {
-            TravelServerWSClient.closeBlocking();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            TravelServerWSClient.closeBlocking();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         //TODO send location trace
     }
 
@@ -275,6 +355,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy(){
         System.out.println("on destroy called");
         super.onDestroy();
+                try {
+            TravelServerWSClient.closeBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void uploadPhotoBitmaps() {
@@ -300,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String request = "images_taken:"+userId+"@"+images_json;
         TravelServerWSClient.send(request);
     }
-    //separate class if needed - only structure
+//separate class if needed - only structure
     /*private class UploadImage extends AsyncTask<Void, Void, Void>{
 
         Bitmap image;
@@ -332,7 +417,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }*/
 
-    //------------------------------------------- methods reimplemented from mapsactivity
+//------------------------------------------- methods reimplemented from mapsactivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -518,11 +603,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             return;
         }
+
         String request = "timeline_address:";
 
         for (TimeLineEntry each : timeLine) {
+
             Location eachLocation = each.getLocation();
             request += eachLocation.getLongitude() + "," + eachLocation.getLatitude() + "@";
+
         }
 //        request += "-0.1269566,51.5194133";
         System.out.println("request message is:*" + request + "*");
@@ -603,8 +691,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         makeToast("Uploading map trace to server");
         Gson gson = new Gson();
         String mapTrace_json = gson.toJson(points);
-        int userId = 1;
-        String request = "Final_map_trace:"+userId+"@"+mapTrace_json;
+        String request = "Final_map_trace:"+userid.toString()+"@"+mapTrace_json;
         System.out.println("uploading map coordinates");
         wsc.send(request);
         System.out.println("map coords uploaded : "+request);
@@ -612,5 +699,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 }
+
+
+
+
+
+
 
 
