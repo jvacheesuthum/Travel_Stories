@@ -88,6 +88,11 @@ public class DisplayStoryActivity extends AppCompatActivity {
         Intent intent = getIntent();
         timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
 
+        if (timeline != null) {
+            if (timeline.isEmpty())
+                System.out.println("+++++++++++++++++++++++++++++++++++++++++++");
+            System.out.println("TimeLine SIZE: " + timeline.size());
+        }
         // specify an adapter (see also next example)
         mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
 

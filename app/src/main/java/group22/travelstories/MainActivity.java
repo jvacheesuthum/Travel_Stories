@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                     sendTimeLineLocation(TravelServerWSClient);
-                    sendLocationTrace(TravelServerWSClient);
+                    //sendLocationTrace(TravelServerWSClient);
                     trackToggle.setText("See summary");
                 }
             }
@@ -522,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         for (TimeLineEntry each : timeLine) {
             Location eachLocation = each.getLocation();
-            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
+            request += eachLocation.getLongitude() + "," + eachLocation.getLatitude() + "@";
         }
 //        request += "-0.1269566,51.5194133";
         System.out.println("request message is:*" + request + "*");
@@ -530,6 +530,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Helper.populateList(timeLine, initStart, this);
 
         wsc.send(request);
+        startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
+
 //        uploadPhotoBitmaps();
 
     }
