@@ -163,6 +163,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             shareDialog.show(linkContent);
         }
+        
+        if (ShareDialog.canShow(SharePhoto.class)) {
+            Bitmap image = //GetPhoto
+            SharePhoto photo = new SharePhoto.Builder()
+                .setBitmap(image)
+                .build();
+            SharePhotoContent content = new SharePhotoContent.Builder()
+                .addPhoto(photo)
+                .build();
+        }
         */
     }
 
