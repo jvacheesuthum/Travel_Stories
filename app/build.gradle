@@ -39,6 +39,15 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.0.0'
     compile 'com.google.code.gson:gson:2.6.2'
 
+    compile 'cn.2crazy.photopicker:PhotoPicker:0.9.0'
+    compile 'com.nineoldandroids:library:2.4.0'
+
+
+    compile 'com.facebook.fresco:fresco:0.13.0'
+    compile 'com.facebook.fresco:animated-webp:0.13.0'
+    compile 'com.facebook.fresco:webpsupport:0.13.0'
+
     //FACEBOOK SDK
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+
 }

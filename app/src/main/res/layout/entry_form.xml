@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newlocationname"
+            android:background="@android:color/transparent"
+            android:inputType="text"
+            android:text="Enter a Location"
+            android:textColor="@android:color/black"
+            android:imeOptions="actionDone"
+            android:padding="5dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editFromTime"
+                android:text="Enter a Starting Time"
+                android:textSize="15dp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_weight="0.5"
+                android:padding="5dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editFromDate"
+                android:textSize="15dp"
+                android:text="Enter a Starting Date"
+                android:textColor="@android:color/darker_gray"
+                android:layout_weight="0.5"
+                android:padding="5dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editEndTime"
+                android:textSize="15dp"
+                android:text="Enter a End Time"
+                android:padding="5dp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_weight="0.5"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editEndDate"
+                android:textSize="15dp"
+                android:text="Enter a End Date"
+                android:padding="5dp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_weight="0.5"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/upload"
+            android:text="Upload"
+            android:layout_weight="0.5"/>
+
+        <Button
+            android:text="Add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/addEntry"
+            android:layout_weight="0.5"/>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/uploadGallery"/>
+
+
+    </LinearLayout>
+
+</LinearLayout>
