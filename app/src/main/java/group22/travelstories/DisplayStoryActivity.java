@@ -1,38 +1,24 @@
 package group22.travelstories;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.location.Location;
 import android.media.ExifInterface;
-import android.net.Uri;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import java.net.URISyntaxException;
-import java.sql.Time;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.TimePicker;
-import android.widget.Toast;
-
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.google.gson.Gson;
 //import android.widget.ListView;
 //import android.widget.ArrayAdapter<T>;
 

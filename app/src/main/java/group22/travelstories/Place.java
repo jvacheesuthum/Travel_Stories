@@ -16,4 +16,12 @@ public class Place {
     public String toString(){
         return "key:" + key + " name:" + name + " popularity:" + popularity;
     }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getAddress(){
+        return latitude + ", " + longitude;
+    }
 }

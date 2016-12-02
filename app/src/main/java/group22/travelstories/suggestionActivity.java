@@ -8,8 +8,6 @@ import android.support.v7.widget.RecyclerView;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-
 public class SuggestionActivity extends AppCompatActivity {
 
     @Override
@@ -28,5 +26,9 @@ public class SuggestionActivity extends AppCompatActivity {
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
+
+        SuggestionAdapter suggestionAdapter = new SuggestionAdapter(places);
+        recyclerView.setAdapter(suggestionAdapter);
+
     }
 }

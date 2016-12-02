@@ -42,6 +42,12 @@
             android:layout_below="@id/suggestion_photo"
             />
 
+        <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/suggestion_discription"-->
+            <!--android:layout_below="@id/suggestion_address"/>-->
+
 
 
     </RelativeLayout>
