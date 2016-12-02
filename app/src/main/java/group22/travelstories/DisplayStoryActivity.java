@@ -88,10 +88,13 @@ public class DisplayStoryActivity extends AppCompatActivity {
         Intent intent = getIntent();
         timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
 
+
         if (timeline != null) {
             if (timeline.isEmpty())
                 System.out.println("+++++++++++++++++++++++++++++++++++++++++++");
             System.out.println("TimeLine SIZE: " + timeline.size());
+        } else {
+            System.out.println("--------------------888888888888888888888888");
         }
         // specify an adapter (see also next example)
         mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
@@ -193,6 +196,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 }
             case ENTRY_FORM_ACTIVITY_REQUEST_CODE:
                 int index = 0;
+                if ( data == null) break;
                 String locationName = data.getStringExtra("Location");
                 Location location = new Location("");
                 System.out.println("===============LOCATION: " + location);

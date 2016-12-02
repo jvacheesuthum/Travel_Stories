@@ -530,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Helper.populateList(timeLine, initStart, this);
 
         wsc.send(request);
-        startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
+        //startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
 
 //        uploadPhotoBitmaps();
 
