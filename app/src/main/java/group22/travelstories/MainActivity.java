@@ -199,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
         trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if(isChecked){ // Let's go case //
@@ -207,7 +208,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     myBindService();
                     isTracking = true;
                 } else {  // That's it case//
-                    timeLine = getTimeLineFromTravelLocationService();
+                    timeLine =
+
+                            getTimeLineFromTravelLocationService();
                     mSeeSummary.setTimeLine(timeLine);
                     stopTravelLocationService();
                     isTracking = false;
@@ -282,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
 
-        makeToast("uploading map trace to server");
+        makeToast("uploading images to server");
         Gson gson = new Gson();
         String images_json = gson.toJson(toSend);
         int userId = 1;
