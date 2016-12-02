@@ -2,6 +2,7 @@ package group22.travelstories;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,10 +13,12 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -24,7 +27,9 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import org.w3c.dom.Text;
 
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import me.iwf.photopicker.PhotoPicker;
 
@@ -40,7 +45,8 @@ public class EditStoryActivity extends AppCompatActivity {
     private static int mColumnCount = 3;
     private static int mImageWidth;
     private static int mImageHeight;
-
+    private ArrayList<String> photoPaths;
+    private boolean deleting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +110,24 @@ public class EditStoryActivity extends AppCompatActivity {
             }
         });
 
+        final ToggleButton delete = (ToggleButton) findViewById(R.id.deletePhoto);
+        delete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked) {
+                    deleting = true;
+                    imageAdapter.setDelete(true);
+                    System.out.println("Checked Deleting");
+                } else {
+                    if (deleting) {
+                        imageAdapter.setDelete(false);
+                        photoPaths = imageAdapter.getPhotoPaths();
+                        imageAdapter.updateAdapter(photoPaths);
+                    }
+                }
+            }
+        });
+
         time.setText(t.getTime());
         time.setTextSize(18);
 
@@ -119,7 +143,7 @@ public class EditStoryActivity extends AppCompatActivity {
         GridLayoutManager layoutManager = new GridLayoutManager(this, mColumnCount);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        ArrayList<String> photoPaths = new ArrayList<String>();
+        photoPaths = new ArrayList<String>();
         for (Photo p : t.photos) {
             photoPaths.add(p.getPath());
         }
@@ -137,6 +161,7 @@ public class EditStoryActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.putExtra("NewLocation", newLocation);
         intent.putExtra("Index", index);
+        intent.putStringArrayListExtra("NewPhotos", photoPaths);
 //        startActivityForResult(intent, Activity.RESULT_OK);
 
         setResult(DisplayStoryActivity.EDIT_STORY_ACTIVITY_REQUEST_CODE, intent);
@@ -153,7 +178,14 @@ public class EditStoryActivity extends AppCompatActivity {
 
                 ArrayList<String> photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
 
-                imageAdapter.updateAdapter(photos);
+                for(String path : photos) {
+                    if (!photoPaths.contains(path)) {
+                        photoPaths.add(path);
+                    }
+                }
+                imageAdapter.updateAdapter(photoPaths);
+
+
 
             }
         } catch (Exception e) {

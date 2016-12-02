@@ -150,15 +150,42 @@ public class DisplayStoryActivity extends AppCompatActivity {
         switch (requestCode) {
             case EDIT_STORY_ACTIVITY_REQUEST_CODE:
                 // Make sure the request was successful
-                if (resultCode == RESULT_FIRST_USER) {
-                    System.out.println("============================IN RESULT FIRST USER");
-                    String newLocation = data.getStringExtra("NewLocation");
-                    int index = data.getIntExtra("Index", 0);
-                    ((TimeLineEntry) timeline.get(index)).setAddress(newLocation);
+                try {
+                    if (resultCode == RESULT_FIRST_USER) {
+                        System.out.println("============================IN RESULT FIRST USER");
+                        String newLocation = data.getStringExtra("NewLocation");
+                        int index = data.getIntExtra("Index", 0);
+                        ArrayList<String> newPhotos = data.getStringArrayListExtra("NewPhotos");
 
-                    mAdapter.updateAdapter(null);
+                        ArrayList<String> entryPhotoPaths = new ArrayList<String>();
+//                        for (Photo p : ((TimeLineEntry) timeline.get(index)).photos) {
+//                            entryPhotoPaths.add(p.getPath());
+//                        }
+                        for (String path : newPhotos) {
+                            if (!entryPhotoPaths.contains(path)) {
+
+                                ExifInterface e = new ExifInterface(path);
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm:ss");
+                                Date d = dateFormat.parse(e.getAttribute(ExifInterface.TAG_DATETIME));
+
+                                float[] output = {0, 0};
+                                e.getLatLong(output);
+                                Double longitude = (double) output[0];
+                                Double latitude = (double) output[1];
+
+                                Photo photo = new Photo(path, d, latitude, longitude);
+                                ((TimeLineEntry)timeline.get(index)).photos.add(photo);
+                            }
+                        }
+
+                        ((TimeLineEntry) timeline.get(index)).setAddress(newLocation);
+
+                        mAdapter.updateAdapter(null);
+                    }
+                    break;
+                } catch(Exception e) {
+                    System.out.println("Something went wrong in onActivityResult for EDIT_STORY_ACTIVITY_REQUEST_CODE in DisplayStoryActivity");
                 }
-                break;
             case ENTRY_FORM_ACTIVITY_REQUEST_CODE:
                 int index = 0;
                 String locationName = data.getStringExtra("Location");
@@ -186,7 +213,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
                     try {
 
                         for (String path : photos) {
-                            ExifInterface e = new ExifInterface(photos.get(0));
+                            ExifInterface e = new ExifInterface(path);
                             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm:ss");
                             Date d = dateFormat.parse(e.getAttribute(ExifInterface.TAG_DATETIME));
 

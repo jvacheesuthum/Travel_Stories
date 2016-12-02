@@ -34,9 +34,9 @@ import java.util.ArrayList;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<String> photos;
+    private static ArrayList<String> photos;
     private static int mImageWidth, mImageHeight;
-
+    private static boolean deleting;
 
     public ImageAdapter(Context c, ArrayList<String> photos, int imageWidth, int imageHeight) {
         System.out.println("Image Adapter Constructor called so Photos should be initialized");
@@ -44,6 +44,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.photos = photos;
         mImageHeight = imageHeight;
         mImageWidth = imageWidth;
+        deleting = false;
     }
 
         @Override
@@ -86,6 +87,20 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         public ViewHolder(View view) {
             super(view);
             simpleDraweeView = (SimpleDraweeView) view;
+
+            View v = view;
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println("Clicked On: " + getAdapterPosition());
+                    if (deleting) {
+                        String deletePath = photos.get(getAdapterPosition());
+                        Uri uri = Uri.fromFile(new File(deletePath));
+                        Fresco.getImagePipeline().evictFromCache(uri);
+                        photos.remove(getAdapterPosition());
+                    }
+                }
+            });
         }
 
         public SimpleDraweeView getSimpleDraweeView() {
@@ -94,14 +109,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     }
 
+    public ArrayList<String> getPhotoPaths() {
+        return photos;
+    }
+
     public void updateAdapter(ArrayList<String> photoPaths) {
-        for(String path : photoPaths) {
-            if (!photos.contains(path)) {
-                photos.add(path);
-            }
-        }
+        photos = photoPaths;
         notifyDataSetChanged();
     }
 
+    public void setDelete(boolean bool) {
+        deleting = bool;
+    }
 
 }
