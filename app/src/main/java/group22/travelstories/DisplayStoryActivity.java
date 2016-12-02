@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,7 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.gson.Gson;
 //import android.widget.ListView;
 //import android.widget.ArrayAdapter<T>;
@@ -37,7 +39,7 @@ import com.google.gson.Gson;
 public class DisplayStoryActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private SummaryAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private View mFab;
     private ArrayList timeline;
@@ -74,7 +76,6 @@ public class DisplayStoryActivity extends AppCompatActivity {
             }
         });
 
-
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
@@ -86,8 +87,10 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
+
         // specify an adapter (see also next example)
         mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
+
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -148,12 +151,12 @@ public class DisplayStoryActivity extends AppCompatActivity {
             case EDIT_STORY_ACTIVITY_REQUEST_CODE:
                 // Make sure the request was successful
                 if (resultCode == RESULT_FIRST_USER) {
+                    System.out.println("============================IN RESULT FIRST USER");
                     String newLocation = data.getStringExtra("NewLocation");
                     int index = data.getIntExtra("Index", 0);
                     ((TimeLineEntry) timeline.get(index)).setAddress(newLocation);
 
-                    finish();
-                    startActivity(getIntent());
+                    mAdapter.updateAdapter(null);
                 }
                 break;
             case ENTRY_FORM_ACTIVITY_REQUEST_CODE:
@@ -201,20 +204,31 @@ public class DisplayStoryActivity extends AppCompatActivity {
                         System.out.println("There is an exception in trying to extract photo info");
                     }
                 }
-                System.out.println("=======================================");
-                TimeLineEntry newEntry = new TimeLineEntry(location, from, end);
+                TimeLineEntry newEntry = new TimeLineEntry(null, from, end);
                 newEntry.locationName = locationName;
                 newEntry.photos = entryPhotos;
 
+                //for test purpose userId = 1
+                int userId = 1;
+                String request = "get_location:" + locationName;
+
+//                TravelServerWSClient.send(request);
+
                 if (timeline == null) {
+                    System.out.println("=======================================");
                     timeline = new ArrayList();
                     timeline.add(newEntry);
                 } else {
                     timeline.add(newEntry);
                 }
 
-                finish();
-                startActivity(getIntent());
+                if (timeline == null) System.out.println("WHY IS IT STILL NULLLLLL");
+
+//                mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
+//                mRecyclerView.setAdapter(mAdapter);
+//                finish();
+//                startActivity(getIntent());
+                mAdapter.updateAdapter(newEntry);
                 break;
         }
     }

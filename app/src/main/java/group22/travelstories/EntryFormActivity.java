@@ -15,7 +15,10 @@ import android.provider.MediaStore;
 import android.support.v4.app.BundleCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -31,6 +34,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import me.iwf.photopicker.PhotoPicker;
+import me.iwf.photopicker.PhotoPreview;
 
 import static me.iwf.photopicker.PhotoPicker.REQUEST_CODE;
 
@@ -58,6 +62,13 @@ public class EntryFormActivity extends AppCompatActivity {
     private static int endHour;
     private static int endMinute;
     static boolean end;
+
+    private RecyclerView mRecyclerView;
+    ImageAdapter imageAdapter;
+
+    private static int mColumnCount = 3;
+    private static int mImageWidth;
+    private static int mImageHeight;
 
 
     @Override
@@ -156,9 +167,9 @@ public class EntryFormActivity extends AppCompatActivity {
 //                intent.setAction(Intent.ACTION_GET_CONTENT);
 //                startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
                 PhotoPicker.builder()
-//                        .setPhotoCount(9)
-//                        .setShowCamera(true)
-                        .setPreviewEnabled(true)
+                        .setShowCamera(true)
+                        .setPhotoCount(100)
+                        .setPreviewEnabled(false)
                         .start(EntryFormActivity.this, PhotoPicker.REQUEST_CODE);
 
             }
@@ -172,9 +183,23 @@ public class EntryFormActivity extends AppCompatActivity {
             if (requestCode == REQUEST_CODE && resultCode == RESULT_OK  && data != null) {
 //                Uri selectedImage = data.getData();
 //                ClipData clipData = data.getClipData();
+                if (photos != null) {
+                    ArrayList<String> newPaths = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
+                    imageAdapter.updateAdapter(newPaths);
+                } else {
+                    photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
 
-                photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                    mImageWidth = displayMetrics.widthPixels / mColumnCount;
+                    mImageHeight = mImageWidth;
 
+                    mRecyclerView = (RecyclerView) findViewById(R.id.uploadGallery);
+                    GridLayoutManager layoutManager = new GridLayoutManager(this, mColumnCount);
+                    mRecyclerView.setLayoutManager(layoutManager);
+                    imageAdapter = new ImageAdapter(this, photos, mImageWidth, mImageHeight);
+                    mRecyclerView.setAdapter(imageAdapter);
+                }
 
             }
         } catch (Exception e) {

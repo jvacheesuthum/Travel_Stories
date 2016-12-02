@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_edit_story"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="group22.travelstories.EditStoryActivity">
 
     <!-- app bar -->
@@ -17,39 +14,72 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <EditText
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/locationname"
-            android:background="@android:color/transparent"
-            android:textColor="@android:color/black"
-            android:inputType="text"
-            android:imeOptions="actionDone"/>
+            android:weightSum="1">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:id="@+id/editPlace"
-            android:text="Edit" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/locationname"
+                android:background="@android:color/transparent"
+                android:textColor="@android:color/black"
+                android:inputType="text"
+                android:imeOptions="actionDone"
+                android:paddingBottom="10dp"
+                android:layout_weight="0.8"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:id="@+id/editPlace"
+                android:text="Edit"
+                android:paddingBottom="10dp"
+                android:layout_weight="0.2"/>
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/time"/>
+            android:id="@+id/time"
+            android:paddingBottom="10dp"/>
 
-        <GridView
-            android:id="@+id/gridview"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:columnWidth="90dp"
-            android:numColumns="auto_fit"
-            android:verticalSpacing="10dp"
-            android:horizontalSpacing="10dp"
-            android:stretchMode="columnWidth"
-            android:gravity="center"
-        />
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/addPhoto"
+                android:background="@android:color/transparent"
+                android:textColor="@android:color/darker_gray"
+                android:text="Add"
+                android:layout_weight="0.5"/>
+
+            <ToggleButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/darker_gray"
+                android:background="@android:color/transparent"
+                android:id="@+id/deletePhoto"
+                android:layout_weight="0.5"
+                android:textOff="Delete"
+                android:textOn="Deleting"/>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:context="group22.travelstories.EditStoryActivity"
+            android:id="@+id/gallery"/>
+
 
     </LinearLayout>
 

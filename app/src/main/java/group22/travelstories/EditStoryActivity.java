@@ -2,8 +2,12 @@ package group22.travelstories;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -11,15 +15,32 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
 
 import org.w3c.dom.Text;
 
 import java.sql.Time;
+import java.util.ArrayList;
+
+import me.iwf.photopicker.PhotoPicker;
+
+import static me.iwf.photopicker.PhotoPicker.REQUEST_CODE;
 
 public class EditStoryActivity extends AppCompatActivity {
 
     private String newLocation;
     private int index;
+    private RecyclerView mRecyclerView;
+    ImageAdapter imageAdapter;
+
+    private static int mColumnCount = 3;
+    private static int mImageWidth;
+    private static int mImageHeight;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +79,24 @@ public class EditStoryActivity extends AppCompatActivity {
 
         });
 
+        Button upload = (Button) findViewById(R.id.addPhoto);
+        upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Intent intent = new Intent();
+//                intent.setType("image/*");
+//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+//                intent.setAction(Intent.ACTION_GET_CONTENT);
+//                startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
+                PhotoPicker.builder()
+                        .setShowCamera(true)
+                        .setPhotoCount(100)
+                        .setPreviewEnabled(false)
+                        .start(EditStoryActivity.this, PhotoPicker.REQUEST_CODE);
+
+            }
+        });
+
         Button edit = (Button) findViewById(R.id.editPlace);
         edit.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
@@ -68,29 +107,58 @@ public class EditStoryActivity extends AppCompatActivity {
         time.setText(t.getTime());
         time.setTextSize(18);
 
-        GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this, t.photos));
+//        GridView gridview = (GridView) findViewById(R.id.gridview);
+//        gridview.setAdapter(new ImageAdapter(this, t.photos, 30, 30));
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        mImageWidth = displayMetrics.widthPixels / mColumnCount;
+        mImageHeight = mImageWidth;
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.gallery);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, mColumnCount);
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        ArrayList<String> photoPaths = new ArrayList<String>();
+        for (Photo p : t.photos) {
+            photoPaths.add(p.getPath());
+        }
+
+        imageAdapter = new ImageAdapter(this, photoPaths, mImageWidth, mImageHeight);
+        mRecyclerView.setAdapter(imageAdapter);
 
     }
 
     @Override
     public void onBackPressed() {
-        System.out.println("==================================<<<<<1>>>>>>>>>>>>>>===================");
 //        finish();
-        System.out.println("==================================<<<<<2>>>>>>>>>>>>>>===================");
 
         Intent intent = new Intent(EditStoryActivity.this, DisplayStoryActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.putExtra("NewLocation", newLocation);
         intent.putExtra("Index", index);
-        System.out.println("==================================<<<<<3>>>>>>>>>>>>>>===================");
 //        startActivityForResult(intent, Activity.RESULT_OK);
-        System.out.println("==================================<<<<<3.111>>>>>>>>>>>>>>===================");
 
         setResult(DisplayStoryActivity.EDIT_STORY_ACTIVITY_REQUEST_CODE, intent);
         finish();
         super.onBackPressed();
 //        super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            if (requestCode == REQUEST_CODE && resultCode == RESULT_OK  && data != null) {
+
+                ArrayList<String> photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
+
+                imageAdapter.updateAdapter(photos);
+
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong with uploading", Toast.LENGTH_LONG).show();
+            System.out.println(e);
+        }
     }
 }

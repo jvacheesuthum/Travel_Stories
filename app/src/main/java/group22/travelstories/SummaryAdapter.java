@@ -89,19 +89,14 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
     @Override
     public void onBindViewHolder(TimeLineViewHolder holder, int i) {
 
-        if (((TimeLineEntry)fromIntent.get(i)).getLocationName().toString().equals("null")) {
+        if (((TimeLineEntry)fromIntent.get(i)).getLocationName() == null) {
             holder.timeLineName.setText("No Location");
-            System.out.println("HERERE IN THE LOOOOOOOP ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        } else if (((TimeLineEntry)fromIntent.get(i)).getLocationName().toString().equals("null")) {
+            holder.timeLineName.setText("No Location");
         } else {
             holder.timeLineName.setText(((TimeLineEntry)fromIntent.get(i)).getLocationName());
         }
         holder.timeLineTime.setText(((TimeLineEntry)fromIntent.get(i)).getTime());
-
-        System.out.println("FROM INTENT GET: " + (((TimeLineEntry) fromIntent.get(i))));
-        System.out.println("FROM INTENT PHOTO: " + (((TimeLineEntry) fromIntent.get(i)).photos));
-        if (((TimeLineEntry) fromIntent.get(i)).photos.size() == 0) System.out.println("SIZE EQUALS ZERO");
-        if (((TimeLineEntry) fromIntent.get(i)).photos.isEmpty()) System.out.println("PHOTOS IS EMPTY");
-        if (((TimeLineEntry) fromIntent.get(i)).photos.toArray().length == 0) System.out.println("ARRAY LENGTH ZERO");
 
         if (!((TimeLineEntry) fromIntent.get(i)).photos.isEmpty()) {
             System.out.println("In check");
@@ -126,6 +121,21 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    public void updateAdapter(TimeLineEntry entry) {
+        if (entry == null) {
+            notifyDataSetChanged();
+            return;
+        }
+        if (fromIntent == null) {
+            fromIntent = new ArrayList();
+        }
+        if (entry.getLocationName() == null) {
+            entry.locationName = "No Location";
+        }
+        fromIntent.add(entry);
+        notifyDataSetChanged();
     }
 
 }

@@ -26,8 +26,7 @@ public class TimeLineEntry implements Serializable{
     public TimeLineEntry(Location l, GregorianCalendar start, GregorianCalendar end){
         location = l;
         this.start = start;
-        this.end  = end;
-        this.locationName = "default location";
+        this.end  = end;;
     }
 
     public boolean nearLocation(Location location) {
