@@ -37,6 +37,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     private static ArrayList<String> photos;
     private static int mImageWidth, mImageHeight;
     private static boolean deleting;
+    private static ArrayList<String> deletePhotos;
 
     public ImageAdapter(Context c, ArrayList<String> photos, int imageWidth, int imageHeight) {
         System.out.println("Image Adapter Constructor called so Photos should be initialized");
@@ -45,6 +46,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         mImageHeight = imageHeight;
         mImageWidth = imageWidth;
         deleting = false;
+
+       deletePhotos = new ArrayList<String>();
     }
 
         @Override
@@ -88,6 +91,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             super(view);
             simpleDraweeView = (SimpleDraweeView) view;
 
+
             View v = view;
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -95,9 +99,16 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                     System.out.println("Clicked On: " + getAdapterPosition());
                     if (deleting) {
                         String deletePath = photos.get(getAdapterPosition());
-                        Uri uri = Uri.fromFile(new File(deletePath));
-                        Fresco.getImagePipeline().evictFromCache(uri);
-                        photos.remove(getAdapterPosition());
+                        if (!deletePhotos.contains(deletePath)) {
+                            System.out.println("Deleting and doesn't contain");
+                            deletePhotos.add(deletePath);
+                        } else {
+                            System.out.println("Deleting and contain");
+                            deletePhotos.remove(deletePath);
+                        }
+//                        Uri uri = Uri.fromFile(new File(deletePath));
+//                        Fresco.getImagePipeline().evictFromCache(uri);
+//                        photos.remove(getAdapterPosition());
                     }
                 }
             });
@@ -122,4 +133,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         deleting = bool;
     }
 
+    public void deletePhotos() {
+        for (String path : deletePhotos) {
+            System.out.println("<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>");
+            Uri uri = Uri.fromFile(new File(path));
+            Fresco.getImagePipeline().evictFromCache(uri);
+            photos.remove(path);
+        }
+    }
 }

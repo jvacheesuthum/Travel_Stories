@@ -23,11 +23,16 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.ToggleButton;
+
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,6 +74,8 @@ public class EntryFormActivity extends AppCompatActivity {
     private static int mColumnCount = 3;
     private static int mImageWidth;
     private static int mImageHeight;
+    private boolean deleting = false;
+
 
 
     @Override
@@ -92,6 +99,23 @@ public class EntryFormActivity extends AppCompatActivity {
             }
 
         });
+
+//        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+//                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+//
+//        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+//            @Override
+//            public void onPlaceSelected(Place place) {
+//                // TODO: Get info about the selected place.
+//                Log.i(TAG, "Place: " + place.getName());
+//            }
+//
+//            @Override
+//            public void onError(Status status) {
+//                // TODO: Handle the error.
+//                Log.i(TAG, "An error occurred: " + status);
+//            }
+//        });
 
         end = false;
         fromDate = (TextView) findViewById(R.id.editFromDate);
@@ -172,6 +196,25 @@ public class EntryFormActivity extends AppCompatActivity {
                         .setPreviewEnabled(false)
                         .start(EntryFormActivity.this, PhotoPicker.REQUEST_CODE);
 
+            }
+        });
+
+        final ToggleButton delete = (ToggleButton) findViewById(R.id.deleteEntry);
+        delete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked) {
+                    deleting = true;
+                    imageAdapter.setDelete(true);
+                    System.out.println("Checked Deleting");
+                } else {
+                    if (deleting) {
+                        imageAdapter.deletePhotos();
+                        imageAdapter.setDelete(false);
+                        photos = imageAdapter.getPhotoPaths();
+                        imageAdapter.updateAdapter(photos);
+                    }
+                }
             }
         });
     }

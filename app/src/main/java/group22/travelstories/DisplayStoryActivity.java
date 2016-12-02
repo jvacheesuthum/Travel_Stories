@@ -147,6 +147,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //        super.onActivityResult(requestCode, resultCode, data);
         // Check which request we're responding to
         System.out.println("++++++++++REQUEST CODE: " + requestCode);
+        if (data == null) return;
         switch (requestCode) {
             case EDIT_STORY_ACTIVITY_REQUEST_CODE:
                 // Make sure the request was successful
@@ -156,27 +157,26 @@ public class DisplayStoryActivity extends AppCompatActivity {
                         String newLocation = data.getStringExtra("NewLocation");
                         int index = data.getIntExtra("Index", 0);
                         ArrayList<String> newPhotos = data.getStringArrayListExtra("NewPhotos");
+                        ArrayList<Photo> entryPhotoPaths = new ArrayList<Photo>();
 
-                        ArrayList<String> entryPhotoPaths = new ArrayList<String>();
 //                        for (Photo p : ((TimeLineEntry) timeline.get(index)).photos) {
 //                            entryPhotoPaths.add(p.getPath());
 //                        }
+
                         for (String path : newPhotos) {
-                            if (!entryPhotoPaths.contains(path)) {
+                            ExifInterface e = new ExifInterface(path);
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm:ss");
+                            Date d = dateFormat.parse(e.getAttribute(ExifInterface.TAG_DATETIME));
 
-                                ExifInterface e = new ExifInterface(path);
-                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm:ss");
-                                Date d = dateFormat.parse(e.getAttribute(ExifInterface.TAG_DATETIME));
+                            float[] output = {0, 0};
+                            e.getLatLong(output);
+                            Double longitude = (double) output[0];
+                            Double latitude = (double) output[1];
 
-                                float[] output = {0, 0};
-                                e.getLatLong(output);
-                                Double longitude = (double) output[0];
-                                Double latitude = (double) output[1];
-
-                                Photo photo = new Photo(path, d, latitude, longitude);
-                                ((TimeLineEntry)timeline.get(index)).photos.add(photo);
-                            }
+                            Photo photo = new Photo(path, d, latitude, longitude);
+                            entryPhotoPaths.add(photo);
                         }
+                        ((TimeLineEntry)timeline.get(index)).photos = entryPhotoPaths;
 
                         ((TimeLineEntry) timeline.get(index)).setAddress(newLocation);
 
@@ -188,6 +188,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 }
             case ENTRY_FORM_ACTIVITY_REQUEST_CODE:
                 int index = 0;
+
                 String locationName = data.getStringExtra("Location");
                 Location location = new Location("");
                 System.out.println("===============LOCATION: " + location);

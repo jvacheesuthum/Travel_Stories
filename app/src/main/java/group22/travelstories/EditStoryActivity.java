@@ -120,6 +120,7 @@ public class EditStoryActivity extends AppCompatActivity {
                     System.out.println("Checked Deleting");
                 } else {
                     if (deleting) {
+                        imageAdapter.deletePhotos();
                         imageAdapter.setDelete(false);
                         photoPaths = imageAdapter.getPhotoPaths();
                         imageAdapter.updateAdapter(photoPaths);
@@ -164,6 +165,7 @@ public class EditStoryActivity extends AppCompatActivity {
         intent.putStringArrayListExtra("NewPhotos", photoPaths);
 //        startActivityForResult(intent, Activity.RESULT_OK);
 
+
         setResult(DisplayStoryActivity.EDIT_STORY_ACTIVITY_REQUEST_CODE, intent);
         finish();
         super.onBackPressed();
@@ -184,8 +186,6 @@ public class EditStoryActivity extends AppCompatActivity {
                     }
                 }
                 imageAdapter.updateAdapter(photoPaths);
-
-
 
             }
         } catch (Exception e) {
