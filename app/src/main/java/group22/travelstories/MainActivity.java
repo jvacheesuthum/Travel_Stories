@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -27,6 +28,15 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+
+import com.facebook.drawee.backends.pipeline.Fresco;
+
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.google.gson.Gson;
+
+import java.io.ByteArrayOutputStream;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -103,10 +113,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         points = new ArrayList<LatLng>();
         firstRun = true;
 
+
     };
-
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -356,6 +364,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //TODO need to set marker drag event later in order for it to change loaction along with the drag
             }
         });
+
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -504,6 +513,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             System.out.println("populating timeline list ...");
 
             wsc.send("timeline_address:-0.126957,51.5194133");
+
+            startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
+
             return;
         }
         String request = "timeline_address:";
@@ -515,10 +527,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        request += "-0.1269566,51.5194133";
         System.out.println("request message is:*" + request + "*");
 
-        System.out.println("POPULATE LISTTTTTTTTTTTTTTTTTTTTT");
         Helper.populateList(timeLine, initStart, this);
 
         wsc.send(request);
+//        uploadPhotoBitmaps();
+
     }
 
 

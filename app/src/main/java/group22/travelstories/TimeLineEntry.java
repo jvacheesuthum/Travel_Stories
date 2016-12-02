@@ -20,14 +20,13 @@ public class TimeLineEntry implements Serializable{
     transient Location location; //<------ temp fix
     GregorianCalendar start;
     GregorianCalendar end;
-    BigInteger locationKey = new BigInteger("1");
 
+    BigInteger locationKey = new BigInteger("1");
 
     public TimeLineEntry(Location l, GregorianCalendar start, GregorianCalendar end){
         location = l;
         this.start = start;
-        this.end  = end;
-        this.locationName = "default location";
+        this.end  = end;;
     }
 
     public boolean nearLocation(Location location) {

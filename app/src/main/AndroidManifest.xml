@@ -8,13 +8,16 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:name=".GalleryApplication">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -25,7 +28,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayStoryActivity" />
+        <activity android:name=".DisplayStoryActivity"
+            android:launchMode="singleTop"/>
 
         <activity android:name=".suggestionActivity"></activity>
 
@@ -40,11 +44,24 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
         <service android:name=".HiService" />
         <service android:name=".TravelLocationService" />
 
-        <activity android:name=".EditStoryActivity"></activity>
+        <activity android:name=".EditStoryActivity"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity android:name=".EntryFormActivity"></activity>
+
+        <activity android:name="me.iwf.photopicker.PhotoPickerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            />
+
+        <activity android:name="me.iwf.photopicker.PhotoPagerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
     </application>
 
 </manifest>
