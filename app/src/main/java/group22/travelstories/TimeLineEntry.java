@@ -1,6 +1,7 @@
 package group22.travelstories;
 
 import android.location.Location;
+import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -58,52 +59,22 @@ public class TimeLineEntry implements Serializable{
 
     public String getTime(){
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         return start.getTime().toString() + " - " + end.getTime().toString();
+    }
+
+    public List<String> getAllPhotoPath(){
+        List<String> out = new ArrayList<>();
+        for(Photo each : photos){
+            out.add(each.getPath());
+        }
+        return out;
     }
 
     public ServerTimeLineEntry toServerTimeLineEntry(){
         return new ServerTimeLineEntry(null, locationName, locationKey, start, end);
+    }
+
+    public int getStartTime(){
+        return (int) start.getTimeInMillis()/1000;
     }
 }

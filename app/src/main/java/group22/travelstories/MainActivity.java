@@ -63,6 +63,7 @@ import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean firstRun;
     Polyline line;
 
+    private BigInteger userid = new BigInteger("1");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         // App code
+                        userid = new BigInteger(loginResult.getAccessToken().getUserId());
                         System.out.println("Hi");
                     }
 
@@ -169,7 +173,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             shareDialog.show(linkContent);
         }
-        */
+
+
+//        Bitmap image = ...
+//        if (ShareDialog.canShow(SharePhoto.class)) {
+//        SharePhoto photo = new SharePhoto.Builder()
+//                .setBitmap(image)
+//                .build();
+//        SharePhotoContent content = new SharePhotoContent.Builder()
+//                .addPhoto(photo)
+//                .build();
+//        }
     }
 
     @Override
@@ -200,9 +214,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 //
 //        }
-
+*/
     }
-    */
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -285,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             getTimeLineFromTravelLocationService();
                     mSeeSummary.setTimeLine(timeLine);
+                    mSeeSummary.setUserId(userid);
                     stopTravelLocationService();
                     isTracking = false;
                     if(timeLine == null) {
@@ -296,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                     sendTimeLineLocation(TravelServerWSClient);
-                    //sendLocationTrace(TravelServerWSClient);
+                    sendLocationTrace(TravelServerWSClient);
                     trackToggle.setText("See summary");
                 }
             }
@@ -671,8 +686,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         makeToast("Uploading map trace to server");
         Gson gson = new Gson();
         String mapTrace_json = gson.toJson(points);
-        int userId = 1;
-        String request = "Final_map_trace:"+userId+"@"+mapTrace_json;
+        String request = "Final_map_trace:"+userid.toString()+"@"+mapTrace_json;
         System.out.println("uploading map coordinates");
         wsc.send(request);
         System.out.println("map coords uploaded : "+request);
