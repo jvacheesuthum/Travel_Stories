@@ -337,11 +337,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mBound = false;
             }
         }
-        try {
-            TravelServerWSClient.closeBlocking();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            TravelServerWSClient.closeBlocking();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         //TODO send location trace
     }
 
@@ -355,6 +355,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy(){
         System.out.println("on destroy called");
         super.onDestroy();
+                try {
+            TravelServerWSClient.closeBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void uploadPhotoBitmaps() {
