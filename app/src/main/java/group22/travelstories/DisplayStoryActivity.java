@@ -87,7 +87,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
-        
+
         // specify an adapter (see also next example)
         mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
 
@@ -188,7 +188,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 }
             case ENTRY_FORM_ACTIVITY_REQUEST_CODE:
                 int index = 0;
-
+                if ( data == null) break;
                 String locationName = data.getStringExtra("Location");
                 Location location = new Location("");
                 System.out.println("===============LOCATION: " + location);
