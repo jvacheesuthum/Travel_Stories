@@ -245,11 +245,11 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 if (timeline == null) {
                     System.out.println("=======================================");
                     timeline = new ArrayList();
-                    timeline.add(newEntry);
+//                    timeline.add(newEntry);
                     System.out.println("Timeline size: " + timeline.size());
                 } else {
                     System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-                    timeline.add(newEntry);
+//                    timeline.add(newEntry);
                     System.out.println("Timeline size: " + timeline.size());
                 }
 

@@ -135,10 +135,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     public void deletePhotos() {
         for (String path : deletePhotos) {
-            System.out.println("<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>");
             Uri uri = Uri.fromFile(new File(path));
             Fresco.getImagePipeline().evictFromCache(uri);
             photos.remove(path);
         }
+        deletePhotos.clear();
     }
 }

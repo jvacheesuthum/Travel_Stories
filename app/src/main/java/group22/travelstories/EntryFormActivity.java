@@ -228,7 +228,12 @@ public class EntryFormActivity extends AppCompatActivity {
 //                ClipData clipData = data.getClipData();
                 if (photos != null) {
                     ArrayList<String> newPaths = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
-                    imageAdapter.updateAdapter(newPaths);
+                    for (String p : newPaths) {
+                        if (!photos.contains(p)) {
+                            photos.add(p);
+                        }
+                    }
+                    imageAdapter.updateAdapter(photos);
                 } else {
                     photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
 

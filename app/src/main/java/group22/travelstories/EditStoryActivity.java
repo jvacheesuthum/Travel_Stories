@@ -63,9 +63,9 @@ public class EditStoryActivity extends AppCompatActivity {
         index = intent.getIntExtra("Index", 0);
 
         name.setText(t.getLocationName());
-        name.setTextSize(35);
+        name.setTextSize(20);
         name.setEnabled(false);
-
+        newLocation = t.getLocationName();
         name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
@@ -160,6 +160,7 @@ public class EditStoryActivity extends AppCompatActivity {
 
         Intent intent = new Intent(EditStoryActivity.this, DisplayStoryActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
         intent.putExtra("NewLocation", newLocation);
         intent.putExtra("Index", index);
         intent.putStringArrayListExtra("NewPhotos", photoPaths);
