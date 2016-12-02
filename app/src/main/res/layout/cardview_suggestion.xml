@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="5dp"
+    card_view:cardCornerRadius="10dp"
+    android:id="@+id/cv_suggestion">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:id="@+id/suggestion_photo"
+            android:scaleType="centerCrop"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/suggestion_name"
+            android:layout_alignLeft="@id/suggestion_photo"
+            android:layout_alignRight="@id/suggestion_photo"
+            android:layout_alignBottom="@id/suggestion_photo"
+            android:textSize="30sp"
+            android:fontFamily="sans-serif-medium"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/suggestion_address"
+            android:layout_below="@id/suggestion_photo"
+            />
+
+
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>
+

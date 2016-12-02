@@ -20,7 +20,7 @@
         android:name=".GalleryApplication">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
+            android:label="main_page_tracking"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,10 +28,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayStoryActivity"
-            android:launchMode="singleTop"/>
 
-        <activity android:name=".suggestionActivity"></activity>
+        <activity
+            android:name=".DisplayStoryActivity"
+            android:launchMode="singleTop"
+            android:label="show_most_recent_story">
+        </activity>
+
+        <activity
+            android:name=".SuggestionActivity"
+            android:label="show_suggestions">
+        </activity>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

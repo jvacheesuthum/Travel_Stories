@@ -42,12 +42,12 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private SummaryAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private View mFab;
+    private View mAdd;
     private ArrayList timeline;
     static final int EDIT_STORY_ACTIVITY_REQUEST_CODE = 1;
     static final int ENTRY_FORM_ACTIVITY_REQUEST_CODE = 2;
 
     Client TravelServerWSClient;
-    //private RecyclerView rv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +60,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //        setSupportActionBar(toolbar);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv);
-        mFab = findViewById(R.id.fab);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -68,7 +68,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton mAdd = (FloatingActionButton) findViewById(R.id.add);
+        mAdd = (FloatingActionButton) findViewById(R.id.add);
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -259,41 +259,5 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 break;
         }
     }
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_display_story);
-//
-//        Intent intent = getIntent();
-//        ArrayList timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
-//
-//        //doing it programmatically - dirty
-//        //should try ArrayAdapter later
-//        LinearLayout summary = (LinearLayout) findViewById(R.id.summary);
-//        for(int i=0; i<timeline.size(); i++){
-//            //We create a Layout for every item
-//            LinearLayout item = new LinearLayout(this);
-//            item.setOrientation(LinearLayout.HORIZONTAL);
-//
-//            //A TextView to put the order (ie: 1.)
-//            TextView number = new TextView(this);
-//            number.setText(i+1 + ". ");
-//            item.addView(number, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 0));
-//
-//            //TextView to put the value from the ArrayList
-//            TextView info = new TextView(this);
-//            info.setText(timeline.get(i).toString());
-//            item.addView(info, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
-//
-//            //Add this layout to the main layout of the XML
-//            summary.addView(item, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 0));
-//        }
-//
-////        ArrayAdapter<TimeLineEntry> adapter = new ArrayAdapter<TimeLineEntry>(this, android.R.layout.simple_list_item_1, timeline);
-////        ListView listView = (ListView) findViewById(R.id.listview);
-////        listView.setAdapter(adapter);
-//
-//
-//    }
 
 }
