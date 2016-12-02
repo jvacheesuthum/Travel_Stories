@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         final ToggleButton trackToggle = (ToggleButton) findViewById(R.id.trackToggle);
         trackToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if(isChecked){ // Let's go case //
@@ -215,7 +216,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     myBindService();
                     isTracking = true;
                 } else {  // That's it case//
-                    timeLine = getTimeLineFromTravelLocationService();
+                    timeLine =
+
+                            getTimeLineFromTravelLocationService();
                     mSeeSummary.setTimeLine(timeLine);
                     stopTravelLocationService();
                     isTracking = false;
@@ -228,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                     sendTimeLineLocation(TravelServerWSClient);
-                    sendLocationTrace(TravelServerWSClient);
+                    //sendLocationTrace(TravelServerWSClient);
                     trackToggle.setText("See summary");
                 }
             }
@@ -290,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
 
-        makeToast("uploading map trace to server");
+        makeToast("uploading images to server");
         Gson gson = new Gson();
         String images_json = gson.toJson(toSend);
         int userId = 1;
@@ -519,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         for (TimeLineEntry each : timeLine) {
             Location eachLocation = each.getLocation();
-            request += eachLocation.getLatitude() + "," + eachLocation.getLongitude() + "@";
+            request += eachLocation.getLongitude() + "," + eachLocation.getLatitude() + "@";
         }
 //        request += "-0.1269566,51.5194133";
         System.out.println("request message is:*" + request + "*");
@@ -527,6 +530,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Helper.populateList(timeLine, initStart, this);
 
         wsc.send(request);
+        startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
+
 //        uploadPhotoBitmaps();
 
     }
