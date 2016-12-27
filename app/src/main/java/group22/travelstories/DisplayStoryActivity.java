@@ -97,7 +97,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
-        userid = new BigInteger(intent.getStringExtra("UserId"));
+//        userid = new BigInteger(intent.getStringExtra("UserId"));
 
         // specify an adapter (see also next example)
         mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
@@ -168,7 +168,9 @@ public class DisplayStoryActivity extends AppCompatActivity {
                     if (resultCode == RESULT_FIRST_USER) {
                         System.out.println("============================IN RESULT FIRST USER");
                         String newLocation = data.getStringExtra("NewLocation");
+                        System.out.println("<1>: " + newLocation);
                         int index = data.getIntExtra("Index", 0);
+                        System.out.println("<2>: " + index);
                         ArrayList<String> newPhotos = data.getStringArrayListExtra("NewPhotos");
                         ArrayList<Photo> entryPhotoPaths = new ArrayList<Photo>();
 
@@ -189,15 +191,19 @@ public class DisplayStoryActivity extends AppCompatActivity {
                             Photo photo = new Photo(path, d, latitude, longitude);
                             entryPhotoPaths.add(photo);
                         }
+                        System.out.println("<3>");
                         ((TimeLineEntry)timeline.get(index)).photos = entryPhotoPaths;
+                        System.out.println("<4>");
 
                         ((TimeLineEntry) timeline.get(index)).setAddress(newLocation);
+                        System.out.println("<5>");
 
                         mAdapter.updateAdapter(null);
                     }
                     break;
                 } catch(Exception e) {
                     System.out.println("Something went wrong in onActivityResult for EDIT_STORY_ACTIVITY_REQUEST_CODE in DisplayStoryActivity");
+                    System.out.println("Exception: " + e);
                 }
             case ENTRY_FORM_ACTIVITY_REQUEST_CODE:
                 int index = 0;
@@ -258,11 +264,11 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 if (timeline == null) {
                     System.out.println("=======================================");
                     timeline = new ArrayList();
-//                    timeline.add(newEntry);
+                    timeline.add(newEntry);
                     System.out.println("Timeline size: " + timeline.size());
                 } else {
                     System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-//                    timeline.add(newEntry);
+                    timeline.add(newEntry);
                     System.out.println("Timeline size: " + timeline.size());
                 }
 

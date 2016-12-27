@@ -28,6 +28,7 @@ import java.util.List;
 public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLineViewHolder> {
     private static ArrayList fromIntent;
     private int rowLayout;
+    private boolean zeroOriginal = false;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -128,13 +129,16 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
             notifyDataSetChanged();
             return;
         }
+
         if (fromIntent == null) {
             fromIntent = new ArrayList();
+            zeroOriginal = true;
         }
         if (entry.getLocationName() == null) {
             entry.locationName = "No Location";
         }
-        fromIntent.add(entry);
+
+        if (zeroOriginal) fromIntent.add(entry);
         notifyDataSetChanged();
     }
 

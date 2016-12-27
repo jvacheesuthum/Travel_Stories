@@ -587,6 +587,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void sendTimeLineLocation(Client wsc) {
+        System.out.println("==========================sendTimeLineLocation Called");
         if (timeLine.isEmpty()) {
             //real thing
             /*
@@ -615,7 +616,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        request += "-0.1269566,51.5194133";
         System.out.println("request message is:*" + request + "*");
 
-        Helper.populateList(timeLine, initStart, this);
+        timeLine = Helper.populateList(timeLine, initStart, this);
+
+        System.out.println("===================timeLine size after populate: " + timeLine.size());
+        System.out.println("===========TIMELINE ENTRY 0: " + timeLine.get(0).getLocationName());
 
         wsc.send(request);
 
