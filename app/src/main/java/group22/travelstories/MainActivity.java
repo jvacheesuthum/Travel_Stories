@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         loadFacebookLogin();
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -227,19 +227,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            //Intent settings = new Intent(this, SettingsActivity.class);
-            //startActivity(settings);
-            return true;
+        switch(item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_favorite:
+                return true;
+            default:
+                return false;
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
 

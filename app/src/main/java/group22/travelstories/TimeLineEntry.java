@@ -5,9 +5,14 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.SimpleTimeZone;
 
 
 /**
@@ -58,8 +63,13 @@ public class TimeLineEntry implements Serializable{
     }
 
     public String getTime(){
+//        return start.getTime().toString() + " - " + end.getTime().toString();
 
-        return start.getTime().toString() + " - " + end.getTime().toString();
+        Date s = start.getTime();
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm EEE, dd MMM yyyy");
+        Date e = end.getTime();
+        return dateFormat.format(s) + " - " + dateFormat.format(e);
+
     }
 
     public List<String> getAllPhotoPath(){
