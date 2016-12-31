@@ -74,7 +74,7 @@ public class Helper {
                 null);
         cursor.moveToFirst();
         int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN);
-
+        System.out.println("Query length: " + cursor.getCount());
         while(cursor.moveToNext()) {
             System.out.println("Curosr: " + cursor.getLong(dateColumn));
         }
@@ -92,7 +92,7 @@ public class Helper {
             System.out.println("TimeLine Time: " + e.getTime());
         }
 
-        if (!cursor.moveToNext()) return result;
+        if (cursor.getCount() == 0) return result;
         cursor.moveToFirst();
 
         int count = cursor.getCount();
