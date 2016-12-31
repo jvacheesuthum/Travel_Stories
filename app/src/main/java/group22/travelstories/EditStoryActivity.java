@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -71,7 +72,7 @@ public class EditStoryActivity extends AppCompatActivity {
         index = intent.getIntExtra("Index", 0);
 
         name.setText(t.getLocationName());
-        name.setTextSize(20);
+        name.setTextSize(25);
         name.setEnabled(false);
         newLocation = t.getLocationName();
         name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -138,7 +139,7 @@ public class EditStoryActivity extends AppCompatActivity {
         });
 
         time.setText(t.getTime());
-        time.setTextSize(18);
+        time.setTextSize(15);
 
 //        GridView gridview = (GridView) findViewById(R.id.gridview);
 //        gridview.setAdapter(new ImageAdapter(this, t.photos, 30, 30));
@@ -167,6 +168,28 @@ public class EditStoryActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_edit, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(EditStoryActivity.this, DisplayStoryActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                intent.putExtra("NewLocation", newLocation);
+                intent.putExtra("Index", index);
+                intent.putStringArrayListExtra("NewPhotos", photoPaths);
+//        startActivityForResult(intent, Activity.RESULT_OK);
+
+
+                setResult(DisplayStoryActivity.EDIT_STORY_ACTIVITY_REQUEST_CODE, intent);
+                finish();
+                super.onBackPressed();
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

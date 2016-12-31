@@ -25,7 +25,7 @@
             android:background="@android:color/transparent"
             android:inputType="text"
             android:text="Enter a Location"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:imeOptions="actionDone"
             android:padding="5dp" />
 
