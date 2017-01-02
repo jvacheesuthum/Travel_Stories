@@ -19,6 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -116,6 +117,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
@@ -228,9 +231,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
-            case R.id.action_settings:
-                return true;
-            case R.id.action_favorite:
+            case android.R.id.home:
+                Intent intent = new Intent(MainActivity.this, PreviousStoriesActivity.class);
+                finish();
+                startActivity(intent);
+                super.onBackPressed();
                 return true;
             default:
                 return false;
@@ -613,8 +618,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         timeLine = Helper.populateList(timeLine, initStart, this);
 
-        System.out.println("===================timeLine size after populate: " + timeLine.size());
-        System.out.println("===========TIMELINE ENTRY 0: " + timeLine.get(0).getLocationName());
 
         wsc.send(request);
 

@@ -32,6 +32,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -57,6 +58,9 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private BigInteger userid;
     static final int EDIT_STORY_ACTIVITY_REQUEST_CODE = 1;
     static final int ENTRY_FORM_ACTIVITY_REQUEST_CODE = 2;
+    //index = -1 -> called from Main
+    //index >= 0 -> called from PreviousStoriesActivity
+    private int index;
 
     Client TravelServerWSClient;
     //private RecyclerView rv;
@@ -101,6 +105,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
+        index = intent.getIntExtra("index", -1);
 //        userid = new BigInteger(intent.getStringExtra("UserId"));
 
         // specify an adapter (see also next example)
@@ -114,6 +119,46 @@ public class DisplayStoryActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_display, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                System.out.println("---------------------------------action bar back in display pressed");
+                Intent intent = new Intent(DisplayStoryActivity.this, PreviousStoriesActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                intent.putParcelableArrayListExtra("Timeline", timeline);
+                intent.putExtra("index", index);
+//        startActivityForResult(intent, Activity.RESULT_OK);
+
+//                setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
+                finish();
+                startActivity(intent);
+                super.onBackPressed();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+//        finish();
+
+        Intent intent = new Intent(DisplayStoryActivity.this, PreviousStoriesActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+        intent.putParcelableArrayListExtra("Timeline", timeline);
+        intent.putExtra("index", index);
+//        startActivityForResult(intent, Activity.RESULT_OK);
+
+//        setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
+        finish();
+        startActivity(intent);
+//        super.onBackPressed();
+
     }
 
     private void makeToast(String msg){

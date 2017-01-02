@@ -28,11 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DisplayStoryActivity"
-            android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+            android:launchMode="singleTop">
         </activity>
 
         <activity android:name=".suggestionActivity"></activity>
@@ -69,6 +65,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
+
+        <activity android:name=".PreviousStoriesActivity"/>
+
 
         <activity android:name="me.iwf.photopicker.PhotoPickerActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"
