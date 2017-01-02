@@ -90,7 +90,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), 2);
+                startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), ENTRY_FORM_ACTIVITY_REQUEST_CODE);
             }
         });
 

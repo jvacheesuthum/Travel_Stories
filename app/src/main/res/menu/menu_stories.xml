@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="group22.travelstories.PreviousStoriesActivity">
+
+    <item
+        android:id="@+id/add_story"
+        android:icon="@drawable/com_facebook_button_icon"
+        android:title="addStory"
+        app:showAsAction="ifRoom"/>
+
+</menu>
