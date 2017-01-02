@@ -45,40 +45,63 @@ public class PreviousStoriesActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-        // Check which request we're responding to
-        if (data == null) return;
-        switch (requestCode) {
-            case DISPLAY_ACTIVITY_REQUEST_CODE:
-                // Make sure the request was successful
-                try {
-                    if (resultCode == RESULT_FIRST_USER) {
-                        System.out.println("============================IN RESULT FIRST USER");
-                        ArrayList timeline = data.getParcelableArrayListExtra("Timeline");
-                        int index = data.getIntExtra("index", -2);
-                        if (index == -2) {
-                            System.out.println("Can't get index in intent!");
-                            return;
-                        } else if (index == -1) {
-                            System.out.println("New story!");
-                            stories.add(timeline);
-                        } else {
-                            System.out.println("Update old story!");
-                            stories.set(index, timeline);
-                        }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        System.out.println("========================OnActivityResult in PrevStoriesAct");
+////        super.onActivityResult(requestCode, resultCode, data);
+//        // Check which request we're responding to
+//        if (data == null) return;
+//        switch (requestCode) {
+//            case DISPLAY_ACTIVITY_REQUEST_CODE:
+//                // Make sure the request was successful
+//                try {
+//                    if (resultCode == RESULT_FIRST_USER) {
+//                        System.out.println("++++++++++++++++++++OnActivityResult in PreviousStoriesActivity TRY");
+//                        ArrayList timeline = data.getParcelableArrayListExtra("Timeline");
+//                        int index = data.getIntExtra("index", -2);
+//                        if (index == -2) {
+//                            System.out.println("Can't get index in intent!");
+//                            return;
+//                        } else if (index == -1) {
+//                            System.out.println("New story!");
+//                            stories.add(timeline);
+//                            mAdapter.updateAdapter(timeline);
+//                        } else {
+//                            System.out.println("Update old story!");
+//                            stories.set(index, timeline);
+//                        }
+//
+//                    }
+//                    break;
+//                } catch(Exception e) {
+//                    System.out.println("Something went wrong in onActivityResult for EDIT_STORY_ACTIVITY_REQUEST_CODE in DisplayStoryActivity");
+//                    System.out.println("Exception: " + e);
+//                    break;
+//                }
+//            default:
+//                System.out.println("Request Code does not match in PreviousStoriesActivity");
+//                break;
+//        }
+//    }
 
-                    }
-                    break;
-                } catch(Exception e) {
-                    System.out.println("Something went wrong in onActivityResult for EDIT_STORY_ACTIVITY_REQUEST_CODE in DisplayStoryActivity");
-                    System.out.println("Exception: " + e);
-                    break;
-                }
-            default:
-                System.out.println("Request Code does not match in PreviousStoriesActivity");
-                break;
+    @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("OnRESUME called");
+        Intent intent = getIntent();
+        ArrayList timeline = intent.getParcelableArrayListExtra("Timeline");
+        int index = intent.getIntExtra("index", -2);
+
+        if (index == -2) {
+            System.out.println("Can't get index in intent!");
+            return;
+        } else if (index == -1) {
+            System.out.println("New story!");
+            stories.add(timeline);
+            mAdapter.updateAdapter(timeline);
+        } else {
+            System.out.println("Update old story!");
+            stories.set(index, timeline);
         }
     }
 }

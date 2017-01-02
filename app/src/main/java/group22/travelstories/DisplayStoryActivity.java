@@ -135,6 +135,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
 //                setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
                 finish();
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 super.onBackPressed();
                 return true;
@@ -156,6 +157,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
 //        setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
         finish();
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
 //        super.onBackPressed();
 
