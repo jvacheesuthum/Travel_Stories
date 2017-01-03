@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -54,15 +55,18 @@ public class PreviousStoriesActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         stories = new ArrayList();
-        FileInputStream inputStream;
-        try {
-            inputStream = openFileInput("Stories");
-            ObjectInputStream oInputStream = new ObjectInputStream(inputStream);
-            stories = (ArrayList) oInputStream.readObject();
-            oInputStream.close();
-        } catch (Exception e) {
-            System.out.println("Something went wrong with reading from internal storage");
-        }
+//        FileInputStream inputStream;
+//        try {
+//            inputStream = openFileInput("Stories");
+//            ObjectInputStream oInputStream = new ObjectInputStream(inputStream);
+//            stories = (ArrayList) oInputStream.readObject();
+//            oInputStream.close();
+//        } catch (Exception e) {
+//            System.out.println("Something went wrong with reading from internal storage");
+//        }
+//        File dir = getFilesDir();
+//        File file = new File(dir, "Stories");
+//        boolean deleted = file.delete();
 
         // specify an adapter (see also next example)
         mAdapter = new PreviousStoriesAdapter(stories);
@@ -86,8 +90,9 @@ public class PreviousStoriesActivity extends AppCompatActivity {
             case R.id.add_story:
                 System.out.println("Add story pressed");
                 Intent intent = new Intent(PreviousStoriesActivity.this, MainActivity.class);
-                finish();
-                startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
+
+//                startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
+                startActivity(intent);
                 return true;
             default:
                 return false;
@@ -103,24 +108,29 @@ public class PreviousStoriesActivity extends AppCompatActivity {
         switch (requestCode) {
             case DISPLAY_ACTIVITY_REQUEST_CODE:
                 // Make sure the request was successful
+                System.out.println("HEREER IN CASE:" + resultCode);
+                System.out.println("RESULT_FIRST_USER: " + RESULT_FIRST_USER);
+                System.out.println("RESULT_OK: " + RESULT_OK);
                 try {
-                    if (resultCode == RESULT_FIRST_USER) {
-                        System.out.println("++++++++++++++++++++OnActivityResult in PreviousStoriesActivity TRY");
-                        ArrayList timeline = data.getParcelableArrayListExtra("Timeline");
-                        int index = data.getIntExtra("index", -2);
-                        if (index == -2) {
-                            System.out.println("Can't get index in intent!");
-                            return;
-                        } else if (index == -1) {
-                            System.out.println("New story!");
-                            stories.add(timeline);
-                            mAdapter.updateAdapter(timeline);
-                        } else {
-                            System.out.println("Update old story!");
-                            stories.set(index, timeline);
-                        }
-
+                    System.out.println("++++++++++++++++++++OnActivityResult in PreviousStoriesActivity TRY");
+                    ArrayList timeline = data.getParcelableArrayListExtra("Timeline");
+                    index = data.getIntExtra("index", -2);
+                    if (index == -2) {
+                        System.out.println("Can't get index in intent!");
+                        return;
+                    } else if (index == -1) {
+                        System.out.println("New story!");
+                        stories.add(timeline);
+                        index = -3;
+                        mAdapter.updateAdapter(timeline);
+                    } else {
+                        System.out.println("Update old story!");
+                        stories.set(index, timeline);
+                        index = -3;
+                        mAdapter.updateAdapter(null);
                     }
+
+
                     break;
                 } catch(Exception e) {
                     System.out.println("Something went wrong in onActivityResult for EDIT_STORY_ACTIVITY_REQUEST_CODE in DisplayStoryActivity");
@@ -137,8 +147,14 @@ public class PreviousStoriesActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         System.out.println("OnRESUME called");
+        if (index == -3) {
+            index = -2;
+            return;
+        }
         Intent intent = getIntent();
         ArrayList timeline = intent.getParcelableArrayListExtra("Timeline");
+        if (timeline == null) System.out.println("-------------------timeline is nulllll");
+//        if (timeline.isEmpty()) System.out.println("--------------------timeline is empty");
         index = intent.getIntExtra("index", -2);
 
         if (index == -2) {
@@ -149,27 +165,29 @@ public class PreviousStoriesActivity extends AppCompatActivity {
             stories.add(timeline);
             index = -2;
             mAdapter.updateAdapter(timeline);
-        } else {
-            System.out.println("Update old story!");
-            stories.set(index, timeline);
-            index = -2;
-            mAdapter.updateAdapter(null);
         }
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        FileOutputStream outputStream;
-        try {
-            outputStream = openFileOutput("Stories", Context.MODE_PRIVATE);
-            ObjectOutputStream ooutputstream = new ObjectOutputStream(outputStream);
-            ooutputstream.writeObject(stories);
-            ooutputstream.close();
-        } catch (Exception e ) {
-            System.out.println("Something went wrong with saving to internal storage");
-        }
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        //now getIntent() should always return the last received intent
     }
+//
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        FileOutputStream outputStream;
+//        try {
+//            outputStream = openFileOutput("Stories", Context.MODE_PRIVATE);
+//            ObjectOutputStream ooutputstream = new ObjectOutputStream(outputStream);
+//            ooutputstream.writeObject(stories);
+//            ooutputstream.close();
+//        } catch (Exception e ) {
+//            System.out.println("Something went wrong with saving to internal storage");
+//        }
+//    }
 
     @Override
     public void onDestroy(){

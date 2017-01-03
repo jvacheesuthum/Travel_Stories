@@ -24,7 +24,7 @@ import java.util.Date;
 
 public class PreviousStoriesAdapter extends RecyclerView.Adapter<PreviousStoriesAdapter.ViewHolder> {
 
-    private ArrayList<ArrayList> stories;
+    private static ArrayList<ArrayList> stories;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -41,28 +41,25 @@ public class PreviousStoriesAdapter extends RecyclerView.Adapter<PreviousStories
             storyName = (TextView)v.findViewById(R.id.story_name);
             storyPhoto = (ImageView)v.findViewById(R.id.story_photo);
             storyTime = (TextView)v.findViewById(R.id.story_time);
+
+            View view = v;
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View vw) {
+                    System.out.println("Detected click on card view: " + vw.toString());
+                    Intent intent = new Intent(vw.getContext(), DisplayStoryActivity.class);
+                    System.out.println("Check: " + getAdapterPosition());
+                    Bundle dataMap = new Bundle();
+//                    ArrayList<Photo> s = ((TimeLineEntry)fromIntent.get(getAdapterPosition())).photos;
+                    dataMap.putSerializable("timeline", stories.get(getAdapterPosition()));
+                    intent.putExtras(dataMap);
+                    intent.putExtra("index", getAdapterPosition());
+                    intent.putExtra("caller", "Stories".toCharArray());
+//                    v.getContext().startActivity(intent);
+                    ((Activity) vw.getContext()).startActivityForResult(intent, PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE);
+                }
+            });
         }
-
-
-
-//            View view = itemView;
-//            view.setOnClickListener(new View.OnClickListener(){
-//                @Override
-//                public void onClick(View v) {
-//                    System.out.println("Detected click on card view: " + v.toString());
-//                    Intent intent = new Intent(v.getContext(), EditStoryActivity.class);
-//                    System.out.println("Check: " + getAdapterPosition());
-//                    Bundle dataMap = new Bundle();
-////                    ArrayList<Photo> s = ((TimeLineEntry)fromIntent.get(getAdapterPosition())).photos;
-//                    dataMap.putSerializable("photos", (TimeLineEntry)fromIntent.get(getAdapterPosition()));
-//                    intent.putExtras(dataMap);
-//
-//                    intent.putExtra("Index", getAdapterPosition());
-////                    v.getContext().startActivity(intent);
-//                    ((Activity) v.getContext()).startActivityForResult(intent, 1);
-//                }
-//            });
-//        }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)

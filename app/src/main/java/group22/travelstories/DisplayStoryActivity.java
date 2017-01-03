@@ -104,7 +104,17 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
+        char[] caller = intent.getCharArrayExtra("caller");
+        String scaller = null;
+        if (caller != null) {
+            scaller = new String(caller);
+        }
+
+        if (caller != null && scaller.equals("Stories")) {
+            timeline = intent.getParcelableArrayListExtra("timeline");
+        } else {
+            timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
+        }
         index = intent.getIntExtra("index", -1);
 //        userid = new BigInteger(intent.getStringExtra("UserId"));
 
@@ -127,16 +137,20 @@ public class DisplayStoryActivity extends AppCompatActivity {
             case android.R.id.home:
                 System.out.println("---------------------------------action bar back in display pressed");
                 Intent intent = new Intent(DisplayStoryActivity.this, PreviousStoriesActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
                 intent.putParcelableArrayListExtra("Timeline", timeline);
+                System.out.println("Index during action bar: " + index);
                 intent.putExtra("index", index);
 //        startActivityForResult(intent, Activity.RESULT_OK);
-
-//                setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
-                finish();
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
+                if (index >= 0) {
+                    setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
+                    finish();
+                } else {
+                    finish();
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                }
                 super.onBackPressed();
                 return true;
             default:
@@ -155,11 +169,15 @@ public class DisplayStoryActivity extends AppCompatActivity {
         intent.putExtra("index", index);
 //        startActivityForResult(intent, Activity.RESULT_OK);
 
-//        setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
-        finish();
-        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivity(intent);
-//        super.onBackPressed();
+        if (index >= 0) {
+            setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
+            finish();
+        } else {
+            finish();
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        }
+        super.onBackPressed();
 
     }
 

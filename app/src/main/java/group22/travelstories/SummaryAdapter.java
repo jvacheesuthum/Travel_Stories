@@ -64,7 +64,7 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
 
                     intent.putExtra("Index", getAdapterPosition());
 //                    v.getContext().startActivity(intent);
-                    ((Activity) v.getContext()).startActivityForResult(intent, 1);
+                    ((Activity) v.getContext()).startActivityForResult(intent, DisplayStoryActivity.EDIT_STORY_ACTIVITY_REQUEST_CODE);
                 }
             });
 
