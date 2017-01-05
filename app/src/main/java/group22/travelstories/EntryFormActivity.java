@@ -37,9 +37,12 @@ import android.widget.ToggleButton;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
 
 import me.iwf.photopicker.PhotoPicker;
 import me.iwf.photopicker.PhotoPreview;
@@ -297,16 +300,18 @@ public class EntryFormActivity extends AppCompatActivity {
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            String time = hourOfDay + ":" + minute;
-            System.out.println("The Time is: " + time);
+            Calendar c = Calendar.getInstance();
+            c.set(0,0,0, hourOfDay, minute);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+            dateFormat.setTimeZone(c.getTimeZone());
             if (end) {
                 endHour = hourOfDay;
                 endMinute = minute;
-                endTime.setText(time);
+                endTime.setText(dateFormat.format(c.getTime()));
             } else {
                 fromHour = hourOfDay;
                 fromMinute = minute;
-                fromTime.setText(time);
+                fromTime.setText(dateFormat.format(c.getTime()));
             }
 
         }
@@ -328,18 +333,22 @@ public class EntryFormActivity extends AppCompatActivity {
 
         @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            String date = day + "/" + month + "/" + year;
-            System.out.println("The Date is: " + date);
+            Calendar c = Calendar.getInstance();
+            c.set(year, month, day);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            dateFormat.setTimeZone(c.getTimeZone());
+//            String date = day + "/" + month + "/" + year;
+//            System.out.println("The Date is: " + date);
             if (end) {
                 endYear = year;
                 endMonth = month;
                 endDay = day;
-                endDate.setText(date);
+                endDate.setText(dateFormat.format(c.getTime()));
             } else {
                 fromYear = year;
                 fromMonth = month;
                 fromDay = day;
-                fromDate.setText(date);
+                fromDate.setText(dateFormat.format(c.getTime()));
             }
         }
 
