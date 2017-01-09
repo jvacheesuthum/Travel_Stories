@@ -19,12 +19,8 @@ public class SuggestionActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.suggestions_rv);
         recyclerView.setHasFixedSize(true);
 
-        System.out.println("HERE: found recyclerview");
-
         LinearLayoutManager llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
-
-        System.out.println("HERE: set layout manager for recycler view");
 
         Intent intent = getIntent();
         System.out.println("HERE: get intent from main activity" + intent.toString());
@@ -32,10 +28,8 @@ public class SuggestionActivity extends AppCompatActivity {
         Gson gson = new Gson();
         System.out.println("DEBUGGGG: " + json);
         Place[] places = gson.fromJson(json, Place[].class);
-        System.out.println("Size of suggestions: " + places.length);
         SuggestionAdapter suggestionAdapter = new SuggestionAdapter(places);
         recyclerView.setAdapter(suggestionAdapter);
-        System.out.println("HERE!!!!");
 
     }
 }

@@ -28,12 +28,10 @@ public class SeeSuggestions implements Callable {
     public void callWithArg(String json){
         System.out.println("DEBUG: arrive from main onstart" + json);
         this.json = json;
-        System.out.println("DEBUG: arrive from main onstart" + this.json);
         seeSuggestions();
     }
 
     public void seeSuggestions(){
-        System.out.println("DEBUG: arrive from seeSuggestions callwith Arg method");
         Intent intent = new Intent(main, SuggestionActivity.class);
 //        Gson gson = new Gson();
 //        String places_gson = gson.toJson(places);

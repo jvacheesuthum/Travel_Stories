@@ -22,36 +22,24 @@ public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionAdapter.Su
         public SuggestionViewHolder(View itemView) {
             super(itemView);
             cv = (CardView) itemView.findViewById(R.id.cv_suggestion);
-            if (itemView.findViewById(R.id.cv_suggestion) == null){
-                System.out.println("Debug: suggestion cardview is null");
-            }
+
             suggestion_photo = (ImageView) itemView.findViewById(R.id.suggestion_photo);
-            if (itemView.findViewById(R.id.suggestion_photo) == null){
-                System.out.println("Debug: suggestion photo is null");
-            }
             suggestion_name = (TextView) itemView.findViewById(R.id.suggestion_name);
             suggestion_address = (TextView) itemView.findViewById(R.id.suggestion_address);
-            System.out.println("HERE4");
-            if(suggestion_name == null && suggestion_photo == null && suggestion_address == null){
-                System.out.println("suggestion name is null");
-            }
         }
     }
 
     SuggestionAdapter(Place[] places){
         fromIntent = places;
-        System.out.println("HERE1");
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        System.out.println("HERE3");
     }
 
     @Override
     public SuggestionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        System.out.println("HERE2");
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_suggestion, parent, false);
         SuggestionViewHolder suggestionViewHolder = new SuggestionViewHolder(v);
         return suggestionViewHolder;
@@ -59,12 +47,8 @@ public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionAdapter.Su
 
     @Override
     public void onBindViewHolder(SuggestionViewHolder holder, int position) {
-        System.out.println("DEBUG: "+fromIntent.length);
-        System.out.println("DEBUG: fromIntent[0] location name "+ fromIntent[0].getName());
-        System.out.println("DEBUG: fromIntent[0] location latlong "+ fromIntent[0].getAddress());
 //        holder.suggestion_photo.setImageResource(fromIntent[position].photoID);
-        holder.suggestion_name.setText("hello");
-//        holder.suggestion_name.setText(fromIntent[position].getName());
+        holder.suggestion_name.setText(fromIntent[position].getName());
         holder.suggestion_address.setText(fromIntent[position].getAddress());
     }
 
