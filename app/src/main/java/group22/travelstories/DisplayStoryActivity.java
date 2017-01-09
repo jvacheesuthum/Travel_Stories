@@ -44,8 +44,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private SummaryAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private View mFab;
-    private View mAdd;
+//    private View mFab;
+//    private View mAdd;
     private ArrayList timeline;
     private BigInteger userid;
     static final int EDIT_STORY_ACTIVITY_REQUEST_CODE = 1;
@@ -69,21 +69,21 @@ public class DisplayStoryActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv);
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mFab.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                shareStorySummary();
-            }
-        });
-
-        mAdd = (FloatingActionButton) findViewById(R.id.add);
-        mAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), ENTRY_FORM_ACTIVITY_REQUEST_CODE);
-            }
-        });
+//        mFab = (FloatingActionButton) findViewById(R.id.fab);
+//        mFab.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                shareStorySummary();
+//            }
+//        });
+//
+//        mAdd = (FloatingActionButton) findViewById(R.id.add);
+//        mAdd.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), ENTRY_FORM_ACTIVITY_REQUEST_CODE);
+//            }
+//        });
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -143,6 +143,12 @@ public class DisplayStoryActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 super.onBackPressed();
+                return true;
+            case R.id.add_entry:
+                startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), ENTRY_FORM_ACTIVITY_REQUEST_CODE);
+                return true;
+            case R.id.sharing:
+                shareStorySummary();
                 return true;
             default:
                 return false;
