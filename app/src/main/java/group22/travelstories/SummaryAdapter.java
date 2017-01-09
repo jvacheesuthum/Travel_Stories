@@ -89,7 +89,7 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(TimeLineViewHolder holder, int i) {
-
+        System.out.println("OnBindViewHolder in SummaryAdapter called");
         if (((TimeLineEntry)fromIntent.get(i)).getLocationName() == null) {
             holder.timeLineName.setText("No Location");
         } else if (((TimeLineEntry)fromIntent.get(i)).getLocationName().toString().equals("null")) {

@@ -202,8 +202,9 @@ public class EntryFormActivity extends AppCompatActivity {
 //                intent.setAction(Intent.ACTION_GET_CONTENT);
 //                startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
                 PhotoPicker.builder()
-                        .setShowCamera(true)
+                        .setShowCamera(false)
                         .setPhotoCount(100)
+                        .setPreviewEnabled(true)
                         .setPreviewEnabled(false)
                         .start(EntryFormActivity.this, PhotoPicker.REQUEST_CODE);
 

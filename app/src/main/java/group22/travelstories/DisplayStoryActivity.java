@@ -309,6 +309,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
                     try {
 
                         for (String path : photos) {
+                            System.out.println("In Entryform on ActivityResult in DisplayStoryActivity");
                             ExifInterface e = new ExifInterface(path);
                             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm:ss");
                             Date d = dateFormat.parse(e.getAttribute(ExifInterface.TAG_DATETIME));
@@ -324,7 +325,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
                             entryPhotos.add(photo);
                         }
                     } catch (Exception e) {
-                        System.out.println("There is an exception in trying to extract photo info");
+                        System.out.println("There is an exception in trying to extract photo info: " + e);
+                        return;
                     }
                 }
                 TimeLineEntry newEntry = new TimeLineEntry(null, from, end);
