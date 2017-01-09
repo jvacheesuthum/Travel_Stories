@@ -73,8 +73,14 @@ public class EditStoryActivity extends AppCompatActivity {
 
         name.setText(t.getLocationName());
         name.setTextSize(25);
-        name.setEnabled(false);
+//        name.setEnabled(false);
         newLocation = t.getLocationName();
+        name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                name.setEnabled(true);
+            }
+        });
         name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
@@ -109,13 +115,6 @@ public class EditStoryActivity extends AppCompatActivity {
                         .setPreviewEnabled(false)
                         .start(EditStoryActivity.this, PhotoPicker.REQUEST_CODE);
 
-            }
-        });
-
-        Button edit = (Button) findViewById(R.id.editPlace);
-        edit.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                name.setEnabled(true);
             }
         });
 

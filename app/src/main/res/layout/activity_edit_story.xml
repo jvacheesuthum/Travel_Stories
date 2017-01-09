@@ -43,15 +43,6 @@
                 <!--android:layout_height="wrap_content"-->
                 <!--android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"/>-->
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:id="@+id/editPlace"
-                android:text="Edit"
-                android:paddingBottom="10dp"
-                android:layout_weight="0.2"/>
-
         </LinearLayout>
 
         <TextView
