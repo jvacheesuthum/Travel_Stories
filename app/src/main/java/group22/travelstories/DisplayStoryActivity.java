@@ -1,52 +1,43 @@
 package group22.travelstories;
 
 import android.content.Intent;
-import android.database.Cursor;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.media.ExifInterface;
-import android.net.Uri;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+
+import android.support.v7.app.ActionBar;
+
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
+
 import java.nio.ByteBuffer;
-import java.sql.Time;
-import java.text.DateFormat;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.google.gson.Gson;
-import com.google.gson.internal.ObjectConstructor;
-//import android.widget.ListView;
-//import android.widget.ArrayAdapter<T>;
 
 public class DisplayStoryActivity extends AppCompatActivity {
 
@@ -54,6 +45,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private SummaryAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private View mFab;
+    private View mAdd;
     private ArrayList timeline;
     private BigInteger userid;
     static final int EDIT_STORY_ACTIVITY_REQUEST_CODE = 1;
@@ -63,7 +55,6 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private int index;
 
     Client TravelServerWSClient;
-    //private RecyclerView rv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +69,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv);
-        mFab = findViewById(R.id.fab);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -86,7 +77,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton mAdd = (FloatingActionButton) findViewById(R.id.add);
+        mAdd = (FloatingActionButton) findViewById(R.id.add);
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -208,7 +199,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
         super.onStart();
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", null,null);
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", null,new SeeSuggestions(this));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -362,42 +353,6 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 break;
         }
     }
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_display_story);
-//
-//        Intent intent = getIntent();
-//        ArrayList timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
-//
-//        //doing it programmatically - dirty
-//        //should try ArrayAdapter later
-//        LinearLayout summary = (LinearLayout) findViewById(R.id.summary);
-//        for(int i=0; i<timeline.size(); i++){
-//            //We create a Layout for every item
-//            LinearLayout item = new LinearLayout(this);
-//            item.setOrientation(LinearLayout.HORIZONTAL);
-//
-//            //A TextView to put the order (ie: 1.)
-//            TextView number = new TextView(this);
-//            number.setText(i+1 + ". ");
-//            item.addView(number, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 0));
-//
-//            //TextView to put the value from the ArrayList
-//            TextView info = new TextView(this);
-//            info.setText(timeline.get(i).toString());
-//            item.addView(info, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
-//
-//            //Add this layout to the main layout of the XML
-//            summary.addView(item, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 0));
-//        }
-//
-////        ArrayAdapter<TimeLineEntry> adapter = new ArrayAdapter<TimeLineEntry>(this, android.R.layout.simple_list_item_1, timeline);
-////        ListView listView = (ListView) findViewById(R.id.listview);
-////        listView.setAdapter(adapter);
-//
-//
-//    }
 
     public void sendAllPhotos(){
         List<String> all_paths = getAllPhotoPaths(timeline);

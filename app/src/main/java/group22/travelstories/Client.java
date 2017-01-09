@@ -50,18 +50,17 @@ public class Client extends WebSocketClient{
                 e.printStackTrace();
             }
         } else if(message.split(":")[0].equals("nearby_place")){
-            Gson gson = new Gson();
-            Place[] places = gson.fromJson(message.split(":")[1],Place[].class);
-            for(Place each : places){
-                System.out.println(each.toString());
+//            Gson gson = new Gson();
+//            Place[] places = gson.fromJson(message.split(":")[1],Place[].class);
+//            for(Place each : places){
+//                System.out.println(each.toString());
+            try {
+                seeSuggestions.callWithArg(message.substring(message.indexOf(':')+1));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-//            TODO:
-//            try {
-//                seeSuggestions.callWithArg(places);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-        }
+
         // test thing
 //        else if(!message.equals("Connected to Server")){
 //            try {
