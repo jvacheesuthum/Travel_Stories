@@ -87,4 +87,8 @@ public class TimeLineEntry implements Serializable{
     public int getStartTime(){
         return (int) start.getTimeInMillis()/1000;
     }
+
+    public void setPlaceId(String id) {
+        locationKey = new BigInteger(id);
+    }
 }

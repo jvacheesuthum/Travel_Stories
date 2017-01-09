@@ -163,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     }
                 });
+
         //SHARNG
         /*
         shareDialog = new ShareDialog(this);
