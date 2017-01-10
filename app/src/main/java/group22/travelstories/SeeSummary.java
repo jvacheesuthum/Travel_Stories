@@ -44,6 +44,10 @@ public class SeeSummary implements Callable {
         seeSummary();
     }
 
+    public void callWithArgEntry(String messages){
+        ((DisplayStoryActivity)main).continueEntry(messages);
+    }
+
     public void seeSummary(){
         Intent intent = new Intent(main, DisplayStoryActivity.class);
         ArrayList list = new ArrayList();

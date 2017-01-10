@@ -95,14 +95,20 @@ public class EntryFormActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         final EditText name = (EditText) findViewById(R.id.newlocationname);
-
+        name.setCursorVisible(false);
+        name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                name.setCursorVisible(true);
+            }
+        });
         name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 name.setEnabled(true);
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    name.setEnabled(false);
+                    name.setCursorVisible(false);
                     location = name.getText().toString();
 //                    name.setTextColor(0);
                 }

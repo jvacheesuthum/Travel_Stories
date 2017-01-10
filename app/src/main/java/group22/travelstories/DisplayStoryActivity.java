@@ -1,5 +1,6 @@
 package group22.travelstories;
 
+import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.Bitmap;
@@ -14,7 +15,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -28,6 +36,7 @@ import java.net.URISyntaxException;
 
 import java.nio.ByteBuffer;
 
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,13 +55,15 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
 //    private View mFab;
 //    private View mAdd;
-    private ArrayList timeline;
+    public ArrayList timeline;
     private BigInteger userid;
     static final int EDIT_STORY_ACTIVITY_REQUEST_CODE = 1;
     static final int ENTRY_FORM_ACTIVITY_REQUEST_CODE = 2;
     //index = -1 -> called from Main
     //index >= 0 -> called from PreviousStoriesActivity
     private int index;
+    private TimeLineEntry newEntry;
+    private EditText title;
 
     Client TravelServerWSClient;
 
@@ -67,6 +78,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
+
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv);
 //        mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -87,14 +100,37 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
+        Intent intent = getIntent();
+        title = (EditText) findViewById(R.id.edittext_title);
+        String t = intent.getStringExtra("title");
+        title.setCursorVisible(false);
+        if (t != null) {
+            title.setText(t);
+        }
+        title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                title.setCursorVisible(true);
+            }
+        });
+        title.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    title.setCursorVisible(false);
+                }
+                return false;
+            }
+        });
+
+
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-
-        Intent intent = getIntent();
         char[] caller = intent.getCharArrayExtra("caller");
         String scaller = null;
         if (caller != null) {
@@ -133,6 +169,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 intent.putParcelableArrayListExtra("Timeline", timeline);
                 System.out.println("Index during action bar: " + index);
                 intent.putExtra("index", index);
+                String title = ((EditText)findViewById(R.id.edittext_title)).getText().toString();
+                intent.putExtra("title", title);
 //        startActivityForResult(intent, Activity.RESULT_OK);
                 if (index >= 0) {
                     setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
@@ -171,7 +209,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
             finish();
         } else {
             finish();
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }
         super.onBackPressed();
@@ -205,7 +243,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
         super.onStart();
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", null,new SeeSuggestions(this));
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", new SeeSummary(this),new SeeSuggestions(this));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -326,14 +364,18 @@ public class DisplayStoryActivity extends AppCompatActivity {
                         return;
                     }
                 }
-                TimeLineEntry newEntry = new TimeLineEntry(null, from, end);
+                newEntry = new TimeLineEntry(null, from, end);
                 newEntry.locationName = locationName;
                 newEntry.photos = entryPhotos;
 
                 //for test purpose userId = 1
                 int userId = 1;
-                String request = "get_location:" + locationName;
-
+//                String request = "get_location:" + locationName;
+//                try {
+//                    TravelServerWSClient.connectBlocking();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
 //                TravelServerWSClient.send(request);
 
                 if (timeline == null) {
@@ -356,8 +398,42 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 mAdapter.updateAdapter(newEntry);
                 System.out.println("------------------------------------------");
                 System.out.println("Timeline size: " + timeline.size());
+
                 break;
         }
+    }
+
+    public void continueEntry(String message) {
+        String[] split = message.split(",");
+        String id = split[0];
+        String longitude = split[1];
+        String latitude = split[2];
+
+        Location l = new Location(id);
+        l.setLongitude(Double.parseDouble(longitude));
+        l.setLatitude(Double.parseDouble(latitude));
+        newEntry.location = l;
+
+        if (timeline == null) {
+            System.out.println("=======================================");
+            timeline = new ArrayList();
+            timeline.add(newEntry);
+            System.out.println("Timeline size: " + timeline.size());
+        } else {
+            System.out.println("++++++++++++++++++++++++++++++++++++++++++");
+            timeline.add(newEntry);
+            System.out.println("Timeline size: " + timeline.size());
+        }
+
+        if (timeline == null) System.out.println("WHY IS IT STILL NULLLLLL");
+
+//                mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
+//                mRecyclerView.setAdapter(mAdapter);
+//                finish();
+//                startActivity(getIntent());
+        mAdapter.updateAdapter(newEntry);
+        System.out.println("------------------------------------------");
+        System.out.println("Timeline size: " + timeline.size());
     }
 
     public void sendAllPhotos(){
@@ -412,5 +488,14 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
         }
     }
+
+//    @Override
+//    public void onResume() {
+//        try {
+//            TravelServerWSClient.connectBlocking();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }

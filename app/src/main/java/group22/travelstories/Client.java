@@ -17,12 +17,12 @@ public class Client extends WebSocketClient{
 
     //String message = null;
     //String message = "British Museum@Blah@Ha";
-    Callable seeSummary;
+    SeeSummary seeSummary;
     SeeSuggestions seeSuggestions;
 
     public Client(String url, Callable seeSummary, Callable seeSuggestions) throws URISyntaxException {
         super(new URI(url));
-        this.seeSummary = seeSummary;
+        this.seeSummary = (SeeSummary) seeSummary;
         this.seeSuggestions = (SeeSuggestions) seeSuggestions;
     }
 
@@ -59,6 +59,15 @@ public class Client extends WebSocketClient{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if(message.split(":")[0].equals("get_location")){
+            /*
+            try {
+                String msg = message.split(":")[1];
+                ((SeeSummary) seeSummary).callWithArgEntry(msg);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+            System.out.print("ASDFADSFDSAFFADS");
         }
 
         // test thing

@@ -24,7 +24,7 @@
             android:id="@+id/newlocationname"
             android:background="@android:color/transparent"
             android:inputType="text"
-            android:text="Enter a Location"
+            android:hint="Enter a Location"
             android:textColor="@android:color/white"
             android:imeOptions="actionDone"
             android:padding="5dp" />
