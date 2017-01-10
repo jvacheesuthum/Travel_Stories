@@ -3,49 +3,36 @@ package group22.travelstories;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.ClipData;
 import android.content.Intent;
-import android.database.Cursor;
-import android.media.TimedMetaData;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-import android.support.v4.app.BundleCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
-import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.View.OnClickListener;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.concurrent.TimeUnit;
 
 import me.iwf.photopicker.PhotoPicker;
-import me.iwf.photopicker.PhotoPreview;
 
 import static me.iwf.photopicker.PhotoPicker.REQUEST_CODE;
 
@@ -82,6 +69,11 @@ public class EntryFormActivity extends AppCompatActivity {
     private static int mImageHeight;
     private boolean deleting = false;
 
+    //for search bar
+    private Integer THRESHOLD = 2;
+    private DelayAutoCompleteTextView geo_autocomplete;
+    private ImageView geo_autocomplete_clear;
+
 
 
     @Override
@@ -94,28 +86,74 @@ public class EntryFormActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        final EditText name = (EditText) findViewById(R.id.newlocationname);
-        name.setCursorVisible(false);
-        name.setOnClickListener(new View.OnClickListener() {
+//        final EditText name = (EditText) findViewById(R.id.newlocationname);
+//        name.setCursorVisible(false);
+//        name.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                name.setCursorVisible(true);
+//            }
+//        });
+//        name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//
+//            @Override
+//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                name.setEnabled(true);
+//                if (actionId == EditorInfo.IME_ACTION_DONE) {
+//                    name.setCursorVisible(false);
+//                    location = name.getText().toString();
+////                    name.setTextColor(0);
+//                }
+//                return false;
+//            }
+//
+//        });
+
+        //location search bar
+        geo_autocomplete_clear = (ImageView) findViewById(R.id.geo_autocomplete_clear);
+
+        geo_autocomplete = (DelayAutoCompleteTextView) findViewById(R.id.geo_autocomplete);
+        geo_autocomplete.setThreshold(THRESHOLD);
+        geo_autocomplete.setAdapter(new GeoAutoCompleteAdapter(this)); // 'this' is Activity instance
+
+        geo_autocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                name.setCursorVisible(true);
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                GeoSearchResult result = (GeoSearchResult) adapterView.getItemAtPosition(position);
+                geo_autocomplete.setText(result.getAddress());
             }
         });
-        name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+        geo_autocomplete.addTextChangedListener(new TextWatcher() {
 
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                name.setEnabled(true);
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    name.setCursorVisible(false);
-                    location = name.getText().toString();
-//                    name.setTextColor(0);
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() > 0) {
+                    geo_autocomplete_clear.setVisibility(View.VISIBLE);
+                    location = geo_autocomplete.getText().toString();
                 }
-                return false;
+                else {
+                    geo_autocomplete_clear.setVisibility(View.GONE);
+                }
             }
-
         });
+
+        geo_autocomplete_clear.setOnClickListener(new OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                geo_autocomplete.setText("");
+            }
+        });
+
 
 //        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
 //                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);

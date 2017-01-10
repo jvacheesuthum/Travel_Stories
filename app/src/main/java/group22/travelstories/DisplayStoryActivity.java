@@ -1,52 +1,43 @@
 package group22.travelstories;
 
-import android.content.Context;
 import android.content.Intent;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-
 import android.support.v7.app.ActionBar;
-
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
-
 import java.nio.ByteBuffer;
-
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 
 
 public class DisplayStoryActivity extends AppCompatActivity {
@@ -365,9 +356,14 @@ public class DisplayStoryActivity extends AppCompatActivity {
                         return;
                     }
                 }
-                newEntry = new TimeLineEntry(null, from, end);
+                newEntry = new TimeLineEntry(new Location(locationName), from, end);
                 newEntry.locationName = locationName;
                 newEntry.photos = entryPhotos;
+                LatLng loc = getLocationFromAddress(locationName);
+                if (loc != null ) {
+                    newEntry.location.setLatitude(loc.latitude);
+                    newEntry.location.setLongitude(loc.longitude);
+                }
 
                 //for test purpose userId = 1
                 int userId = 1;
@@ -565,6 +561,26 @@ public class DisplayStoryActivity extends AppCompatActivity {
             e.printStackTrace();
         } {
 
+        }
+    }
+
+    public LatLng getLocationFromAddress(String addr){
+
+        Geocoder coder = new Geocoder(this);
+        List<Address> address;
+
+        try {
+            address = coder.getFromLocationName(addr,5);
+            if (address==null) {
+                return null;
+            }
+            Address location=address.get(0);
+            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+            System.out.println("retrieved from geocode ======== " + loc.toString());
+            return loc;
+        } catch (IOException e) {
+            System.out.println("FAIL TO GET LOCATION FROM ADDRESS");
+            return null;
         }
     }
 

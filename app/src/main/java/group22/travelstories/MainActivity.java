@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean isTracking;
     SeeSummary mSeeSummary;
 
-    //moved local vars from mapsactivity ----------------
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
