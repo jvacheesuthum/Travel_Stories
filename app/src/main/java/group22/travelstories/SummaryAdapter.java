@@ -114,7 +114,7 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
         super.onAttachedToRecyclerView(recyclerView);
     }
 
-    public void updateAdapter(TimeLineEntry entry) {
+    public void updateAdapter(TimeLineEntry entry, int position) {
         if (entry == null) {
             notifyDataSetChanged();
             return;
@@ -128,7 +128,16 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
             entry.locationName = "No Location";
         }
 
-        if (zeroOriginal) fromIntent.add(entry);
+        if (zeroOriginal) {
+            if (position == -1) {
+                fromIntent.add(entry);
+            } else if (position == -2) {
+                System.out.println("ERROR IN INDEX");
+            } else {
+                System.out.println("Input at position: " + position);
+                fromIntent.add(position, entry);
+            }
+        }
         notifyDataSetChanged();
     }
 

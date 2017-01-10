@@ -39,6 +39,7 @@ import java.nio.ByteBuffer;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -302,14 +303,14 @@ public class DisplayStoryActivity extends AppCompatActivity {
                             Photo photo = new Photo(path, d, latitude, longitude);
                             entryPhotoPaths.add(photo);
                         }
-                        System.out.println("<3>");
+                        System.out.println("<3>: " + timeline.size() + " Index: " + index);
                         ((TimeLineEntry)timeline.get(index)).photos = entryPhotoPaths;
                         System.out.println("<4>");
 
                         ((TimeLineEntry) timeline.get(index)).setAddress(newLocation);
                         System.out.println("<5>");
 
-                        mAdapter.updateAdapter(null);
+                        mAdapter.updateAdapter(null, -2);
                     }
                     break;
                 } catch(Exception e) {
@@ -377,15 +378,15 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //                    e.printStackTrace();
 //                }
 //                TravelServerWSClient.send(request);
-
+                int position = -2;
                 if (timeline == null) {
                     System.out.println("=======================================");
                     timeline = new ArrayList();
-                    timeline.add(newEntry);
+                    position = addToCorrectIndex(newEntry);
                     System.out.println("Timeline size: " + timeline.size());
                 } else {
                     System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-                    timeline.add(newEntry);
+                    position = addToCorrectIndex(newEntry);
                     System.out.println("Timeline size: " + timeline.size());
                 }
 
@@ -395,7 +396,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //                mRecyclerView.setAdapter(mAdapter);
 //                finish();
 //                startActivity(getIntent());
-                mAdapter.updateAdapter(newEntry);
+                mAdapter.updateAdapter(newEntry, position);
                 System.out.println("------------------------------------------");
                 System.out.println("Timeline size: " + timeline.size());
 
@@ -414,14 +415,15 @@ public class DisplayStoryActivity extends AppCompatActivity {
         l.setLatitude(Double.parseDouble(latitude));
         newEntry.location = l;
 
+        int position;
         if (timeline == null) {
             System.out.println("=======================================");
             timeline = new ArrayList();
-            timeline.add(newEntry);
+            position = addToCorrectIndex(newEntry);
             System.out.println("Timeline size: " + timeline.size());
         } else {
             System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-            timeline.add(newEntry);
+            position = addToCorrectIndex(newEntry);
             System.out.println("Timeline size: " + timeline.size());
         }
 
@@ -431,9 +433,86 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //                mRecyclerView.setAdapter(mAdapter);
 //                finish();
 //                startActivity(getIntent());
-        mAdapter.updateAdapter(newEntry);
+        mAdapter.updateAdapter(newEntry, position);
         System.out.println("------------------------------------------");
         System.out.println("Timeline size: " + timeline.size());
+    }
+
+    private int addToCorrectIndex(TimeLineEntry timeLineEntry) {
+        System.out.println("Add to correct index called: " + timeline.size());
+        GregorianCalendar start = timeLineEntry.start;
+        GregorianCalendar end = timeLineEntry.end;
+        GregorianCalendar newCal;
+        if (timeline.isEmpty()) {
+            timeline.add(timeLineEntry);
+            return -1;
+        }
+        for (Object o : timeline) {
+            System.out.println("In Loop: " + timeline.size());
+            TimeLineEntry t = (TimeLineEntry) o;
+            GregorianCalendar tStart = t.start;
+            GregorianCalendar tEnd = t.end;
+            int i = timeline.indexOf(o);
+            System.out.println("Index i: " + i);
+            boolean tSbeforeStart = tStart.compareTo(start) < 0; //true if tStart is before start
+            boolean tEbeforeEnd = tEnd.compareTo(end) < 0; //true if tEnd before end
+            boolean tSbeforeEnd = tStart.compareTo(end) < 0; //true if tStart before end
+            if (tEnd.compareTo(start) < 0) continue; //true if tEnd before start
+            if (!tSbeforeEnd) {
+                System.out.println("Fits Perfectly");
+                timeline.add(i, timeLineEntry);
+                return i;
+            }
+            if (tSbeforeStart && tEbeforeEnd) {//t overlaps on top
+                System.out.println("t overlaps on top");
+                newCal = start;
+                newCal.add(Calendar.SECOND, 0);
+                ((TimeLineEntry)timeline.get(i)).end = newCal;
+
+                if (timeline.size() == i + 1) {
+                    System.out.println("RETURNED: " + timeline.size());
+                    return i;
+                }
+                TimeLineEntry next = (TimeLineEntry)timeline.get(i + 1);
+                if (next.start.compareTo(end) < 0) {//next entry overlaps as well
+                    newCal = next.start;
+                    newCal.add(Calendar.SECOND, 0);
+                    timeLineEntry.end = newCal;
+                }
+                timeline.add(i + 1, timeLineEntry);
+                return i + 1;
+            } else if (tSbeforeStart) {//t includes new entry
+                System.out.println("t includes new entry");
+                long s = start.getTimeInMillis();
+                long e = end.getTimeInMillis();
+                long diff = s - e;
+                long newS = tStart.getTimeInMillis() + diff;
+                newCal = new GregorianCalendar();
+                newCal.setTimeInMillis(newS);
+                timeLineEntry.start = newCal;
+                newCal = tStart;
+                newCal.add(Calendar.SECOND, 0);
+                timeLineEntry.end = newCal;
+                timeline.add(i, timeLineEntry);
+                return i;
+            } else if (tEbeforeEnd) {//new entry includes t
+                System.out.println("new entry includes t");
+                newCal = tStart;
+                newCal.add(Calendar.SECOND, 0);
+                timeLineEntry.end = newCal;
+                timeline.add(i, timeLineEntry);
+                return i;
+            } else {//t overlaps on bottom
+                System.out.println("t overlaps on bottom");
+                newCal = end;
+                newCal.add(Calendar.SECOND, 0);
+                ((TimeLineEntry)timeline.get(i)).start = newCal;
+                timeline.add(i, timeLineEntry);
+                return i;
+            }
+        }
+        timeline.add(timeLineEntry);
+        return -1;
     }
 
     public void sendAllPhotos(){

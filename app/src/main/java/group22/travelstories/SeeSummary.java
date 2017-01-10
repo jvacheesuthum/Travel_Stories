@@ -45,6 +45,7 @@ public class SeeSummary implements Callable {
     }
 
     public void callWithArgEntry(String messages){
+        System.out.println("--------------------------------------------MESSAGE RETURN FROM SERVER: " + messages);
         ((DisplayStoryActivity)main).continueEntry(messages);
     }
 
