@@ -18,16 +18,52 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <EditText
-            android:layout_width="wrap_content"
+        <!--<EditText-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/newlocationname"-->
+            <!--android:background="@android:color/transparent"-->
+            <!--android:inputType="text"-->
+            <!--android:hint="Enter a Location"-->
+            <!--android:textColor="@android:color/white"-->
+            <!--android:imeOptions="actionDone"-->
+            <!--android:padding="5dp" />-->
+
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/newlocationname"
-            android:background="@android:color/transparent"
-            android:inputType="text"
-            android:hint="Enter a Location"
-            android:textColor="@android:color/white"
-            android:imeOptions="actionDone"
-            android:padding="5dp" />
+            android:background="@color/white">
+
+            <YOUR_PACKAGE_NAME.DelayAutoCompleteTextView
+                android:id="@+id/geo_autocomplete"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:imeOptions="flagNoExtractUi|actionSearch"
+                android:inputType="textCapSentences"
+                android:textColor="@color/header_text_color"
+                android:background="@color/white"
+                android:hint="@string/map_geo_search_input_hint"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="35dp"
+                android:layout_marginRight="35dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:padding="10dp"
+                android:dropDownWidth="fill_parent"
+                />
+
+            <ImageView
+                android:id="@+id/geo_autocomplete_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_remove"
+                android:contentDescription="@string/map_list_header_txt"
+                android:layout_gravity="center_vertical|end"
+                android:visibility="gone"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                />
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
