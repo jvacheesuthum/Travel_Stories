@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static int RESULT_LOAD_IMAGE = 1;
     private List<TimeLineEntry> timeLine;
-    public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
+    public final static String EXTRA_MESSAGE = "com.travelstories.Main";
     Long initStart;
 
     public Client TravelServerWSClient;
@@ -696,6 +696,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         wsc.send(request);
         System.out.println("map coords uploaded : "+request);
 
+    }
+
+    @Override
+    public void onResume() {
+        System.out.println("onResume called");
+        super.onResume();
+        Intent intent = getIntent();
+        System.out.println("Getting intent from SUGGESTION!!!: " + intent);
+        String suggestion = intent.getStringExtra("latlong");
+        System.out.println("suggestion in string: ! " + suggestion);
+//        mMap.addMarker(new MarkerOptions()
+//                .position(latlong)
+//                .title("suggestion"));
     }
 
 }

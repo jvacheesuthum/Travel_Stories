@@ -9,6 +9,7 @@
     android:layout_margin="5dp"
     card_view:cardCornerRadius="10dp"
     android:id="@+id/cv_suggestion">
+    <!--android:onClick="clickSuggestion">-->
 
     <RelativeLayout
         android:layout_width="wrap_content"
