@@ -347,7 +347,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onRestart(){
         System.out.println("on restart called");
         super.onRestart();
+
+        Intent intent = getIntent();
+        String suggestion = intent.getStringExtra("latlong");
+
+        mMap.addMarker(new MarkerOptions()
+                .position(getLatLngFromString(suggestion))
+                .title("suggestion"));
+
     }
+
+
 
     @Override
     protected void onDestroy(){
@@ -699,18 +709,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
+    public void onNewIntent(Intent newintent){
+        super.onNewIntent(newintent);
+        // getIntent() should always return the most recent
+        setIntent(newintent);
+    }
+
+    @Override
     public void onResume() {
         System.out.println("onResume called");
         super.onResume();
-        Intent intent = getIntent();
-        System.out.println("Getting intent from SUGGESTION!!!: " + intent);
-        String suggestion = intent.getStringExtra("latlong");
-        System.out.println("suggestion in string: ! " + suggestion);
-//        mMap.addMarker(new MarkerOptions()
-//                .position(latlong)
-//                .title("suggestion"));
+
     }
 
+
+    public LatLng getLatLngFromString(String address){
+        String[] latlng = address.split(", ", 2);
+        Double lat = Double.parseDouble(latlng[0]);
+        Double longi = Double.parseDouble(latlng[1]);
+        return new LatLng(lat, longi);
+    }
 }
 
 

@@ -38,8 +38,9 @@ public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionAdapter.Su
                     String latlong = suggestion_address.getText().toString();
                     Intent addMarkerIntent = new Intent(v.getContext(), MainActivity.class);
                     System.out.println("Sending intent from SUGGESTION!!!: " + addMarkerIntent);
-                    System.out.println("!!!!suggestion address:" +latlong);
-//                    addMarkerIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    System.out.println("!!!!suggestion address: " +latlong);
+//                    addMarkerIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    addMarkerIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     addMarkerIntent.putExtra("latlong", latlong);
                     (v.getContext()).startActivity(addMarkerIntent);
                 }
