@@ -74,9 +74,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+        System.out.println("onBindViewHolder called in Image Adapter");
         Uri uri = Uri.fromFile(new File(photos.get(position)));
 
         holder.getSimpleDraweeView().setImageURI(uri);
+        if (!deletePhotos.contains(photos.get(position))) {
+            holder.getSimpleDraweeView().clearColorFilter();
+        } else {
+            holder.getSimpleDraweeView().setColorFilter(Color.RED, PorterDuff.Mode.LIGHTEN);
+        }
 //        holder.getSimpleDraweeView().setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
