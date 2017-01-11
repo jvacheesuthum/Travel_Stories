@@ -1,6 +1,8 @@
 package group22.travelstories;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,8 +12,15 @@ import android.widget.TextView;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
+import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.model.ShareMediaContent;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
+
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * Created by vasin on 11/01/2017.
@@ -27,12 +36,10 @@ public class SharedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shared);
-        System.out.println("alalallalalala");
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog(this);
 
-        System.out.println("fuckkkkkkkk");
         Intent intent = getIntent();
         final String triptoken = intent.getStringExtra("triptoken");
         TextView token = (TextView) findViewById(R.id.triptoken);
@@ -54,14 +61,15 @@ public class SharedActivity extends AppCompatActivity {
         final Button fbutton = (Button) findViewById(R.id.facebookshare);
         fbutton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                System.out.println("fuck");
                 if (ShareDialog.canShow(ShareLinkContent.class)) {
-                    System.out.print(" yeah");
 
                     ShareLinkContent linkContent = new ShareLinkContent.Builder()
                             .setContentTitle("My Journey")
-                            .setContentUrl(Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk/"))
+                            .setContentUrl(Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/map.html?token=1"))
+                            .setImageUrl(Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/images/treek.png"))
                             .build();
+
+
 
                     shareDialog.show(linkContent);
                 }
