@@ -3,8 +3,6 @@ package group22.travelstories;
 import android.content.Context;
 import android.content.Intent;
 
-import com.google.gson.Gson;
-
 import java.util.concurrent.Callable;
 
 /**

@@ -545,9 +545,9 @@ public class DisplayStoryActivity extends AppCompatActivity {
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
             System.out.println("retrieved from geocode ======== " + loc.toString());
             return loc;
-        } catch (IOException e) {
-            System.out.println("FAIL TO GET LOCATION FROM ADDRESS");
-            return null;
+        } catch (Exception e) {
+            System.out.println("FAIL TO GET LOCATION FROM ADDRESS, using imperial as a default");
+            return getLocationFromAddress("Imperial College London");
         }
     }
 
