@@ -74,6 +74,13 @@
                 android:value=".MainActivity"/>
         </activity>
 
+        <activity android:name=".SharedActivity"
+            android:parentActivityName=".EntryFormActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
+
         <activity android:name=".PreviousStoriesActivity"
             android:launchMode="singleInstance"/>
 

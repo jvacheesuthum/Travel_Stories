@@ -31,7 +31,7 @@ public class SeeShared implements Callable {
         Intent intent = new Intent(main, SharedActivity.class);
 //        Gson gson = new Gson();
 //        String places_gson = gson.toJson(places);
-        intent.putExtra(MainActivity.EXTRA_MESSAGE, triptoken);
+        intent.putExtra("triptoken", triptoken);
         main.startActivity(intent);
     }
 }
