@@ -1,14 +1,16 @@
 package group22.travelstories;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.google.gson.Gson;
 
 public class SuggestionActivity extends AppCompatActivity {
+
+    public final static String EXTRA_MESSAGE = "com.travelstories.Suggestion";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,4 +34,14 @@ public class SuggestionActivity extends AppCompatActivity {
         recyclerView.setAdapter(suggestionAdapter);
 
     }
+
+//    public void clickSuggestion(View view) {
+//        Toast.makeText(this, "show on map", Toast.LENGTH_LONG).show();
+//        Intent intent = new Intent(this, MainActivity.class);
+//        TextView address = (TextView) findViewById(R.id.suggestion_address);
+//        String latlong = address.getText().toString();
+//        System.out.println("!!!!suggestion address:" +latlong);
+//        intent.putExtra(SuggestionActivity.EXTRA_MESSAGE, latlong);
+//        startActivity(intent);
+//    }
 }
