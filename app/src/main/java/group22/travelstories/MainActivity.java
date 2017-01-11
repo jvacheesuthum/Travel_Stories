@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static int RESULT_LOAD_IMAGE = 1;
     private List<TimeLineEntry> timeLine;
-    public final static String EXTRA_MESSAGE = "com.travelstories.Main";
+    public final static String EXTRA_MESSAGE = "com.travelstories.timeline";
     Long initStart;
 
     public Client TravelServerWSClient;
@@ -592,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    public void sendLocationTrace(Client wsc) {
+    public void sendLocationTrace(Client wsc) {/*
         if (points.isEmpty()) {
             makeToast("No trace to upload");
             return;
@@ -606,7 +606,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println("uploading map coordinates");
         wsc.send(request);
         System.out.println("map coords uploaded : "+request);
-
+*/
     }
 
     @Override

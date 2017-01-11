@@ -86,6 +86,9 @@ public class TimeLineEntry implements Serializable{
         for(int i = 0; i < photos.size(); i++){
             photopaths.add(userid.toString()+":"+basetime+i);
         }
+        if (locationKey.equals(new BigInteger("0"))) {
+            return new ServerTimeLineEntry(photopaths, locationName, start, end, location.getLongitude(), location.getLatitude());
+        }
         return new ServerTimeLineEntry(photopaths, locationName, locationKey, start, end);
     }
 

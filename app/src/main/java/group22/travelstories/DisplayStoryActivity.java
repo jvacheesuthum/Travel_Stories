@@ -365,6 +365,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
                     newEntry.location.setLatitude(loc.latitude);
                     newEntry.location.setLongitude(loc.longitude);
                 }
+                newEntry.locationKey = new BigInteger("0");
 
                 //for test purpose userId = 1
                 int userId = 1;
