@@ -175,6 +175,7 @@ public class PreviousStoriesActivity extends AppCompatActivity {
             index = -2;
             mAdapter.updateAdapter(timeline);
         }
+        intent.removeExtra("index");
     }
 
     @Override
@@ -183,10 +184,11 @@ public class PreviousStoriesActivity extends AppCompatActivity {
         setIntent(intent);
         //now getIntent() should always return the last received intent
     }
-//
+
 //    @Override
 //    public void onPause() {
 //        super.onPause();
+//        index = -3;
 //        FileOutputStream outputStream;
 //        try {
 //            outputStream = openFileOutput("Stories", Context.MODE_PRIVATE);
