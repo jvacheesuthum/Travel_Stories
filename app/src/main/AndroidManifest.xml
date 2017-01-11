@@ -75,6 +75,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
+        <provider android:authorities="com.facebook.app.FacebookContentProvider1279020278807001"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true"/>
 
         <activity android:name=".PreviousStoriesActivity"
             android:launchMode="singleInstance"/>

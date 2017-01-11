@@ -8,16 +8,31 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
+
 /**
  * Created by vasin on 11/01/2017.
  */
 public class SharedActivity extends AppCompatActivity {
 
+    CallbackManager callbackManager;
+
+    ShareDialog shareDialog;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shared);
+        System.out.println("alalallalalala");
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog(this);
 
+        System.out.println("fuckkkkkkkk");
         Intent intent = getIntent();
         final String triptoken = intent.getStringExtra("triptoken");
         TextView token = (TextView) findViewById(R.id.triptoken);
@@ -27,15 +42,33 @@ public class SharedActivity extends AppCompatActivity {
         final Button button = (Button) findViewById(R.id.weblink);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                try {
-                    Uri uri = Uri.parse("cloud-vm-46-251.doc.ic.ac.uk:8081/map.html?token=1");
+                //try {
+                    Uri uri = Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/map.html?token=1");
                     Intent i = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(i);
-                } catch (Exception e) {}
+                //} catch (Exception e) {}
         }
 
         });
+
+        final Button fbutton = (Button) findViewById(R.id.facebookshare);
+        fbutton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                System.out.println("fuck");
+                if (ShareDialog.canShow(ShareLinkContent.class)) {
+                    System.out.print(" yeah");
+
+                    ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                            .setContentTitle("My Journey")
+                            .setContentUrl(Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk/"))
+                            .build();
+
+                    shareDialog.show(linkContent);
+                }
+            }
+
+        });
+            }
     }
 
-}
 
