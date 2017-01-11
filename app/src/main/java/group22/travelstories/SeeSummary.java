@@ -38,7 +38,9 @@ public class SeeSummary implements Callable {
     public void callWithArg(String[] messages){
         for(int i = 0; i<messages.length; i++){
             if(messages[i] != null){
-                timeLine.get(i).setAddress(messages[i]);
+                String[] id_name = messages[i].split(",");
+                timeLine.get(i).setPlaceId(id_name[0]);
+                timeLine.get(i).setAddress(id_name[1]);
             }
         }
         seeSummary();
