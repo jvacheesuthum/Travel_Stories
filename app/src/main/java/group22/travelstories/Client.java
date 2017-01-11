@@ -19,11 +19,16 @@ public class Client extends WebSocketClient{
     //String message = "British Museum@Blah@Ha";
     SeeSummary seeSummary;
     SeeSuggestions seeSuggestions;
+    SeeShared seeShared;
 
-    public Client(String url, Callable seeSummary, Callable seeSuggestions) throws URISyntaxException {
+    public Client(String url, Callable seeSummary, Callable seeSomething) throws URISyntaxException {
         super(new URI(url));
         this.seeSummary = (SeeSummary) seeSummary;
-        this.seeSuggestions = (SeeSuggestions) seeSuggestions;
+        if(seeSomething instanceof SeeSuggestions){
+            this.seeSuggestions = (SeeSuggestions) seeSomething;
+        } else {
+            this.seeShared = (SeeShared) seeSomething;
+        }
     }
 
     @Override
@@ -56,6 +61,13 @@ public class Client extends WebSocketClient{
 //                System.out.println(each.toString());
             try {
                 seeSuggestions.callWithArg(message.substring(message.indexOf(':')+1));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if(message.split(":")[0].equals("timeline_share")){
+              String triptoken = message.split(":")[1];
+            try {
+                seeShared.callWithArg(triptoken);
             } catch (Exception e) {
                 e.printStackTrace();
             }
