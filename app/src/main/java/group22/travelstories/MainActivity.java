@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static int RESULT_LOAD_IMAGE = 1;
     private List<TimeLineEntry> timeLine;
-    public final static String EXTRA_MESSAGE = "com.travelstories.timeline"; //dodgy restrictions
+    public final static String EXTRA_MESSAGE = "com.travelstories.Main";
     Long initStart;
 
     public Client TravelServerWSClient;
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
 
         //Facebook Sdk setup
-        loadFacebookLogin();
+//        loadFacebookLogin();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -133,92 +133,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         points = new ArrayList<LatLng>();
         firstRun = true;
 
-    }
-
-    private void loadFacebookLogin() {
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
-        callbackManager = CallbackManager.Factory.create();
-
-        LoginManager.getInstance().registerCallback(callbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        // App code
-                        userid = new BigInteger(loginResult.getAccessToken().getUserId());
-                        System.out.println("Hi");
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        // App code
-                        System.out.println("what");
-
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-                        // App code
-                        System.out.println("crap");
-
-                    }
-                });
-
-        //SHARNG
-        /*
-        shareDialog = new ShareDialog(this);
-
-    };
-
-        if (ShareDialog.canShow(ShareLinkContent.class)) {
-            ShareLinkContent linkContent = new ShareLinkContent.Builder()
-                    .setContentUrl(Uri.parse("https://placekitten.com/"))
-                    .build();
-
-            shareDialog.show(linkContent);
-        }
-
-
-//        Bitmap image = ...
-//        if (ShareDialog.canShow(SharePhoto.class)) {
-//        SharePhoto photo = new SharePhoto.Builder()
-//                .setBitmap(image)
-//                .build();
-//        SharePhotoContent content = new SharePhotoContent.Builder()
-//                .addPhoto(photo)
-//                .build();
-//        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
-    /*
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-//        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-//            Uri selectedImage = data.getData();
-//            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-//
-//            Cursor cursor = getContentResolver().query(selectedImage,
-//                    filePathColumn, null, null, null);
-//            cursor.moveToFirst();
-//
-//            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//            String picturePath = cursor.getString(columnIndex);
-//            cursor.close();
-//
-//            ImageView imageView = (ImageView) findViewById(R.id.imgView);
-//            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-//
-//        }
-*/
     }
 
 
@@ -349,7 +263,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onRestart(){
         System.out.println("on restart called");
         super.onRestart();
+
+//        Intent intent = getIntent();
+//        String suggestion = intent.getStringExtra("latlong");
+//
+//        mMap.addMarker(new MarkerOptions()
+//                .position(getLatLngFromString(suggestion))
+//                .title("suggestion"));
+
     }
+
+
 
     @Override
     protected void onDestroy(){
@@ -698,6 +622,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    @Override
+    public void onNewIntent(Intent newintent){
+        super.onNewIntent(newintent);
+        // getIntent() should always return the most recent
+        setIntent(newintent);
+    }
+
+    @Override
+    public void onResume() {
+        System.out.println("onResume called");
+        super.onResume();
+
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SeeSuggestions.SUGGESTION_MARKER) {
+            if(resultCode == RESULT_OK){
+                Toast.makeText(this, "Showing this location", Toast.LENGTH_LONG).show();
+                String suggestion = data.getStringExtra("latlong");
+                mMap.addMarker(new MarkerOptions()
+                        .position(getLatLngFromString(suggestion))
+                        .title("suggestion"));
+            }
+        }
+    }
+
+    /* utils */
+    public LatLng getLatLngFromString(String address){
+        String[] latlng = address.split(", ", 2);
+        Double lat = Double.parseDouble(latlng[0]);
+        Double longi = Double.parseDouble(latlng[1]);
+        return new LatLng(lat, longi);
+    }
 }
 
 

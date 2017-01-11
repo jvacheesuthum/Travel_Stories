@@ -1,5 +1,6 @@
 package group22.travelstories;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -29,11 +30,15 @@ public class SeeSuggestions implements Callable {
         seeSuggestions();
     }
 
+    static final int SUGGESTION_MARKER = 1;
+
     public void seeSuggestions(){
         Intent intent = new Intent(main, SuggestionActivity.class);
 //        Gson gson = new Gson();
 //        String places_gson = gson.toJson(places);
         intent.putExtra(MainActivity.EXTRA_MESSAGE, json);
-        main.startActivity(intent);
+        ((Activity) main).startActivityForResult(intent, SUGGESTION_MARKER);
+//        (MainActivity) main.startActivity(intent);
+        //DON't KNOW WHY I CAN'T HAVE startActivityForResult
     }
 }
