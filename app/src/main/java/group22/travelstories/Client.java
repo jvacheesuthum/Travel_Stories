@@ -60,14 +60,14 @@ public class Client extends WebSocketClient{
                 e.printStackTrace();
             }
     } else if(message.split(":")[0].equals("get_location")){
-            System.out.println("HERERERERERERERERE===============================");
-            try {
-                String msg = message.split(":")[1];
-                ((SeeSummary) seeSummary).callWithArgEntry(msg);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.out.println("ASDFADSFDSAFFADS");
+//            System.out.println("HERERERERERERERERE===============================");
+//            try {
+//                String msg = message.split(":")[1];
+//                ((SeeSummary) seeSummary).callWithArgEntry(msg);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println("ASDFADSFDSAFFADS");
         }
 
         // test thing

@@ -400,40 +400,6 @@ public class DisplayStoryActivity extends AppCompatActivity {
         }
     }
 
-    public void continueEntry(String message) {
-        String[] split = message.split(",");
-        String id = split[0];
-        String longitude = split[1];
-        String latitude = split[2];
-
-        Location l = new Location(id);
-        l.setLongitude(Double.parseDouble(longitude));
-        l.setLatitude(Double.parseDouble(latitude));
-        newEntry.location = l;
-
-        int position;
-        if (timeline == null) {
-            System.out.println("=======================================");
-            timeline = new ArrayList();
-            position = addToCorrectIndex(newEntry);
-            System.out.println("Timeline size: " + timeline.size());
-        } else {
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-            position = addToCorrectIndex(newEntry);
-            System.out.println("Timeline size: " + timeline.size());
-        }
-
-        if (timeline == null) System.out.println("WHY IS IT STILL NULLLLLL");
-
-//                mAdapter = new SummaryAdapter(timeline, R.layout.cardview);
-//                mRecyclerView.setAdapter(mAdapter);
-//                finish();
-//                startActivity(getIntent());
-        mAdapter.updateAdapter(newEntry, position);
-        System.out.println("------------------------------------------");
-        System.out.println("Timeline size: " + timeline.size());
-    }
-
     private int addToCorrectIndex(TimeLineEntry timeLineEntry) {
         System.out.println("Add to correct index called: " + timeline.size());
         GregorianCalendar start = timeLineEntry.start;
@@ -566,6 +532,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
     public LatLng getLocationFromAddress(String addr){
 
+        if (addr == null) return null;
         Geocoder coder = new Geocoder(this);
         List<Address> address;
 
@@ -592,5 +559,6 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
 //    }
+
 
 }

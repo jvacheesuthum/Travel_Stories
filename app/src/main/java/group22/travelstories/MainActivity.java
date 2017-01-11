@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        System.out.println("MainActivity onCreate Called");
         super.onCreate(savedInstanceState);
 
         //Facebook Sdk setup
@@ -351,7 +352,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onDestroy(){
-        System.out.println("on destroy called");
         super.onDestroy();
                 try {
             TravelServerWSClient.closeBlocking();
@@ -382,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int userId = 1;
         String request = "images_taken:"+userId+"@"+images_json;
         TravelServerWSClient.send(request);
+
     }
 //separate class if needed - only structure
     /*private class UploadImage extends AsyncTask<Void, Void, Void>{
@@ -599,7 +600,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             wsc.send("timeline_address:-0.126957,51.5194133");
 
             startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
-
             return;
         }
 
@@ -618,7 +618,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         wsc.send(request);
-
 
     }
 
