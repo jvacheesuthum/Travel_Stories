@@ -598,9 +598,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
         makeToast("Uploading map trace to server");
-        Gson gson = new Gson();
-        String mapTrace_json = gson.toJson(points);
-        String request = "Final_map_trace:"+userid.toString()+"@"+mapTrace_json;
+        String mapTrace = "";
+        for (LatLng l : points) {
+            mapTrace += "/" + l.longitude + "," + l.latitude;
+        }
+        String request = "Final_map_trace:"+userid.toString()+"@"+mapTrace;
         System.out.println("uploading map coordinates");
         wsc.send(request);
         System.out.println("map coords uploaded : "+request);
