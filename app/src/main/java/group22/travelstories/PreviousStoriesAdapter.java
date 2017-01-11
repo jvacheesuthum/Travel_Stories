@@ -87,7 +87,13 @@ public class PreviousStoriesAdapter extends RecyclerView.Adapter<PreviousStories
 
         holder.storyName.setText("Placeholder");
 
+        System.out.println("onBindViewHolder position: " + position);
+        System.out.println("onBindViewHolder stories size: " + stories.size());
+        System.out.println("onBindViewHolder Stories: " + stories);
+        System.out.println("onBindViewHolder Stories: " + stories.get(0));
+
         Pair pair = stories.get(position);
+        System.out.println("Pair: " + pair);
         String title = (String) pair.first;
         ArrayList timeline = (ArrayList) pair.second;
         holder.storyName.setText(title);

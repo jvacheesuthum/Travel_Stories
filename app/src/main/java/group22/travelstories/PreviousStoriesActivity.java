@@ -33,6 +33,8 @@ public class PreviousStoriesActivity extends AppCompatActivity {
     private PreviousStoriesAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Pair> stories;
+    private ArrayList<String> titles;
+    private ArrayList<ArrayList<TimeLineEntry>> timelines;
     private int index = -2;
     static final int DISPLAY_ACTIVITY_REQUEST_CODE = 3;
 
@@ -57,18 +59,31 @@ public class PreviousStoriesActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         stories = new ArrayList();
-//        FileInputStream inputStream;
-//        try {
-//            inputStream = openFileInput("Stories");
-//            ObjectInputStream oInputStream = new ObjectInputStream(inputStream);
-//            stories = (ArrayList) oInputStream.readObject();
-//            oInputStream.close();
-//        } catch (Exception e) {
-//            System.out.println("Something went wrong with reading from internal storage");
-//        }
-//        File dir = getFilesDir();
-//        File file = new File(dir, "Stories");
-//        boolean deleted = file.delete();
+        titles = new ArrayList<>();
+        timelines = new ArrayList<>();
+
+        FileInputStream inputStream;
+        FileInputStream titleInputStream;
+        try {
+            inputStream = openFileInput("Stories");
+            titleInputStream = openFileInput("Titles");
+            System.out.println("<1>");
+            ObjectInputStream oInputStream = new ObjectInputStream(inputStream);
+            ObjectInputStream titleOInputStream = new ObjectInputStream(titleInputStream);
+            System.out.println("<2>");
+            timelines = (ArrayList) oInputStream.readObject();
+            titles = (ArrayList) titleOInputStream.readObject();
+            System.out.println("<3>: " + stories.size() + " And titles size: " + titles);
+            oInputStream.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong with reading from internal storage: " + e);
+        }
+        File dir = getFilesDir();
+        File file = new File(dir, "Stories");
+        boolean deleted = file.delete();
+        for (int i = 0; i < timelines.size(); i++) {
+            stories.add(i, Pair.create(titles.get(i), timelines.get(i)));
+        }
 
         // specify an adapter (see also next example)
         mAdapter = new PreviousStoriesAdapter(stories);
@@ -130,7 +145,7 @@ public class PreviousStoriesActivity extends AppCompatActivity {
                         mAdapter.updateAdapter(timeline);
                     } else {
                         System.out.println("Update old story!");
-                        String t = (String)((Pair)stories.get(index)).first;
+//                        String t = (String)(stories.get(index)).first();
                         stories.set(index, Pair.create(title, timeline));
                         index = -3;
                         mAdapter.updateAdapter(null);
@@ -171,6 +186,7 @@ public class PreviousStoriesActivity extends AppCompatActivity {
         } else if (index == -1) {
             System.out.println("New story!");
             Pair p = Pair.create(title, timeline);
+            System.out.println("New story timeline length: " + timeline.size());
             stories.add(p);
             index = -2;
             mAdapter.updateAdapter(timeline);
@@ -185,20 +201,37 @@ public class PreviousStoriesActivity extends AppCompatActivity {
         //now getIntent() should always return the last received intent
     }
 
-//    @Override
-//    public void onPause() {
-//        super.onPause();
+    @Override
+    public void onPause() {
+        super.onPause();
 //        index = -3;
-//        FileOutputStream outputStream;
-//        try {
-//            outputStream = openFileOutput("Stories", Context.MODE_PRIVATE);
-//            ObjectOutputStream ooutputstream = new ObjectOutputStream(outputStream);
+        FileOutputStream outputStream, titleoutputStream;
+        try {
+            outputStream = openFileOutput("Stories", Context.MODE_PRIVATE);
+            titleoutputStream = openFileOutput("Titles", Context.MODE_PRIVATE);
+            System.out.println("<1 Saving>");
+            ObjectOutputStream ooutputstream = new ObjectOutputStream(outputStream);
+            ObjectOutputStream titleOOutputstream = new ObjectOutputStream(titleoutputStream);
+            System.out.println("<2 Saving>");
 //            ooutputstream.writeObject(stories);
-//            ooutputstream.close();
-//        } catch (Exception e ) {
-//            System.out.println("Something went wrong with saving to internal storage");
-//        }
-//    }
+            ArrayList<ArrayList<TimeLineEntry>> timelines = new ArrayList<>();
+            ArrayList<String> titles = new ArrayList<>();
+            for (int i = 0; i < stories.size(); i++) {
+                timelines.add(i, (ArrayList<TimeLineEntry>)stories.get(i).second);
+                titles.add(i, (String)stories.get(i).first);
+            }
+            ooutputstream.writeObject(timelines);
+            titleOOutputstream.writeObject(titles);
+            System.out.println("<3 Saving>");
+            ooutputstream.close();
+            titleoutputStream.close();
+            System.out.println("Stories: " + stories.get(0).first);
+            System.out.println("Stories Timeline: " + stories.get(0).second);
+            System.out.println("=========================================Finished saving");
+        } catch (Exception e ) {
+            System.out.println("Something went wrong with saving to internal storage: " + e);
+        }
+    }
 
 
     @Override
