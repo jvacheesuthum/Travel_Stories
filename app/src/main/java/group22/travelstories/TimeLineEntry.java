@@ -80,8 +80,13 @@ public class TimeLineEntry implements Serializable{
         return out;
     }
 
-    public ServerTimeLineEntry toServerTimeLineEntry(){
-        return new ServerTimeLineEntry(null, locationName, locationKey, start, end);
+    public ServerTimeLineEntry toServerTimeLineEntry(BigInteger userid){
+        ArrayList<String> photopaths = new ArrayList();
+        int basetime = getStartTime();
+        for(int i = 0; i < photos.size(); i++){
+            photopaths.add(userid.toString()+":"+basetime+i);
+        }
+        return new ServerTimeLineEntry(photopaths, locationName, locationKey, start, end);
     }
 
     public int getStartTime(){

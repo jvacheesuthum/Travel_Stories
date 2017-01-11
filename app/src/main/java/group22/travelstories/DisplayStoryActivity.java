@@ -55,7 +55,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private View mFab;
     private ArrayList timeline;
-    private BigInteger userid;
+    private BigInteger userid = new BigInteger("1");
     static final int EDIT_STORY_ACTIVITY_REQUEST_CODE = 1;
     static final int ENTRY_FORM_ACTIVITY_REQUEST_CODE = 2;
     //index = -1 -> called from Main
@@ -186,11 +186,13 @@ public class DisplayStoryActivity extends AppCompatActivity {
     }
 
     private void shareStorySummary(){
+        makeToast("sending photos");
+        sendAllPhotos();
         makeToast("sharing");
         Gson gson = new Gson();
         List<ServerTimeLineEntry> toSend = new ArrayList<>();
         for(Object each : timeline){
-            toSend.add(((TimeLineEntry) each).toServerTimeLineEntry());
+            toSend.add(((TimeLineEntry) each).toServerTimeLineEntry(userid));
         }
         String timeline_json = gson.toJson(toSend);
         //for test purpose userId = 1
@@ -198,8 +200,6 @@ public class DisplayStoryActivity extends AppCompatActivity {
         String request = "timeline_share:"+userId+"@"+timeline_json;
         System.out.println("sharing request:"+request);
         TravelServerWSClient.send(request);
-        makeToast("sending photos");
-        sendAllPhotos();
     }
 
     @Override
