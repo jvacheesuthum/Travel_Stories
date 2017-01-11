@@ -1,12 +1,9 @@
 package group22.travelstories;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -16,15 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
-import java.net.URI;
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Created by vasin on 09/11/2016.
- */
 public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLineViewHolder> {
     private static ArrayList fromIntent;
     private int rowLayout;
@@ -124,7 +114,7 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
         super.onAttachedToRecyclerView(recyclerView);
     }
 
-    public void updateAdapter(TimeLineEntry entry) {
+    public void updateAdapter(TimeLineEntry entry, int position) {
         if (entry == null) {
             notifyDataSetChanged();
             return;
@@ -138,7 +128,16 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
             entry.locationName = "No Location";
         }
 
-        if (zeroOriginal) fromIntent.add(entry);
+        if (zeroOriginal) {
+            if (position == -1) {
+                fromIntent.add(entry);
+            } else if (position == -2) {
+                System.out.println("ERROR IN INDEX");
+            } else {
+                System.out.println("Input at position: " + position);
+                fromIntent.add(position, entry);
+            }
+        }
         notifyDataSetChanged();
     }
 

@@ -3,11 +3,13 @@ package group22.travelstories;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -30,7 +32,7 @@ public class PreviousStoriesActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private PreviousStoriesAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private ArrayList stories;
+    private ArrayList<Pair> stories;
     private int index = -2;
     static final int DISPLAY_ACTIVITY_REQUEST_CODE = 3;
 
@@ -115,17 +117,21 @@ public class PreviousStoriesActivity extends AppCompatActivity {
                     System.out.println("++++++++++++++++++++OnActivityResult in PreviousStoriesActivity TRY");
                     ArrayList timeline = data.getParcelableArrayListExtra("Timeline");
                     index = data.getIntExtra("index", -2);
+                    String title = data.getStringExtra("title");
+
                     if (index == -2) {
                         System.out.println("Can't get index in intent!");
                         return;
                     } else if (index == -1) {
                         System.out.println("New story!");
-                        stories.add(timeline);
+                        Pair p = Pair.create(title, timeline);
+                        stories.add(p);
                         index = -3;
                         mAdapter.updateAdapter(timeline);
                     } else {
                         System.out.println("Update old story!");
-                        stories.set(index, timeline);
+                        String t = (String)((Pair)stories.get(index)).first;
+                        stories.set(index, Pair.create(title, timeline));
                         index = -3;
                         mAdapter.updateAdapter(null);
                     }
@@ -153,19 +159,23 @@ public class PreviousStoriesActivity extends AppCompatActivity {
         }
         Intent intent = getIntent();
         ArrayList timeline = intent.getParcelableArrayListExtra("Timeline");
-        if (timeline == null) System.out.println("-------------------timeline is nulllll");
+        if (timeline == null) return;
 //        if (timeline.isEmpty()) System.out.println("--------------------timeline is empty");
         index = intent.getIntExtra("index", -2);
+        String title = intent.getStringExtra("title");
+        System.out.println("TITLE::::::::::::::::::::::::::" + title);
 
         if (index == -2) {
             System.out.println("Can't get index in intent!");
             return;
         } else if (index == -1) {
             System.out.println("New story!");
-            stories.add(timeline);
+            Pair p = Pair.create(title, timeline);
+            stories.add(p);
             index = -2;
             mAdapter.updateAdapter(timeline);
         }
+        intent.removeExtra("index");
     }
 
     @Override
@@ -174,10 +184,11 @@ public class PreviousStoriesActivity extends AppCompatActivity {
         setIntent(intent);
         //now getIntent() should always return the last received intent
     }
-//
+
 //    @Override
 //    public void onPause() {
 //        super.onPause();
+//        index = -3;
 //        FileOutputStream outputStream;
 //        try {
 //            outputStream = openFileOutput("Stories", Context.MODE_PRIVATE);

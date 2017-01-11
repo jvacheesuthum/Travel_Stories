@@ -26,6 +26,7 @@ import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -91,9 +92,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     boolean mBound = false;
     private boolean isTracking;
     SeeSummary mSeeSummary;
-    SeeSuggestions mSeeSuggestions;
 
-    //moved local vars from mapsactivity ----------------
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -109,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        System.out.println("MainActivity onCreate Called");
         super.onCreate(savedInstanceState);
 
         //Facebook Sdk setup
@@ -257,14 +257,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println("on start called");
         super.onStart();
         mSeeSummary = new SeeSummary(this);
-        mSeeSuggestions = new SeeSuggestions(this);
         if(isTracking){
             Intent intent = new Intent(this, TravelLocationService.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
 
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", mSeeSummary, mSeeSuggestions);
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", mSeeSummary, new SeeSuggestions(this));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -354,7 +353,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onDestroy(){
-        System.out.println("on destroy called");
         super.onDestroy();
                 try {
             TravelServerWSClient.closeBlocking();
@@ -385,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int userId = 1;
         String request = "images_taken:"+userId+"@"+images_json;
         TravelServerWSClient.send(request);
+
     }
 //separate class if needed - only structure
     /*private class UploadImage extends AsyncTask<Void, Void, Void>{
@@ -602,7 +601,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             wsc.send("timeline_address:-0.126957,51.5194133");
 
             startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
-
             return;
         }
 
@@ -621,7 +619,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         wsc.send(request);
-
 
     }
 

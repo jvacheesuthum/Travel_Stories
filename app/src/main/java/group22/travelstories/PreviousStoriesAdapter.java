@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,7 @@ import java.util.Date;
 
 public class PreviousStoriesAdapter extends RecyclerView.Adapter<PreviousStoriesAdapter.ViewHolder> {
 
-    private static ArrayList<ArrayList> stories;
+    private static ArrayList<Pair> stories;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -51,10 +52,11 @@ public class PreviousStoriesAdapter extends RecyclerView.Adapter<PreviousStories
                     System.out.println("Check: " + getAdapterPosition());
                     Bundle dataMap = new Bundle();
 //                    ArrayList<Photo> s = ((TimeLineEntry)fromIntent.get(getAdapterPosition())).photos;
-                    dataMap.putSerializable("timeline", stories.get(getAdapterPosition()));
+                    dataMap.putSerializable("timeline", (ArrayList) stories.get(getAdapterPosition()).second);
                     intent.putExtras(dataMap);
                     intent.putExtra("index", getAdapterPosition());
                     intent.putExtra("caller", "Stories".toCharArray());
+                    intent.putExtra("title", (String)stories.get(getAdapterPosition()).first);
 //                    v.getContext().startActivity(intent);
                     ((Activity) vw.getContext()).startActivityForResult(intent, PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE);
                 }
@@ -63,7 +65,7 @@ public class PreviousStoriesAdapter extends RecyclerView.Adapter<PreviousStories
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public PreviousStoriesAdapter(ArrayList<ArrayList> stories) {
+    public PreviousStoriesAdapter(ArrayList<Pair> stories) {
         this.stories = stories;
     }
 
@@ -85,7 +87,10 @@ public class PreviousStoriesAdapter extends RecyclerView.Adapter<PreviousStories
 
         holder.storyName.setText("Placeholder");
 
-        ArrayList timeline = stories.get(position);
+        Pair pair = stories.get(position);
+        String title = (String) pair.first;
+        ArrayList timeline = (ArrayList) pair.second;
+        holder.storyName.setText(title);
         Date start = ((TimeLineEntry)timeline.get(0)).start.getTime();
         Date end = ((TimeLineEntry)timeline.get(timeline.size() - 1)).end.getTime();
 

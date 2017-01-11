@@ -1,69 +1,64 @@
 package group22.travelstories;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.media.ExifInterface;
-import android.net.Uri;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-import java.sql.Time;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.TimePicker;
-import android.widget.Toast;
-
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.google.gson.Gson;
-import com.google.gson.internal.ObjectConstructor;
-//import android.widget.ListView;
-//import android.widget.ArrayAdapter<T>;
 
 public class DisplayStoryActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private SummaryAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
     private View mFab;
     private ArrayList timeline;
     private BigInteger userid = new BigInteger("1");
+
     static final int EDIT_STORY_ACTIVITY_REQUEST_CODE = 1;
     static final int ENTRY_FORM_ACTIVITY_REQUEST_CODE = 2;
     //index = -1 -> called from Main
     //index >= 0 -> called from PreviousStoriesActivity
     private int index;
+    private TimeLineEntry newEntry;
+    private EditText title;
 
     Client TravelServerWSClient;
-    //private RecyclerView rv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,33 +72,58 @@ public class DisplayStoryActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv);
-        mFab = findViewById(R.id.fab);
-        mFab.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                shareStorySummary();
-            }
-        });
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        FloatingActionButton mAdd = (FloatingActionButton) findViewById(R.id.add);
-        mAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), ENTRY_FORM_ACTIVITY_REQUEST_CODE);
-            }
-        });
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv);
+//        mFab = (FloatingActionButton) findViewById(R.id.fab);
+//        mFab.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                shareStorySummary();
+//            }
+//        });
+//
+//        mAdd = (FloatingActionButton) findViewById(R.id.add);
+//        mAdd.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), ENTRY_FORM_ACTIVITY_REQUEST_CODE);
+//            }
+//        });
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
+        Intent intent = getIntent();
+        title = (EditText) findViewById(R.id.edittext_title);
+        String t = intent.getStringExtra("title");
+        title.setCursorVisible(false);
+        if (t != null) {
+            title.setText(t);
+        }
+        title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                title.setCursorVisible(true);
+            }
+        });
+        title.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    title.setCursorVisible(false);
+                }
+                return false;
+            }
+        });
+
+
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-
-        Intent intent = getIntent();
         char[] caller = intent.getCharArrayExtra("caller");
         String scaller = null;
         if (caller != null) {
@@ -142,6 +162,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 intent.putParcelableArrayListExtra("Timeline", timeline);
                 System.out.println("Index during action bar: " + index);
                 intent.putExtra("index", index);
+                String title = ((EditText)findViewById(R.id.edittext_title)).getText().toString();
+                intent.putExtra("title", title);
 //        startActivityForResult(intent, Activity.RESULT_OK);
                 if (index >= 0) {
                     setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
@@ -152,6 +174,12 @@ public class DisplayStoryActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 super.onBackPressed();
+                return true;
+            case R.id.add_entry:
+                startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), ENTRY_FORM_ACTIVITY_REQUEST_CODE);
+                return true;
+            case R.id.sharing:
+                shareStorySummary();
                 return true;
             default:
                 return false;
@@ -174,7 +202,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
             finish();
         } else {
             finish();
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }
         super.onBackPressed();
@@ -186,8 +214,6 @@ public class DisplayStoryActivity extends AppCompatActivity {
     }
 
     private void shareStorySummary(){
-        makeToast("sending photos");
-        sendAllPhotos();
         makeToast("sharing");
         Gson gson = new Gson();
         List<ServerTimeLineEntry> toSend = new ArrayList<>();
@@ -200,6 +226,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
         String request = "timeline_share:"+userId+"@"+timeline_json;
         System.out.println("sharing request:"+request);
         TravelServerWSClient.send(request);
+        makeToast("sending photos");
+        sendAllPhotos();
     }
 
     @Override
@@ -208,7 +236,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
         super.onStart();
         try {
-            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", null,null);
+            TravelServerWSClient = new Client("http://cloud-vm-46-251.doc.ic.ac.uk:1080", new SeeSummary(this),new SeeSuggestions(this));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -267,14 +295,14 @@ public class DisplayStoryActivity extends AppCompatActivity {
                             Photo photo = new Photo(path, d, latitude, longitude);
                             entryPhotoPaths.add(photo);
                         }
-                        System.out.println("<3>");
+                        System.out.println("<3>: " + timeline.size() + " Index: " + index);
                         ((TimeLineEntry)timeline.get(index)).photos = entryPhotoPaths;
                         System.out.println("<4>");
 
                         ((TimeLineEntry) timeline.get(index)).setAddress(newLocation);
                         System.out.println("<5>");
 
-                        mAdapter.updateAdapter(null);
+                        mAdapter.updateAdapter(null, -2);
                     }
                     break;
                 } catch(Exception e) {
@@ -329,24 +357,33 @@ public class DisplayStoryActivity extends AppCompatActivity {
                         return;
                     }
                 }
-                TimeLineEntry newEntry = new TimeLineEntry(null, from, end);
+                newEntry = new TimeLineEntry(new Location(locationName), from, end);
                 newEntry.locationName = locationName;
                 newEntry.photos = entryPhotos;
+                LatLng loc = getLocationFromAddress(locationName);
+                if (loc != null ) {
+                    newEntry.location.setLatitude(loc.latitude);
+                    newEntry.location.setLongitude(loc.longitude);
+                }
 
                 //for test purpose userId = 1
                 int userId = 1;
-                String request = "get_location:" + locationName;
-
+//                String request = "get_location:" + locationName;
+//                try {
+//                    TravelServerWSClient.connectBlocking();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
 //                TravelServerWSClient.send(request);
-
+                int position = -2;
                 if (timeline == null) {
                     System.out.println("=======================================");
                     timeline = new ArrayList();
-                    timeline.add(newEntry);
+                    position = addToCorrectIndex(newEntry);
                     System.out.println("Timeline size: " + timeline.size());
                 } else {
                     System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-                    timeline.add(newEntry);
+                    position = addToCorrectIndex(newEntry);
                     System.out.println("Timeline size: " + timeline.size());
                 }
 
@@ -356,48 +393,90 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //                mRecyclerView.setAdapter(mAdapter);
 //                finish();
 //                startActivity(getIntent());
-                mAdapter.updateAdapter(newEntry);
+                mAdapter.updateAdapter(newEntry, position);
                 System.out.println("------------------------------------------");
                 System.out.println("Timeline size: " + timeline.size());
+
                 break;
         }
     }
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_display_story);
-//
-//        Intent intent = getIntent();
-//        ArrayList timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
-//
-//        //doing it programmatically - dirty
-//        //should try ArrayAdapter later
-//        LinearLayout summary = (LinearLayout) findViewById(R.id.summary);
-//        for(int i=0; i<timeline.size(); i++){
-//            //We create a Layout for every item
-//            LinearLayout item = new LinearLayout(this);
-//            item.setOrientation(LinearLayout.HORIZONTAL);
-//
-//            //A TextView to put the order (ie: 1.)
-//            TextView number = new TextView(this);
-//            number.setText(i+1 + ". ");
-//            item.addView(number, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 0));
-//
-//            //TextView to put the value from the ArrayList
-//            TextView info = new TextView(this);
-//            info.setText(timeline.get(i).toString());
-//            item.addView(info, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
-//
-//            //Add this layout to the main layout of the XML
-//            summary.addView(item, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 0));
-//        }
-//
-////        ArrayAdapter<TimeLineEntry> adapter = new ArrayAdapter<TimeLineEntry>(this, android.R.layout.simple_list_item_1, timeline);
-////        ListView listView = (ListView) findViewById(R.id.listview);
-////        listView.setAdapter(adapter);
-//
-//
-//    }
+
+    private int addToCorrectIndex(TimeLineEntry timeLineEntry) {
+        System.out.println("Add to correct index called: " + timeline.size());
+        GregorianCalendar start = timeLineEntry.start;
+        GregorianCalendar end = timeLineEntry.end;
+        GregorianCalendar newCal;
+        if (timeline.isEmpty()) {
+            timeline.add(timeLineEntry);
+            return -1;
+        }
+        for (Object o : timeline) {
+            System.out.println("In Loop: " + timeline.size());
+            TimeLineEntry t = (TimeLineEntry) o;
+            GregorianCalendar tStart = t.start;
+            GregorianCalendar tEnd = t.end;
+            int i = timeline.indexOf(o);
+            System.out.println("Index i: " + i);
+            boolean tSbeforeStart = tStart.compareTo(start) < 0; //true if tStart is before start
+            boolean tEbeforeEnd = tEnd.compareTo(end) < 0; //true if tEnd before end
+            boolean tSbeforeEnd = tStart.compareTo(end) < 0; //true if tStart before end
+            if (tEnd.compareTo(start) < 0) continue; //true if tEnd before start
+            if (!tSbeforeEnd) {
+                System.out.println("Fits Perfectly");
+                timeline.add(i, timeLineEntry);
+                return i;
+            }
+            if (tSbeforeStart && tEbeforeEnd) {//t overlaps on top
+                System.out.println("t overlaps on top");
+                newCal = start;
+                newCal.add(Calendar.SECOND, 0);
+                ((TimeLineEntry)timeline.get(i)).end = newCal;
+
+                if (timeline.size() == i + 1) {
+                    System.out.println("RETURNED: " + timeline.size());
+                    return i;
+                }
+                TimeLineEntry next = (TimeLineEntry)timeline.get(i + 1);
+                if (next.start.compareTo(end) < 0) {//next entry overlaps as well
+                    newCal = next.start;
+                    newCal.add(Calendar.SECOND, 0);
+                    timeLineEntry.end = newCal;
+                }
+                timeline.add(i + 1, timeLineEntry);
+                return i + 1;
+            } else if (tSbeforeStart) {//t includes new entry
+                System.out.println("t includes new entry");
+                long s = start.getTimeInMillis();
+                long e = end.getTimeInMillis();
+                long diff = s - e;
+                long newS = tStart.getTimeInMillis() + diff;
+                newCal = new GregorianCalendar();
+                newCal.setTimeInMillis(newS);
+                timeLineEntry.start = newCal;
+                newCal = tStart;
+                newCal.add(Calendar.SECOND, 0);
+                timeLineEntry.end = newCal;
+                timeline.add(i, timeLineEntry);
+                return i;
+            } else if (tEbeforeEnd) {//new entry includes t
+                System.out.println("new entry includes t");
+                newCal = tStart;
+                newCal.add(Calendar.SECOND, 0);
+                timeLineEntry.end = newCal;
+                timeline.add(i, timeLineEntry);
+                return i;
+            } else {//t overlaps on bottom
+                System.out.println("t overlaps on bottom");
+                newCal = end;
+                newCal.add(Calendar.SECOND, 0);
+                ((TimeLineEntry)timeline.get(i)).start = newCal;
+                timeline.add(i, timeLineEntry);
+                return i;
+            }
+        }
+        timeline.add(timeLineEntry);
+        return -1;
+    }
 
     public void sendAllPhotos(){
         List<String> all_paths = getAllPhotoPaths(timeline);
@@ -439,7 +518,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
             ByteArrayOutputStream byteout = new ByteArrayOutputStream();
             byteout.write(lengthToBuffer);
             byteout.write(filenameToBuffer);
-            img.compress(Bitmap.CompressFormat.PNG, 100, byteout);
+            img.compress(Bitmap.CompressFormat.JPEG, 10, byteout);
             byteout.flush();
             byte[] imgbyte = byteout.toByteArray();
 
@@ -451,5 +530,36 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
         }
     }
+
+    public LatLng getLocationFromAddress(String addr){
+
+        if (addr == null) return null;
+        Geocoder coder = new Geocoder(this);
+        List<Address> address;
+
+        try {
+            address = coder.getFromLocationName(addr,5);
+            if (address==null) {
+                return null;
+            }
+            Address location=address.get(0);
+            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+            System.out.println("retrieved from geocode ======== " + loc.toString());
+            return loc;
+        } catch (Exception e) {
+            System.out.println("FAIL TO GET LOCATION FROM ADDRESS, using imperial as a default");
+            return getLocationFromAddress("Imperial College London");
+        }
+    }
+
+//    @Override
+//    public void onResume() {
+//        try {
+//            TravelServerWSClient.connectBlocking();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
 
 }

@@ -4,5 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="group22.travelstories.DisplayStoryActivity">
 
+    <item
+        android:id="@+id/add_entry"
+        android:icon="@drawable/ic_add_box_black_24dp"
+        android:title="addEntry"
+        app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/sharing"
+        android:icon="@drawable/com_facebook_button_icon"
+        android:title="sharing"
+        app:showAsAction="ifRoom"/>
 </menu>

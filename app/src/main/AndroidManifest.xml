@@ -28,11 +28,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayStoryActivity"
-            android:launchMode="singleTop">
+
+
+        <activity
+            android:name=".DisplayStoryActivity"
+            android:launchMode="singleTop"
+            android:label="Your Most Recent Story">
         </activity>
 
-        <activity android:name=".suggestionActivity"></activity>
+        <activity
+            android:name=".SuggestionActivity"
+            android:label="Suggestions">
+        </activity>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

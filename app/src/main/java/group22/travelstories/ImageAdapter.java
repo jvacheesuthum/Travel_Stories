@@ -22,10 +22,13 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.stfalcon.frescoimageviewer.ImageViewer;
+
 
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by hayleykwan on 17/11/2016.
@@ -66,11 +69,16 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         Uri uri = Uri.fromFile(new File(photos.get(position)));
 
-
         holder.getSimpleDraweeView().setImageURI(uri);
+        holder.getSimpleDraweeView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPicker(position);
+            }
+        });
 
 //        SimpleDraweeView test = (SimpleDraweeView) findViewById(R.id.test);
 //        Uri uri = Uri.parse("http://image.slidesharecdn.com/androiddeeplinking-141118113917-conversion-gate02/95/android-deep-linking-19-638.jpg?cb=1416310811");
@@ -80,7 +88,23 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 //        Bitmap scaledB = Bitmap.createScaledBitmap(b,b.getWidth()/10, b.getHeight()/10, true);
 //        b.recycle();
 //        holder.imageView.setImageBitmap(scaledB);
+    }
 
+    private void showPicker(int position) {
+        System.out.println("showPicker Called");
+        String[] arr = new String[photos.size()];
+        int i = 0;
+        for (String s : photos) {
+            Uri uri = Uri.fromFile(new File(photos.get(i)));
+            arr[i] = uri.toString();
+            i++;
+        }
+        System.out.println("Context: " + mContext);
+        System.out.println("this: " + arr[position]);
+        new ImageViewer.Builder(mContext, arr)
+                .setStartPosition(position)
+                .setImageMargin(mContext, R.dimen.cast_notification_image_size)
+                .show();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

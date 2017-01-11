@@ -73,21 +73,22 @@ public class EditStoryActivity extends AppCompatActivity {
 
         name.setText(t.getLocationName());
         name.setTextSize(25);
-        name.setEnabled(false);
+        name.setCursorVisible(false);
+
         newLocation = t.getLocationName();
+        name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                name.setCursorVisible(true);
+            }
+        });
         name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                    TextView newName = (TextView) findViewById(R.id.timeLine_name);
-//                    if (newName == null) System.out.println("newName is NULL");
-//                    System.out.println("WHAT IS newNAME??: " + newName);
-//                    System.out.println("PRINTING NAME GET TEXT");
-//                    System.out.println("HERE IT IS: " + name.getText());
-//                    newName.setText(name.getText());
                     newLocation = name.getText().toString();
-                    name.setEnabled(false);
+                    name.setCursorVisible(false);
                 }
                 return false;
             }
@@ -98,24 +99,11 @@ public class EditStoryActivity extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent();
-//                intent.setType("image/*");
-//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-//                intent.setAction(Intent.ACTION_GET_CONTENT);
-//                startActivityForResult(Intent.createChooser(intent,"Select Picture"), 1);
                 PhotoPicker.builder()
                         .setShowCamera(true)
                         .setPhotoCount(100)
                         .setPreviewEnabled(false)
                         .start(EditStoryActivity.this, PhotoPicker.REQUEST_CODE);
-
-            }
-        });
-
-        Button edit = (Button) findViewById(R.id.editPlace);
-        edit.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                name.setEnabled(true);
             }
         });
 

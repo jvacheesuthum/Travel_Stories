@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 public class SeeSuggestions implements Callable {
 
     Context main;
-    Place[] places;
+    String json;
 
     public SeeSuggestions(Context main){
         this.main = main;
@@ -23,14 +23,17 @@ public class SeeSuggestions implements Callable {
         return null;
     }
 
-    public void callWithArg(Place[] places){
-        this.places = places;
+    public void callWithArg(String json){
+        System.out.println("DEBUG: arrive from main onstart" + json);
+        this.json = json;
         seeSuggestions();
     }
 
     public void seeSuggestions(){
-        Intent intent = new Intent(main, suggestionActivity.class);
-        intent.putExtra(MainActivity.EXTRA_MESSAGE, places);
+        Intent intent = new Intent(main, SuggestionActivity.class);
+//        Gson gson = new Gson();
+//        String places_gson = gson.toJson(places);
+        intent.putExtra(MainActivity.EXTRA_MESSAGE, json);
         main.startActivity(intent);
     }
 }
