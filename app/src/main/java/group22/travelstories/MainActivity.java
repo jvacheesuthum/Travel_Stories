@@ -348,12 +348,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println("on restart called");
         super.onRestart();
 
-        Intent intent = getIntent();
-        String suggestion = intent.getStringExtra("latlong");
-
-        mMap.addMarker(new MarkerOptions()
-                .position(getLatLngFromString(suggestion))
-                .title("suggestion"));
+//        Intent intent = getIntent();
+//        String suggestion = intent.getStringExtra("latlong");
+//
+//        mMap.addMarker(new MarkerOptions()
+//                .position(getLatLngFromString(suggestion))
+//                .title("suggestion"));
 
     }
 
@@ -722,7 +722,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SeeSuggestions.SUGGESTION_MARKER) {
+            if(resultCode == RESULT_OK){
+                Toast.makeText(this, "Showing this location", Toast.LENGTH_LONG).show();
+                String suggestion = data.getStringExtra("latlong");
+                mMap.addMarker(new MarkerOptions()
+                        .position(getLatLngFromString(suggestion))
+                        .title("suggestion"));
+            }
+        }
+    }
 
+    /* utils */
     public LatLng getLatLngFromString(String address){
         String[] latlng = address.split(", ", 2);
         Double lat = Double.parseDouble(latlng[0]);
