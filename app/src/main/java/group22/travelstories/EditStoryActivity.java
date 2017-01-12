@@ -175,9 +175,10 @@ public class EditStoryActivity extends AppCompatActivity {
                 super.onBackPressed();
                 return true;
             case R.id.delete_entry:
+                System.out.println("In Delete_entry");
                 intent.putExtra("delete", true);
                 intent.putExtra("Index", index);
-                setResult(DisplayStoryActivity.ENTRY_FORM_ACTIVITY_REQUEST_CODE, intent);
+                setResult(DisplayStoryActivity.EDIT_STORY_ACTIVITY_REQUEST_CODE, intent);
 //                startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
                 finish();
                 return true;

@@ -28,7 +28,6 @@ public class SuggestionActivity extends AppCompatActivity {
         System.out.println("HERE: get intent from main activity" + intent.toString());
         String json = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
         Gson gson = new Gson();
-        System.out.println("DEBUGGGG: " + json);
         Place[] places = gson.fromJson(json, Place[].class);
         SuggestionAdapter suggestionAdapter = new SuggestionAdapter(places);
         recyclerView.setAdapter(suggestionAdapter);

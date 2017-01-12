@@ -62,10 +62,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    CallbackManager callbackManager;
-
-    ShareDialog shareDialog;
-
     private static int RESULT_LOAD_IMAGE = 1;
     private List<TimeLineEntry> timeLine;
     public final static String EXTRA_MESSAGE = "com.travelstories.timeline";
@@ -95,9 +91,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         System.out.println("MainActivity onCreate Called");
         super.onCreate(savedInstanceState);
-
-        //Facebook Sdk setup
-//        loadFacebookLogin();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -172,12 +165,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             e.printStackTrace();
         }
 
+        View previousButton = findViewById(R.id.previous_stories);
+        previousButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, PreviousStoriesActivity.class);
+                startActivity(intent);
+            }
+        });
+
         View suggestButton = findViewById(R.id.suggestion);
         suggestButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
-                makeToast("suggest!");
                 requestNearBySuggestions(TravelServerWSClient);
             }
         });
@@ -194,9 +195,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     myBindService();
                     isTracking = true;
                 } else {  // That's it case//
-                    timeLine =
-
-                            getTimeLineFromTravelLocationService();
+                    timeLine =getTimeLineFromTravelLocationService();
                     mSeeSummary.setTimeLine(timeLine);
                     mSeeSummary.setUserId(userid);
                     stopTravelLocationService();
@@ -248,14 +247,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onRestart(){
         System.out.println("on restart called");
         super.onRestart();
-
-//        Intent intent = getIntent();
-//        String suggestion = intent.getStringExtra("latlong");
-//
-//        mMap.addMarker(new MarkerOptions()
-//                .position(getLatLngFromString(suggestion))
-//                .title("suggestion"));
-
     }
 
 
@@ -627,7 +618,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SeeSuggestions.SUGGESTION_MARKER) {
             if(resultCode == RESULT_OK){
-                Toast.makeText(this, "Showing this location", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Showing this location", Toast.LENGTH_SHORT).show();
                 String suggestion = data.getStringExtra("latlong");
                 mMap.addMarker(new MarkerOptions()
                         .position(getLatLngFromString(suggestion))

@@ -152,7 +152,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item){
         Intent intent = new Intent(DisplayStoryActivity.this, PreviousStoriesActivity.class);
         switch(item.getItemId()) {
             case android.R.id.home:
@@ -179,7 +179,13 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), ENTRY_FORM_ACTIVITY_REQUEST_CODE);
                 return true;
             case R.id.sharing:
-                shareStorySummary();
+                try {
+                    System.out.println("HEREHEHRHEHHRHEHREHHREHEHR================");
+                    shareStorySummary();
+                } catch(Exception e) {
+                    System.out.println("?????????================");
+                    Toast.makeText(this, "Cannot upload without a location", Toast.LENGTH_SHORT);
+                }
                 return true;
             case R.id.deleteTimeline:
                 intent.putExtra("delete", true);
@@ -224,8 +230,14 @@ public class DisplayStoryActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void shareStorySummary(){
-        makeToast("sharing");
+    private void shareStorySummary() throws Exception {
+        System.out.println("HREEREERERE: timeline is ?, should not share");
+        if(timeline == null){
+            System.out.println("timeline is null");
+            Toast.makeText(this, "Cannot upload without a location", Toast.LENGTH_LONG);
+            throw new Exception("Cannot upload without a timeline");
+        }
+        makeToast("Sharing");
         Gson gson = new Gson();
         List<ServerTimeLineEntry> toSend = new ArrayList<>();
         for(Object each : timeline){
