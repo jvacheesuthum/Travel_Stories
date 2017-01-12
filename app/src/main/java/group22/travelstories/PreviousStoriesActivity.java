@@ -130,6 +130,12 @@ public class PreviousStoriesActivity extends AppCompatActivity {
                 System.out.println("RESULT_OK: " + RESULT_OK);
                 try {
                     System.out.println("++++++++++++++++++++OnActivityResult in PreviousStoriesActivity TRY");
+                    if(data.getBooleanExtra("delete", false)) {
+                        index = data.getIntExtra("index", -2);
+                        stories.remove(index);
+                        mAdapter.updateAdapter(null);
+                        break;
+                    }
                     ArrayList timeline = data.getParcelableArrayListExtra("Timeline");
                     index = data.getIntExtra("index", -2);
                     String title = data.getStringExtra("title");

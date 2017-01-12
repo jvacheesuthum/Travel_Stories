@@ -160,9 +160,9 @@ public class EditStoryActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(EditStoryActivity.this, DisplayStoryActivity.class);
         switch(item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(EditStoryActivity.this, DisplayStoryActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
                 intent.putExtra("NewLocation", newLocation);
@@ -170,10 +170,16 @@ public class EditStoryActivity extends AppCompatActivity {
                 intent.putStringArrayListExtra("NewPhotos", photoPaths);
 //        startActivityForResult(intent, Activity.RESULT_OK);
 
-
                 setResult(DisplayStoryActivity.EDIT_STORY_ACTIVITY_REQUEST_CODE, intent);
                 finish();
                 super.onBackPressed();
+                return true;
+            case R.id.delete_entry:
+                intent.putExtra("delete", true);
+                intent.putExtra("Index", index);
+                setResult(DisplayStoryActivity.ENTRY_FORM_ACTIVITY_REQUEST_CODE, intent);
+//                startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
+                finish();
                 return true;
             default:
                 return false;

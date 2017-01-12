@@ -153,10 +153,10 @@ public class DisplayStoryActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(DisplayStoryActivity.this, PreviousStoriesActivity.class);
         switch(item.getItemId()) {
             case android.R.id.home:
                 System.out.println("---------------------------------action bar back in display pressed");
-                Intent intent = new Intent(DisplayStoryActivity.this, PreviousStoriesActivity.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
                 intent.putParcelableArrayListExtra("Timeline", timeline);
@@ -181,6 +181,17 @@ public class DisplayStoryActivity extends AppCompatActivity {
             case R.id.sharing:
                 shareStorySummary();
                 return true;
+            case R.id.deleteTimeline:
+                intent.putExtra("delete", true);
+                intent.putExtra("index", index);
+                if (index >= 0) {
+                    setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
+                    finish();
+                } else {
+                    finish();
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                }
             default:
                 return false;
         }
@@ -270,6 +281,11 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 // Make sure the request was successful
                 try {
                     if (resultCode == RESULT_FIRST_USER) {
+                        if (data.getBooleanExtra("delete", false)) {
+                            timeline.remove(data.getIntExtra("Index", -1));
+                            mAdapter.updateAdapter(null, -2);
+                            break;
+                        }
                         System.out.println("============================IN RESULT FIRST USER");
                         String newLocation = data.getStringExtra("NewLocation");
                         System.out.println("<1>: " + newLocation);
