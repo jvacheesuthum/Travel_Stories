@@ -282,8 +282,10 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 try {
                     if (resultCode == RESULT_FIRST_USER) {
                         if (data.getBooleanExtra("delete", false)) {
-                            timeline.remove(data.getIntExtra("Index", -1));
-                            mAdapter.updateAdapter(null, -2);
+                            System.out.println("Deleting");
+                            int i = data.getIntExtra("Index", -1);
+                            timeline.remove(i);
+                            mAdapter.updateAdapter(null, i, true);
                             break;
                         }
                         System.out.println("============================IN RESULT FIRST USER");
@@ -318,7 +320,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
                         ((TimeLineEntry) timeline.get(index)).setAddress(newLocation);
                         System.out.println("<5>");
 
-                        mAdapter.updateAdapter(null, -2);
+                        mAdapter.updateAdapter(null, -2, false);
                     }
                     break;
                 } catch(Exception e) {
@@ -410,7 +412,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //                mRecyclerView.setAdapter(mAdapter);
 //                finish();
 //                startActivity(getIntent());
-                mAdapter.updateAdapter(newEntry, position);
+                mAdapter.updateAdapter(newEntry, position, false);
                 System.out.println("------------------------------------------");
                 System.out.println("Timeline size: " + timeline.size());
 

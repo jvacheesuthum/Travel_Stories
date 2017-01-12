@@ -114,7 +114,10 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.TimeLine
         super.onAttachedToRecyclerView(recyclerView);
     }
 
-    public void updateAdapter(TimeLineEntry entry, int position) {
+    public void updateAdapter(TimeLineEntry entry, int position, boolean deleting) {
+        if (deleting) {//deleting
+            fromIntent.remove(position);
+        }
         if (entry == null) {
             notifyDataSetChanged();
             return;
