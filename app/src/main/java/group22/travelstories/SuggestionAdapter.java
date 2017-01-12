@@ -18,7 +18,7 @@ public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionAdapter.Su
     public static class SuggestionViewHolder extends RecyclerView.ViewHolder {
 
         CardView cv;
-        ImageView suggestion_photo;
+//        ImageView suggestion_photo;
         TextView suggestion_name;
         TextView suggestion_address;
 
@@ -26,7 +26,7 @@ public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionAdapter.Su
             super(itemView);
             cv = (CardView) itemView.findViewById(R.id.cv_suggestion);
 
-            suggestion_photo = (ImageView) itemView.findViewById(R.id.suggestion_photo);
+//            suggestion_photo = (ImageView) itemView.findViewById(R.id.suggestion_photo);
             suggestion_name = (TextView) itemView.findViewById(R.id.suggestion_name);
             suggestion_address = (TextView) itemView.findViewById(R.id.suggestion_address);
 
@@ -34,17 +34,12 @@ public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionAdapter.Su
 
                 @Override
                 public void onClick(View v) {
-                    System.out.println("Detected click on card view: " + v.toString());
                     String latlong = suggestion_address.getText().toString();
                     Intent addMarkerIntent = new Intent(v.getContext(), MainActivity.class);
-                    System.out.println("Sending intent from SUGGESTION!!!: " + addMarkerIntent);
                     System.out.println("!!!!suggestion address: " +latlong);
-//                    addMarkerIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                    addMarkerIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     addMarkerIntent.putExtra("latlong", latlong);
                     ((Activity) v.getContext()).setResult(Activity.RESULT_OK, addMarkerIntent);
                     ((Activity) v.getContext()).finish();
-//                    (v.getContext()).startActivity(addMarkerIntent);
                 }
             });
         }
