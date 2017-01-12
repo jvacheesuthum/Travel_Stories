@@ -20,6 +20,7 @@ public class Client extends WebSocketClient{
     SeeSummary seeSummary;
     SeeSuggestions seeSuggestions;
     SeeShared seeShared;
+    String[] locations;
 
     public Client(String url, Callable seeSummary, Callable seeSomething) throws URISyntaxException {
         super(new URI(url));
@@ -47,10 +48,17 @@ public class Client extends WebSocketClient{
         }*/
 
         // real thing
-        if(message.split(":")[0].equals("timeline_address")){
+        if(message.split(":")[0].equals("timeline_address")) {
             try {
-                String[] locations = message.split(":")[1].split("@");
-                ((SeeSummary) seeSummary).callWithArg(locations);
+                locations = message.split(":")[1].split("@");
+                ((MainActivity) seeSummary.main).sendLocationTrace(this);
+                //////((SeeSummary) seeSummary).callWithArg(locations);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if(message.split(":")[0].equals("Final_map_trace")){
+            try {
+                ((SeeSummary) seeSummary).callWithArg(locations,message.split(":")[1]);
             } catch (Exception e) {
                 e.printStackTrace();
             }

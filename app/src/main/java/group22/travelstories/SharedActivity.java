@@ -43,14 +43,13 @@ public class SharedActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final String triptoken = intent.getStringExtra("triptoken");
         TextView token = (TextView) findViewById(R.id.triptoken);
-        //TODO change back to triptoken
-        token.setText("29");
+        token.setText(triptoken);
 
         final Button button = (Button) findViewById(R.id.weblink);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //try {
-                    Uri uri = Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/map.html?token=1");
+                    Uri uri = Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/map.html?token="+triptoken);
                     Intent i = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(i);
                 //} catch (Exception e) {}
@@ -65,7 +64,7 @@ public class SharedActivity extends AppCompatActivity {
 
                     ShareLinkContent linkContent = new ShareLinkContent.Builder()
                             .setContentTitle("My Journey")
-                            .setContentUrl(Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/map.html?token=1"))
+                            .setContentUrl(Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/map.html?token="+triptoken))
                             .setImageUrl(Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/images/treek.png"))
                             .build();
 

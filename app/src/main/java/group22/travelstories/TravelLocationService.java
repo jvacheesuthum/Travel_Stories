@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -42,8 +43,9 @@ public class TravelLocationService extends Service implements GoogleApiClient.Co
     private ArrayList<TimeLineEntry> timeLine;
     TimeLineEntry currentTimeLineEntry;
 
-    SimpleTimeZone pdt;
-    private long thresholdDuration = 10 * 1000; // 5 minutes
+    public static SimpleTimeZone pdt;
+    //private long thresholdDuration = 3 * 60 * 1000; // 3 minutes
+    private long thresholdDuration = 5 * 1000; // 5 seconds
 
     private Timer mTimer = null;
 
@@ -62,6 +64,12 @@ public class TravelLocationService extends Service implements GoogleApiClient.Co
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
+    }
+
+    @Override
+    public void onCreate(){
+        System.out.println("service starts in service");
+        super.onCreate();
     }
 
 //    @Override
@@ -92,11 +100,14 @@ public class TravelLocationService extends Service implements GoogleApiClient.Co
     protected void createLocationRequest() {
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setInterval(5 * 1000)        // 5 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+//                .setInterval(60 * 1000)        // 60 seconds, in milliseconds
+//                .setFastestInterval(30 * 1000); // 30 second, in milliseconds
     }
 
     public ArrayList<TimeLineEntry> getTimeLineList(){
+        stopSelf();
         return this.timeLine;
     }
 

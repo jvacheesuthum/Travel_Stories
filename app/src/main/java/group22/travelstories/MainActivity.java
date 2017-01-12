@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     CallbackManager callbackManager;
 
     ShareDialog shareDialog;
+
+    Intent serviceIntent;
 
     private static int RESULT_LOAD_IMAGE = 1;
     private List<TimeLineEntry> timeLine;
@@ -210,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                     sendTimeLineLocation(TravelServerWSClient);
-                    sendLocationTrace(TravelServerWSClient);
+                    //sendLocationTrace(TravelServerWSClient);
                     trackToggle.setText("See summary");
                 }
             }
@@ -219,11 +222,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void startTravelLocationService(){
-        startService(new Intent(this, TravelLocationService.class));
+        serviceIntent = new Intent(this, TravelLocationService.class);
+        startService(serviceIntent);
     }
 
     private void stopTravelLocationService(){
-        stopService(new Intent(this, TravelLocationService.class));
+        stopService(serviceIntent);
     }
 
     protected void onStop() {
@@ -498,19 +502,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void sendTimeLineLocation(Client wsc) {
         System.out.println("==========================sendTimeLineLocation Called");
         if (timeLine.isEmpty()) {
-            //real thing
-            /*
-            System.out.println("timeline is empty");
-            return;
-            */
-            // test thing
-            System.out.println("timeline is empty");
-            System.out.println("populating timeline list ...");
-
-            wsc.send("timeline_address:-0.126957,51.5194133");
-
-            startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
-            return;
+//            //real thing
+//            /*
+//            System.out.println("timeline is empty");
+//            return;
+//            */
+//            // test thing
+//            System.out.println("timeline is empty");
+//            System.out.println("populating timeline list ...");
+//
+//            wsc.send("timeline_address:-0.126957,51.5194133");
+//
+//            //startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
+//
+//            ///
+//
+//            return;
+            TimeLineEntry last_entry = new TimeLineEntry(mLastLocation, new GregorianCalendar(TravelLocationService.pdt),new GregorianCalendar(TravelLocationService.pdt) );
+            timeLine.add(last_entry);
         }
 
         String request = "timeline_address:";
@@ -592,7 +601,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    public void sendLocationTrace(Client wsc) {/*
+    public void sendLocationTrace(Client wsc) {
         if (points.isEmpty()) {
             makeToast("No trace to upload");
             return;
@@ -606,7 +615,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println("uploading map coordinates");
         wsc.send(request);
         System.out.println("map coords uploaded : "+request);
-*/
+
     }
 
     @Override

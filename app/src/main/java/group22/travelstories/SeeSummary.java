@@ -31,11 +31,11 @@ public class SeeSummary implements Callable {
 
     @Override
     public Object call() throws Exception {
-        seeSummary();
+        //seeSummary();
         return null;
     }
 
-    public void callWithArg(String[] messages){
+    public void callWithArg(String[] messages, String s){
         for(int i = 0; i<messages.length; i++){
             if(messages[i] != null){
                 String[] id_name = messages[i].split(",");
@@ -43,10 +43,10 @@ public class SeeSummary implements Callable {
                 timeLine.get(i).setAddress(id_name[1]);
             }
         }
-        seeSummary();
+        seeSummary(s);
     }
 
-    public void seeSummary(){
+    public void seeSummary(String trip_token){
         Intent intent = new Intent(main, DisplayStoryActivity.class);
         ArrayList list = new ArrayList();
         for (int i = 0 ; i < timeLine.size() ; i++ ){
@@ -57,6 +57,7 @@ public class SeeSummary implements Callable {
         }
         intent.putParcelableArrayListExtra(EXTRA_MESSAGE, (ArrayList) list);
         intent.putExtra("UserId", userid.toString());
+        intent.putExtra("TripToken", trip_token);
         main.startActivity(intent);
     }
 

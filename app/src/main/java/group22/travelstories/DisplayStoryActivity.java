@@ -59,6 +59,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private EditText title;
 
     Client TravelServerWSClient;
+    public String tripToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +95,8 @@ public class DisplayStoryActivity extends AppCompatActivity {
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         Intent intent = getIntent();
+        tripToken = intent.getStringExtra("TripToken");
+        System.out.print("oncreate triptoken:"+tripToken);
         title = (EditText) findViewById(R.id.edittext_title);
         String t = intent.getStringExtra("title");
         title.setCursorVisible(false);
@@ -223,7 +226,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
         String timeline_json = gson.toJson(toSend);
         //for test purpose userId = 1
         int userId = 1;
-        String request = "timeline_share:"+userId+"@"+timeline_json;
+        String request = "timeline_share:"+userId+"@"+tripToken+"@"+timeline_json;
         System.out.println("sharing request:"+request);
         TravelServerWSClient.send(request);
         makeToast("sending photos");
@@ -479,18 +482,18 @@ public class DisplayStoryActivity extends AppCompatActivity {
         return -1;
     }
 
-    public void sendAllPhotos(){
-        List<String> all_paths = getAllPhotoPaths(timeline);
-        int basetime = ((TimeLineEntry) timeline.get(0)).getStartTime();
-        for(int i = 0; i < all_paths.size(); i++){
-            String path = all_paths.get(i);
-            try {
-                sendPhoto(path, userid, basetime + i);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void sendAllPhotos(){
+//        List<String> all_paths = getAllPhotoPaths(timeline);
+//        int basetime = ((TimeLineEntry) timeline.get(0)).getStartTime();
+//        for(int i = 0; i < all_paths.size(); i++){
+//            String path = all_paths.get(i);
+//            try {
+//                sendPhoto(path, userid, basetime + i);
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     public List<String> getAllPhotoPaths(List timeline){
         List<String> out = new ArrayList<String>();
@@ -499,6 +502,31 @@ public class DisplayStoryActivity extends AppCompatActivity {
             for(String path : each_entry.getAllPhotoPath()){
                 out.add(path);
             }
+        }
+        return out;
+    }
+
+    public void sendAllPhotos(){
+        for(int i = 0; i < timeline.size(); i++){
+            List<String> all_paths = getEachEntryPhotoPaths(timeline,i);
+            int basetime = ((TimeLineEntry) timeline.get(i)).getStartTime();
+            for(int j = 0; j < all_paths.size(); j++){
+                String path = all_paths.get(j);
+                try {
+                    sendPhoto(path, userid, basetime + j);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public List<String> getEachEntryPhotoPaths(List timeline, int index){
+        List<String> out = new ArrayList<String>();
+        Object each = timeline.get(index);
+        TimeLineEntry each_entry = (TimeLineEntry) each;
+        for(String path : each_entry.getAllPhotoPath()){
+            out.add(path);
         }
         return out;
     }
