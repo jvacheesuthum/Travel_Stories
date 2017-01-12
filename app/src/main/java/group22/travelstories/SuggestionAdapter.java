@@ -34,10 +34,12 @@ public class SuggestionAdapter extends RecyclerView.Adapter<SuggestionAdapter.Su
 
                 @Override
                 public void onClick(View v) {
+                    String name = suggestion_name.getText().toString();
                     String latlong = suggestion_address.getText().toString();
                     Intent addMarkerIntent = new Intent(v.getContext(), MainActivity.class);
                     System.out.println("!!!!suggestion address: " +latlong);
                     addMarkerIntent.putExtra("latlong", latlong);
+                    addMarkerIntent.putExtra("name", name);
                     ((Activity) v.getContext()).setResult(Activity.RESULT_OK, addMarkerIntent);
                     ((Activity) v.getContext()).finish();
                 }

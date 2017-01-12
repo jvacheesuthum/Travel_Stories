@@ -631,7 +631,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 String suggestion = data.getStringExtra("latlong");
                 mMap.addMarker(new MarkerOptions()
                         .position(getLatLngFromString(suggestion))
-                        .title("suggestion"));
+                        .title(data.getStringExtra("name")));
             }
         }
     }
