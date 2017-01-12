@@ -602,17 +602,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void sendLocationTrace(Client wsc) {
+        System.out.println("sendLocationTrace called");
         if (points.isEmpty()) {
-            makeToast("No trace to upload");
-            return;
+            System.out.println("locationtrace 1");
+            points.add(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLatitude()));
         }
-        makeToast("Uploading map trace to server");
+        System.out.println("locationtrace 2");
         String mapTrace = "";
         for (LatLng l : points) {
             mapTrace += "/" + l.longitude + "," + l.latitude;
         }
         String request = "Final_map_trace:"+userid.toString()+"@"+mapTrace;
         System.out.println("uploading map coordinates");
+        System.out.println(request);
         wsc.send(request);
         System.out.println("map coords uploaded : "+request);
 
