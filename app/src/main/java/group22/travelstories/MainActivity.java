@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Polyline line;
 
     private BigInteger userid = new BigInteger("1");
+    public static GregorianCalendar startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -518,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //            ///
 //
 //            return;
-            TimeLineEntry last_entry = new TimeLineEntry(mLastLocation, new GregorianCalendar(TravelLocationService.pdt),new GregorianCalendar(TravelLocationService.pdt) );
+            TimeLineEntry last_entry = new TimeLineEntry(mLastLocation, startTime,new GregorianCalendar(TravelLocationService.pdt) );
             timeLine.add(last_entry);
         }
 

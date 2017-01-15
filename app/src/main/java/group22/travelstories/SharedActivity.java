@@ -65,7 +65,7 @@ public class SharedActivity extends AppCompatActivity {
                     ShareLinkContent linkContent = new ShareLinkContent.Builder()
                             .setContentTitle("My Journey")
                             .setContentUrl(Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/map.html?token="+triptoken))
-                            .setImageUrl(Uri.parse("http://cloud-vm-46-251.doc.ic.ac.uk:8081/images/treek.png"))
+                            .setImageUrl(Uri.parse("http://www.doc.ic.ac.uk/~vw214/treek.png"))
                             .build();
 
 

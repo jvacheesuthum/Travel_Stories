@@ -136,6 +136,8 @@ public class TravelLocationService extends Service implements GoogleApiClient.Co
         pdt.setStartRule(Calendar.APRIL, 1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
         pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
 
+        MainActivity.startTime = new GregorianCalendar(pdt);
+
         mGoogleApiClient.connect();
 
         return START_STICKY;
