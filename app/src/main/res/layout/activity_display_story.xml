@@ -28,7 +28,7 @@
             android:background="@android:color/transparent"
             android:textColor="@android:color/white"
             android:imeOptions="actionDone"
-            android:hint="Click Here to Add Title!"/>
+            android:hint="Add Journey Title"/>
 
     </android.support.v7.widget.Toolbar>
 

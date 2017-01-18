@@ -16,6 +16,7 @@ import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View.OnClickListener;
 import android.view.View;
 import android.widget.AdapterView;
@@ -281,7 +282,6 @@ public class EntryFormActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_form, menu);
         return true;
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

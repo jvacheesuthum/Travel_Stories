@@ -32,7 +32,7 @@ public class PreviousStoriesActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private PreviousStoriesAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private ArrayList<Pair> stories;
+    protected ArrayList<Pair> stories;
     private ArrayList<String> titles;
     private ArrayList<ArrayList<TimeLineEntry>> timelines;
     private int index = -2;
@@ -130,6 +130,12 @@ public class PreviousStoriesActivity extends AppCompatActivity {
                 System.out.println("RESULT_OK: " + RESULT_OK);
                 try {
                     System.out.println("++++++++++++++++++++OnActivityResult in PreviousStoriesActivity TRY");
+                    if(data.getBooleanExtra("delete", false)) {
+                        index = data.getIntExtra("index", -2);
+                        stories.remove(index);
+                        mAdapter.updateAdapter(null);
+                        break;
+                    }
                     ArrayList timeline = data.getParcelableArrayListExtra("Timeline");
                     index = data.getIntExtra("index", -2);
                     String title = data.getStringExtra("title");

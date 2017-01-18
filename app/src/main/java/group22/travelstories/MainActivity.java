@@ -14,6 +14,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Intent serviceIntent;
 
     private static int RESULT_LOAD_IMAGE = 1;
-    private List<TimeLineEntry> timeLine;
+    private ArrayList<TimeLineEntry> timeLine;
     public final static String EXTRA_MESSAGE = "com.travelstories.timeline";
     Long initStart;
 
@@ -99,9 +100,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         System.out.println("MainActivity onCreate Called");
         super.onCreate(savedInstanceState);
-
-        //Facebook Sdk setup
-//        loadFacebookLogin();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
@@ -176,12 +174,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             e.printStackTrace();
         }
 
+        View previousButton = findViewById(R.id.previous_stories);
+        previousButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, PreviousStoriesActivity.class);
+                startActivity(intent);
+            }
+        });
+
         View suggestButton = findViewById(R.id.suggestion);
         suggestButton.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
-                makeToast("suggest!");
                 requestNearBySuggestions(TravelServerWSClient);
             }
         });
@@ -198,9 +204,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     myBindService();
                     isTracking = true;
                 } else {  // That's it case//
-                    timeLine =
-
-                            getTimeLineFromTravelLocationService();
+                    timeLine =getTimeLineFromTravelLocationService();
                     mSeeSummary.setTimeLine(timeLine);
                     mSeeSummary.setUserId(userid);
                     stopTravelLocationService();
@@ -253,14 +257,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onRestart(){
         System.out.println("on restart called");
         super.onRestart();
-
-//        Intent intent = getIntent();
-//        String suggestion = intent.getStringExtra("latlong");
-//
-//        mMap.addMarker(new MarkerOptions()
-//                .position(getLatLngFromString(suggestion))
-//                .title("suggestion"));
-
     }
 
 
@@ -503,7 +499,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void sendTimeLineLocation(Client wsc) {
         System.out.println("==========================sendTimeLineLocation Called");
         if (timeLine.isEmpty()) {
-//            //real thing
 //            /*
 //            System.out.println("timeline is empty");
 //            return;
@@ -514,13 +509,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //
 //            wsc.send("timeline_address:-0.126957,51.5194133");
 //
-//            //startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
+//            startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
 //
 //            ///
-//
+
 //            return;
+
+
             TimeLineEntry last_entry = new TimeLineEntry(mLastLocation, startTime,new GregorianCalendar(TravelLocationService.pdt) );
             timeLine.add(last_entry);
+
+            //uncomment below for testing photos
+//            timeLine = new ArrayList<>();
+//            Intent i = new Intent();
+//            i.putParcelableArrayListExtra("timeline", timeLine);
+//            i.putExtra("caller", "Stories");
+            startActivity(new Intent(MainActivity.this, DisplayStoryActivity.class));
+            return;
+            //------------------------------------
         }
 
         String request = "timeline_address:";
@@ -544,8 +550,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     /** Called when a button is clicked (the button in the layout file attaches to
      * this method with the android:onClick attribute) */
-    public List<TimeLineEntry> getTimeLineFromTravelLocationService() {
-        List<TimeLineEntry> out = null;
+    public ArrayList<TimeLineEntry> getTimeLineFromTravelLocationService() {
+        ArrayList<TimeLineEntry> out = null;
         if (mBound) {
             // Call a method from the LocalService.
             // However, if this call were something that might hang, then this request should
@@ -639,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SeeSuggestions.SUGGESTION_MARKER) {
             if(resultCode == RESULT_OK){
-                Toast.makeText(this, "Showing this location", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Showing this location", Toast.LENGTH_SHORT).show();
                 String suggestion = data.getStringExtra("latlong");
                 mMap.addMarker(new MarkerOptions()
                         .position(getLatLngFromString(suggestion))

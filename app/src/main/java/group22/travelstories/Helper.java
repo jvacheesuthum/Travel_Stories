@@ -52,9 +52,9 @@ public class Helper {
         return distance;
     }
 
-    protected static List<TimeLineEntry> populateList(List<TimeLineEntry> timeLine, Long initStart, Context context) {
+    protected static ArrayList<TimeLineEntry> populateList(ArrayList<TimeLineEntry> timeLine, Long initStart, Context context) {
         if (timeLine.isEmpty()) return timeLine;
-        List<TimeLineEntry> result = timeLine;
+        ArrayList<TimeLineEntry> result = timeLine;
         String[] projection = {MediaStore.Images.ImageColumns.DATA,
                 MediaStore.Images.ImageColumns.LATITUDE,
                 MediaStore.Images.ImageColumns.LONGITUDE,

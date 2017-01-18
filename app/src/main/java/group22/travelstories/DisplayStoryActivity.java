@@ -47,7 +47,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
 
     private View mFab;
-    private ArrayList timeline;
+    protected ArrayList timeline;
     private BigInteger userid = new BigInteger("1");
 
     static final int EDIT_STORY_ACTIVITY_REQUEST_CODE = 1;
@@ -139,6 +139,13 @@ public class DisplayStoryActivity extends AppCompatActivity {
             timeline = intent.getParcelableArrayListExtra(MainActivity.EXTRA_MESSAGE);
         }
         index = intent.getIntExtra("index", -1);
+
+        //Uncomment for Photo Testing
+        timeline = new ArrayList();
+        TimeLineEntry newEntry = new TimeLineEntry(null, new GregorianCalendar(2017, 1, 18),new GregorianCalendar(2017, 1, 19));
+        timeline.add(newEntry);
+        //-------------------------
+
 //        userid = new BigInteger(intent.getStringExtra("UserId"));
 
         // specify an adapter (see also next example)
@@ -155,11 +162,11 @@ public class DisplayStoryActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item){
+        Intent intent = new Intent(DisplayStoryActivity.this, PreviousStoriesActivity.class);
         switch(item.getItemId()) {
             case android.R.id.home:
                 System.out.println("---------------------------------action bar back in display pressed");
-                Intent intent = new Intent(DisplayStoryActivity.this, PreviousStoriesActivity.class);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
                 intent.putParcelableArrayListExtra("Timeline", timeline);
@@ -182,8 +189,25 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 startActivityForResult(new Intent(DisplayStoryActivity.this, EntryFormActivity.class), ENTRY_FORM_ACTIVITY_REQUEST_CODE);
                 return true;
             case R.id.sharing:
-                shareStorySummary();
+                try {
+                    System.out.println("HEREHEHRHEHHRHEHREHHREHEHR================");
+                    shareStorySummary();
+                } catch(Exception e) {
+                    System.out.println("?????????================");
+                    Toast.makeText(this, "Cannot upload without a location", Toast.LENGTH_SHORT);
+                }
                 return true;
+            case R.id.deleteTimeline:
+                intent.putExtra("delete", true);
+                intent.putExtra("index", index);
+                if (index >= 0) {
+                    setResult(PreviousStoriesActivity.DISPLAY_ACTIVITY_REQUEST_CODE, intent);
+                    finish();
+                } else {
+                    finish();
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                }
             default:
                 return false;
         }
@@ -216,8 +240,14 @@ public class DisplayStoryActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void shareStorySummary(){
-        makeToast("sharing");
+    private void shareStorySummary() throws Exception {
+        System.out.println("HREEREERERE: timeline is ?, should not share");
+        if(timeline == null){
+            System.out.println("timeline is null");
+            Toast.makeText(this, "Cannot upload without a location", Toast.LENGTH_LONG);
+            throw new Exception("Cannot upload without a timeline");
+        }
+        makeToast("Sharing");
         Gson gson = new Gson();
         List<ServerTimeLineEntry> toSend = new ArrayList<>();
         for(Object each : timeline){
@@ -273,6 +303,13 @@ public class DisplayStoryActivity extends AppCompatActivity {
                 // Make sure the request was successful
                 try {
                     if (resultCode == RESULT_FIRST_USER) {
+                        if (data.getBooleanExtra("delete", false)) {
+                            System.out.println("Deleting");
+                            int i = data.getIntExtra("Index", -1);
+                            timeline.remove(i);
+                            mAdapter.updateAdapter(null, i, true);
+                            return;
+                        }
                         System.out.println("============================IN RESULT FIRST USER");
                         String newLocation = data.getStringExtra("NewLocation");
                         System.out.println("<1>: " + newLocation);
@@ -305,7 +342,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
                         ((TimeLineEntry) timeline.get(index)).setAddress(newLocation);
                         System.out.println("<5>");
 
-                        mAdapter.updateAdapter(null, -2);
+                        mAdapter.updateAdapter(null, -2, false);
                     }
                     break;
                 } catch(Exception e) {
@@ -397,7 +434,7 @@ public class DisplayStoryActivity extends AppCompatActivity {
 //                mRecyclerView.setAdapter(mAdapter);
 //                finish();
 //                startActivity(getIntent());
-                mAdapter.updateAdapter(newEntry, position);
+                mAdapter.updateAdapter(newEntry, position, false);
                 System.out.println("------------------------------------------");
                 System.out.println("Timeline size: " + timeline.size());
 
